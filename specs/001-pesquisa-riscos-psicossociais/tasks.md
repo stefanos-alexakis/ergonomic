@@ -153,16 +153,23 @@ Arquitetura e ordem verificada: `review.md` §7 e §10.
   no boot, `db seed`, `admin:create`, login real) — 9 bugs reais encontrados e corrigidos só
   rodando a imagem de verdade (review.md §10). `.dockerignore` criado.
 - ✅ Código publicado em <https://github.com/stefanos-alexakis/ergonomic> (primeiro commit).
-- ⬜ **Confirmar rede/certresolver Traefik reais da VPS e DNS propagado antes de subir** (🔒 evita
-  bloqueio por limite de emissão do Let's Encrypt) — depende de acesso à VPS, não feito nesta
-  sessão.
-- ⬜ `.env` de produção com segredos gerados do zero na própria VPS (nunca reaproveitados do
-  CRM/OSManager, nunca meus) — gate humano, só quem tem acesso root faz isso.
-- ⬜ `docker compose up -d --build`, `db seed`, criar primeiro `PLATFORM_ADMIN` — comandos prontos
-  em `quickstart.md`, a rodar na VPS.
+- ✅ Rede/certresolver Traefik confirmados na VPS real (`traefik_traefik-public`, `letsencrypt`,
+  entrypoints `web`/`websecure` — idênticos ao que já estava no `docker-compose.yml`, conferido
+  contra as labels do `crm-alex-app-1`). DNS já resolvia via Cloudflare.
+- ✅ `.env` de produção gerado na própria VPS pelo usuário, com segredos próprios (nunca
+  reaproveitados de outro app).
+- ✅ `docker compose up -d --build`, `db seed` (42 perguntas), primeiro `PLATFORM_ADMIN` criado —
+  tudo rodado na VPS pelo usuário, comando a comando, guiado nesta sessão.
+- ✅ **Deploy verificado em produção**: `https://pesquisa.agtrade.com.br` responde 200, HTTPS
+  válido (Let's Encrypt atrás de Cloudflare), login de administrador testado de verdade pelo
+  navegador.
+- ✅ Bug real encontrado só no clone limpo da VPS (não aparecia no ambiente local, que já tinha a
+  pasta em disco): `public/` estava vazia e o Git não versiona diretórios vazios — o Dockerfile
+  quebrava com "COPY .../public: not found". Corrigido com `public/.gitkeep`, revalidado com
+  clone+build do zero antes de pedir pro usuário tentar de novo (review.md §10).
 - ⬜ 🔒 Access log do Traefik desligado/anonimizado nas rotas públicas da pesquisa — configuração
-  do Traefik em si, fora do repositório desta app; confirmar antes de considerar o deploy
-  completo (constitution.md — anonimato do colaborador).
+  do Traefik em si, fora do repositório desta app; ainda não confirmado (constitution.md —
+  anonimato do colaborador). **Único item pendente antes de considerar a Fase 1 100% fechada.**
 - Verificar: acesso público funcional em `https://pesquisa.agtrade.com.br`, HTTPS válido.
 
 ## Fase 8 — Hardening e aceite
