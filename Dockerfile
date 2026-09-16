@@ -20,6 +20,15 @@ RUN npm run build
 FROM base AS runner
 WORKDIR /app
 ENV NODE_ENV=production
+# Os campos de data/hora do formulário (datetime-local) mandam o horário
+# "nu", sem fuso — o servidor interpreta isso como horário local DELE. Sem
+# fixar TZ, um container Linux roda em UTC por padrão, e "09:58" digitado
+# em São Paulo virava 09:58 UTC = 06:58 em Brasília, 3h adiantado (achado
+# em produção: pesquisa aparecia "encerrada" 3h antes do horário real que
+# o gestor cadastrou). tzdata é necessário no Alpine pro nome da zona
+# resolver de verdade, não só o offset numérico.
+RUN apk add --no-cache tzdata
+ENV TZ=America/Sao_Paulo
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
