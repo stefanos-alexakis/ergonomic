@@ -2,11 +2,14 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getActor } from "@/lib/tenant";
 import { getWorkspaceDoGestor, resolvePesquisaDoWorkspace } from "@/lib/pesquisa";
-import { calcularDashboard, type ResumoGrupo } from "@/lib/dashboard";
+import { listarCatalogoOrganizacional } from "@/lib/estrutura";
+import { calcularDashboard, calcularScoreBase, type ResumoGrupo } from "@/lib/dashboard";
 import type { GrupoComSupressao } from "@/lib/agregacao";
 import { AppShell } from "@/components/shell/app-shell";
 import { PageHeader } from "@/components/ui/page-header";
 import { Table, Thead, Th, Tr, Td } from "@/components/ui/table";
+import { Select } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +26,7 @@ function TabelaGrupo({ titulo, grupos }: { titulo: string; grupos: GrupoComSupre
             <Th>Grupo</Th>
             <Th>Respostas</Th>
             <Th>Média de risco (1–5)</Th>
+            <Th>Score Base</Th>
           </Tr>
         </Thead>
         <tbody>
@@ -30,13 +34,14 @@ function TabelaGrupo({ titulo, grupos }: { titulo: string; grupos: GrupoComSupre
             <Tr key={g.nome}>
               <Td className="font-medium text-zinc-900">{g.nome}</Td>
               {g.suprimido ? (
-                <Td colSpan={2} className="text-zinc-400">
+                <Td colSpan={3} className="text-zinc-400">
                   Dados insuficientes para exibir com segurança
                 </Td>
               ) : (
                 <>
                   <Td>{g.total}</Td>
                   <Td className="font-medium">{g.mediaGeral.toFixed(2)}</Td>
+                  <Td className="font-medium">{calcularScoreBase(g.mediaGeral)}</Td>
                 </>
               )}
             </Tr>
@@ -58,8 +63,15 @@ function Contador({ valor, rotulo, testId }: { valor: number; rotulo: string; te
   );
 }
 
-export default async function DashboardPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function DashboardPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ setorId?: string; departamentoId?: string; segmentoId?: string; funcaoId?: string }>;
+}) {
   const { id } = await params;
+  const filtros = await searchParams;
   const actor = await getActor();
   if (!actor) return <p>Sem sessão.</p>;
   const workspace = await getWorkspaceDoGestor(actor.userId);
@@ -67,7 +79,15 @@ export default async function DashboardPage({ params }: { params: Promise<{ id: 
   const pesquisa = await resolvePesquisaDoWorkspace(id, workspace.id);
   if (!pesquisa) notFound();
 
-  const dashboard = await calcularDashboard(pesquisa.id);
+  const [dashboard, catalogo] = await Promise.all([
+    calcularDashboard(pesquisa.id, filtros),
+    listarCatalogoOrganizacional(workspace.id),
+  ]);
+
+  const filtroAtivo = Boolean(filtros.setorId || filtros.departamentoId || filtros.segmentoId || filtros.funcaoId);
+  const queryRespostas = new URLSearchParams(
+    Object.entries(filtros).filter(([, v]) => v) as [string, string][],
+  ).toString();
 
   return (
     <AppShell contexto={workspace.nome} homeHref="/gestor" nav={NAV} accentColor={workspace.corPrimaria} secondaryColor={workspace.corSecundaria}>
@@ -86,44 +106,132 @@ export default async function DashboardPage({ params }: { params: Promise<{ id: 
         </p>
       ) : (
         <>
-          <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-5 py-4 mb-6 flex items-baseline gap-3">
-            <span className="text-3xl font-bold text-zinc-900">{dashboard.scoreBase}</span>
-            <span className="text-sm text-zinc-500">
-              / {dashboard.scoreBaseMaximo} pontos — Score Base (Eixo 1: percepção dos colaboradores). Quanto maior,
-              melhor. Os {1000 - dashboard.scoreBaseMaximo} pontos restantes (Eixos 2 e 3) ainda não entram nesse
-              número.
-            </span>
-          </div>
-
-          <p className="text-sm text-zinc-700 mb-6">
-            Média geral de risco: <strong className="font-semibold">{dashboard.mediaGeral?.toFixed(2)}</strong>{" "}
-            <span className="text-zinc-500">(escala 1–5, quanto maior, mais exposição a risco)</span>
-          </p>
-
-          <section className="mb-6">
-            <h3 className="text-sm font-semibold text-zinc-900 mb-2">Por dimensão</h3>
-            <Table>
-              <tbody>
-                {dashboard.porDimensao.map((d) => (
-                  <Tr key={d.nome}>
-                    <Td className="text-zinc-900">{d.nome}</Td>
-                    <Td className="font-medium">{d.media.toFixed(2)}</Td>
-                  </Tr>
+          <form className="flex flex-wrap items-end gap-3 mb-8 rounded-lg border border-zinc-200 p-4" method="get">
+            <div className="flex flex-col gap-1">
+              <label htmlFor="setorId" className="text-xs font-medium text-zinc-500">
+                Setor
+              </label>
+              <Select id="setorId" name="setorId" defaultValue={filtros.setorId ?? ""} className="w-44">
+                <option value="">Todos</option>
+                {catalogo.setores.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.nome}
+                  </option>
                 ))}
-              </tbody>
-            </Table>
-          </section>
+              </Select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <label htmlFor="departamentoId" className="text-xs font-medium text-zinc-500">
+                Departamento
+              </label>
+              <Select id="departamentoId" name="departamentoId" defaultValue={filtros.departamentoId ?? ""} className="w-44">
+                <option value="">Todos</option>
+                {catalogo.departamentos.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.nome}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <label htmlFor="segmentoId" className="text-xs font-medium text-zinc-500">
+                Segmento
+              </label>
+              <Select id="segmentoId" name="segmentoId" defaultValue={filtros.segmentoId ?? ""} className="w-44">
+                <option value="">Todos</option>
+                {catalogo.segmentos.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.nome}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <label htmlFor="funcaoId" className="text-xs font-medium text-zinc-500">
+                Função
+              </label>
+              <Select id="funcaoId" name="funcaoId" defaultValue={filtros.funcaoId ?? ""} className="w-44">
+                <option value="">Todas</option>
+                {catalogo.funcoes.map((f) => (
+                  <option key={f.id} value={f.id}>
+                    {f.nome}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            <Button type="submit" variant="secondary">
+              Filtrar
+            </Button>
+            {filtroAtivo && (
+              <Link href={`/gestor/pesquisas/${pesquisa.id}/dashboard`} className="text-sm text-zinc-500 hover:text-zinc-900">
+                Limpar filtro
+              </Link>
+            )}
+          </form>
 
-          <TabelaGrupo titulo="Por setor" grupos={dashboard.porSetor} />
-          <TabelaGrupo titulo="Por departamento" grupos={dashboard.porDepartamento} />
-          <TabelaGrupo titulo="Por segmento" grupos={dashboard.porSegmento} />
-          <TabelaGrupo titulo="Por função" grupos={dashboard.porFuncao} />
+          {dashboard.filtroSuprimido ? (
+            <p className="text-sm text-zinc-500 mb-6">
+              Esse filtro reúne só {dashboard.totalFiltrado}{" "}
+              {dashboard.totalFiltrado === 1 ? "resposta" : "respostas"} — abaixo do mínimo de{" "}
+              {dashboard.limiteSupressaoGrupo} para exibir com segurança (evita identificar quem respondeu).
+              Tente um filtro mais amplo.
+            </p>
+          ) : (
+            <>
+              <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-5 py-4 mb-6 flex items-baseline gap-3">
+                <span className="text-3xl font-bold text-zinc-900">{dashboard.scoreBase}</span>
+                <span className="text-sm text-zinc-500">
+                  / {dashboard.scoreBaseMaximo} pontos — Score Base (Eixo 1: percepção dos colaboradores). Quanto
+                  maior, melhor. Os {1000 - dashboard.scoreBaseMaximo} pontos restantes (Eixos 2 e 3) ainda não
+                  entram nesse número.
+                </span>
+              </div>
 
-          <p className="text-sm">
-            <a href={`/gestor/pesquisas/${pesquisa.id}/dashboard/relatorio`} className="font-medium text-zinc-900 hover:underline">
-              Baixar relatório em PDF
-            </a>
-          </p>
+              <p className="text-sm text-zinc-700 mb-6">
+                Média geral de risco: <strong className="font-semibold">{dashboard.mediaGeral?.toFixed(2)}</strong>{" "}
+                <span className="text-zinc-500">(escala 1–5, quanto maior, mais exposição a risco)</span> ·{" "}
+                {dashboard.totalFiltrado} {dashboard.totalFiltrado === 1 ? "resposta considerada" : "respostas consideradas"}
+              </p>
+
+              <section className="mb-6">
+                <h3 className="text-sm font-semibold text-zinc-900 mb-2">Por dimensão</h3>
+                <Table>
+                  <tbody>
+                    {dashboard.porDimensao.map((d) => (
+                      <Tr key={d.nome}>
+                        <Td className="text-zinc-900">{d.nome}</Td>
+                        <Td className="font-medium">{d.media.toFixed(2)}</Td>
+                      </Tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </section>
+
+              {!filtroAtivo && (
+                <>
+                  <TabelaGrupo titulo="Por setor" grupos={dashboard.porSetor} />
+                  <TabelaGrupo titulo="Por departamento" grupos={dashboard.porDepartamento} />
+                  <TabelaGrupo titulo="Por segmento" grupos={dashboard.porSegmento} />
+                  <TabelaGrupo titulo="Por função" grupos={dashboard.porFuncao} />
+                </>
+              )}
+
+              <p className="text-sm mb-2">
+                <Link
+                  href={`/gestor/pesquisas/${pesquisa.id}/dashboard/respostas${queryRespostas ? `?${queryRespostas}` : ""}`}
+                  className="font-medium text-zinc-900 hover:underline"
+                >
+                  Ver respostas individuais →
+                </Link>
+              </p>
+
+              <p className="text-sm">
+                <a href={`/gestor/pesquisas/${pesquisa.id}/dashboard/relatorio`} className="font-medium text-zinc-900 hover:underline">
+                  Baixar relatório em PDF
+                </a>
+              </p>
+            </>
+          )}
         </>
       )}
 

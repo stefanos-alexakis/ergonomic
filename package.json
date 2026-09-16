@@ -13,6 +13,7 @@
     "test:e2e": "playwright test",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
+    "seed:empresa-teste": "tsx scripts/seed-empresa-teste.ts",
     "admin:create": "tsx scripts/create-admin.ts"
   },
   "prisma": {

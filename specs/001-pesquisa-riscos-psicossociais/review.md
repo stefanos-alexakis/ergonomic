@@ -846,3 +846,39 @@ não só regenerar o client.
 na plataforma (Eixo 2 é hoje um checklist de entrevista por setor; Eixo 3 é uma planilha de RH com
 atestados CID-F) — quando entrarem, a fórmula de multiplicador/agravante-atenuante sobre os 200
 pontos restantes precisa ser desenhada e validada com o usuário antes de implementar.
+
+## Parte 13 — Dashboard com filtros, navegação por resposta individual e dados de demonstração
+
+A pedido do usuário: filtros por setor/departamento/segmento/função no painel do gestor, Score
+Base por grupo (não só média), navegação pelas respostas individuais, e uma empresa de teste com
+~15-18 respostas simuladas pra construir/validar tudo isso sem esperar dado real de cliente.
+
+**`calcularDashboard` ganhou um segundo parâmetro `filtros`** (setorId/departamentoId/segmentoId/
+funcaoId) — filtra a query de respostas antes de qualquer cálculo. Decisão importante: um filtro
+que afunila pra menos gente que `limiteSupressaoGrupo` (padrão 5) é **o mesmo risco de
+reidentificação** que um grupo pequeno na quebra por setor/departamento — então o filtro passa
+pela mesma regra de supressão (`aplicarSupressaoGruposPequenos`, constitution.md §3), com uma
+mensagem explicando por que ("Esse filtro reúne só N respostas..."). Novo campo `filtroSuprimido`
+distingue esse caso de "pesquisa toda ainda sem dado suficiente" (`suficiente: false`).
+
+**Navegação por resposta individual** (`/dashboard/respostas` e `/dashboard/respostas/[id]`) —
+lista e detalhe de cada resposta concluída, sempre anônima (a tabela `Resposta` nunca teve campo
+identificável, constitution.md §1). Gate duplo de segurança: a lista só renderiza se
+`!filtroSuprimido` (checado na própria página, não só escondendo o link), e o detalhe confirma que
+a `respostaId` da URL pertence à pesquisa/workspace certo antes de mostrar qualquer coisa (nunca
+confiar em ID de URL sem checar o tenant, mesma regra do resto da plataforma).
+
+**Empresa de demonstração** — `scripts/seed-empresa-teste.ts` (`npm run seed:empresa-teste`), roda
+direto no banco (não pela jornada real, mais rápido e controla o perfil de risco de propósito):
+cria "Empresa Demonstração" com 3 setores, 5 departamentos, 2 segmentos, 5 funções, uma pesquisa
+aberta e 18 respostas simuladas com viés de risco por setor (Produção alto, Administrativo baixo,
+Comercial médio) — o grupo Comercial tem só 4 pessoas, de propósito abaixo do limite de 5, pra
+testar a supressão com dado de verdade em vez de só em teste unitário. Login:
+`gestor@demonstracao.teste` / `demoForte123`.
+
+**Testado end-to-end no navegador** (não só tsc/vitest/build): login como o gestor de
+demonstração, painel completo com Score Base e quebras por grupo, filtro por setor batendo
+exatamente com a linha da tabela agregada, filtro estreito (Comercial) mostrando a mensagem de
+supressão corretamente, lista de respostas individuais, detalhe de uma resposta com as 42
+perguntas, acesso direto por URL a um recorte suprimido bloqueado (404), e o relatório em PDF
+gerando com o Score incluído (200, `application/pdf`, 5.4KB).

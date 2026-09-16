@@ -1,5 +1,5 @@
 import { Document, Page, View, Text, StyleSheet, renderToBuffer } from "@react-pdf/renderer";
-import type { DashboardPesquisa } from "@/lib/dashboard";
+import { calcularScoreBase, type DashboardPesquisa } from "@/lib/dashboard";
 
 const styles = StyleSheet.create({
   page: { padding: 32, fontSize: 10 },
@@ -77,7 +77,9 @@ export async function gerarRelatorioPdf(params: {
                     <View key={g.nome} style={styles.linha}>
                       <Text style={styles.colNome}>{g.nome}</Text>
                       <Text style={styles.colValor}>
-                        {g.suprimido ? "dados insuficientes" : `${g.total} · ${g.mediaGeral.toFixed(2)}`}
+                        {g.suprimido
+                          ? "dados insuficientes"
+                          : `${g.total} · média ${g.mediaGeral.toFixed(2)} · score ${calcularScoreBase(g.mediaGeral)}`}
                       </Text>
                     </View>
                   ))}

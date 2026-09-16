@@ -63,6 +63,13 @@ export function agruparEResumir(respondentes: { grupoNome: string; media: number
   }));
 }
 
+export type FiltrosDashboard = {
+  setorId?: string;
+  departamentoId?: string;
+  segmentoId?: string;
+  funcaoId?: string;
+};
+
 export type DashboardPesquisa = {
   contadores: { distribuidos: number; iniciadas: number; concluidas: number };
   suficiente: boolean; // false = "ainda não há respostas suficientes" (tasks.md Fase 6)
@@ -75,9 +82,23 @@ export type DashboardPesquisa = {
   porDepartamento: GrupoComSupressao<ResumoGrupo>[];
   porSegmento: GrupoComSupressao<ResumoGrupo>[];
   porFuncao: GrupoComSupressao<ResumoGrupo>[];
+  // Total de respostas concluídas já considerando o filtro atual — usado
+  // pra decidir se a navegação por resposta individual pode ser liberada
+  // (mesma regra de supressão de grupo pequeno, constitution.md §3: um
+  // filtro que afunila pra poucas pessoas é, na prática, o mesmo risco de
+  // reidentificação que um grupo pequeno).
+  totalFiltrado: number;
+  // true quando há dados suficientes na pesquisa toda, mas o filtro atual
+  // (setor/departamento/segmento/função) afunilou pra menos gente que o
+  // limite de supressão — distinto de `suficiente: false`, que significa
+  // que a pesquisa inteira ainda não tem respostas suficientes.
+  filtroSuprimido: boolean;
 };
 
-export async function calcularDashboard(pesquisaId: string): Promise<DashboardPesquisa> {
+export async function calcularDashboard(
+  pesquisaId: string,
+  filtros: FiltrosDashboard = {},
+): Promise<DashboardPesquisa> {
   const pesquisa = await db.pesquisa.findUniqueOrThrow({ where: { id: pesquisaId } });
 
   const [distribuidos, iniciadas, concluidas] = await Promise.all([
@@ -102,13 +123,22 @@ export async function calcularDashboard(pesquisaId: string): Promise<DashboardPe
       porDepartamento: [],
       porSegmento: [],
       porFuncao: [],
+      totalFiltrado: 0,
+      filtroSuprimido: false,
     };
   }
 
   // Só respostas CONCLUÍDAS de códigos PARTICIPANTE entram na estatística
   // oficial — nunca rascunho, nunca código de teste (constitution.md §3).
   const respostas = await db.resposta.findMany({
-    where: { concluidoEm: { not: null }, codigoAcesso: { pesquisaId, tipo: "PARTICIPANTE" } },
+    where: {
+      concluidoEm: { not: null },
+      codigoAcesso: { pesquisaId, tipo: "PARTICIPANTE" },
+      ...(filtros.setorId ? { setorId: filtros.setorId } : {}),
+      ...(filtros.departamentoId ? { departamentoId: filtros.departamentoId } : {}),
+      ...(filtros.segmentoId ? { segmentoId: filtros.segmentoId } : {}),
+      ...(filtros.funcaoId ? { funcaoId: filtros.funcaoId } : {}),
+    },
     include: {
       setor: true,
       departamento: true,
@@ -119,6 +149,27 @@ export async function calcularDashboard(pesquisaId: string): Promise<DashboardPe
       },
     },
   });
+
+  // O filtro pode afunilar pra menos gente que o limite de supressão —
+  // nesse caso, nada de estatística é exibido também para o recorte
+  // filtrado (mesma regra dos grupos, agora aplicada ao recorte inteiro).
+  if (respostas.length < limiteSupressaoGrupo) {
+    return {
+      contadores,
+      suficiente: true,
+      limiteSupressaoGrupo,
+      mediaGeral: null,
+      scoreBase: null,
+      scoreBaseMaximo: SCORE_BASE_MAXIMO,
+      porDimensao: [],
+      porSetor: [],
+      porDepartamento: [],
+      porSegmento: [],
+      porFuncao: [],
+      totalFiltrado: respostas.length,
+      filtroSuprimido: true,
+    };
+  }
 
   const mediasPessoais = respostas.map((r) => ({
     resposta: r,
@@ -171,5 +222,67 @@ export async function calcularDashboard(pesquisaId: string): Promise<DashboardPe
     porDepartamento: resumirCampo("departamento"),
     porSegmento: resumirCampo("segmento"),
     porFuncao: resumirCampo("funcao"),
+    totalFiltrado: respostas.length,
+    filtroSuprimido: false,
   };
+}
+
+export type RespostaIndividual = {
+  id: string;
+  setor: string | null;
+  departamento: string | null;
+  segmento: string | null;
+  funcao: string | null;
+  concluidoEm: Date;
+  media: number;
+  scoreBase: number;
+};
+
+/**
+ * Lista respostas individuais (anônimas — nenhum campo identificável
+ * existe na tabela Resposta pra começo de conversa) para navegação no
+ * dashboard. SEMPRE gate isto atrás do mesmo limite de supressão de
+ * grupo pequeno antes de chamar — esta função não decide isso sozinha,
+ * quem chama (a página) já checou `totalFiltrado >= limiteSupressaoGrupo`.
+ */
+export async function listarRespostasIndividuais(
+  pesquisaId: string,
+  filtros: FiltrosDashboard = {},
+): Promise<RespostaIndividual[]> {
+  const respostas = await db.resposta.findMany({
+    where: {
+      concluidoEm: { not: null },
+      codigoAcesso: { pesquisaId, tipo: "PARTICIPANTE" },
+      ...(filtros.setorId ? { setorId: filtros.setorId } : {}),
+      ...(filtros.departamentoId ? { departamentoId: filtros.departamentoId } : {}),
+      ...(filtros.segmentoId ? { segmentoId: filtros.segmentoId } : {}),
+      ...(filtros.funcaoId ? { funcaoId: filtros.funcaoId } : {}),
+    },
+    orderBy: { concluidoEm: "desc" },
+    include: {
+      setor: true,
+      departamento: true,
+      segmento: true,
+      funcao: true,
+      itens: {
+        include: { pergunta: { select: { polaridade: true, peso: true } } },
+      },
+    },
+  });
+
+  return respostas.map((r) => {
+    const media =
+      calcularMedia(r.itens.map((i) => ({ valor: i.valor, polaridade: i.pergunta.polaridade, peso: i.pergunta.peso }))) ??
+      0;
+    return {
+      id: r.id,
+      setor: r.setor?.nome ?? null,
+      departamento: r.departamento?.nome ?? null,
+      segmento: r.segmento?.nome ?? null,
+      funcao: r.funcao?.nome ?? null,
+      concluidoEm: r.concluidoEm!,
+      media,
+      scoreBase: calcularScoreBase(media),
+    };
+  });
 }
