@@ -709,3 +709,49 @@ variável resolve certo dentro da jornada e um elemento fora do wrapper cai no f
    páginas com mais perguntas (10 por página = 5 páginas)?
 4. **Limite de supressão**: 5 respostas é o padrão que sugeri. Em empresas pequenas isso pode
    esconder quase tudo — vale definir com o cliente caso a caso.
+
+## Parte 10 — Preparação para o primeiro deploy: bugs reais só visíveis rodando a imagem de produção
+
+O `Dockerfile`/`docker-compose.yml`/`entrypoint.sh` já existiam de um trabalho anterior (Fase 7,
+nunca testados de ponta a ponta). Antes de publicar em `pesquisa.agtrade.com.br`, buildei a
+imagem localmente e subi o container de verdade contra um Postgres real — nenhum destes bugs
+aparecia em `tsc`, `vitest` ou `next build`, só rodando a imagem:
+
+1. **`npm ci` sem `--legacy-peer-deps`** — quebrava o build logo na primeira camada (mesmo
+   conflito nodemailer/next-auth do ambiente local, nunca propagado pro Dockerfile).
+2. **`.dockerignore` inexistente** — o build mandava `node_modules`/`.next`/`.git` inteiros como
+   contexto (1.3GB+, ~3-4min só de transferência). Criado.
+3. **Dois `npm install` separados na etapa runner** — o segundo "podava" o que o primeiro tinha
+   acabado de instalar (`prisma` sumia), porque nenhum dos dois estava declarado no
+   `package.json` minimalista que o `next build` standalone gera. Unificados.
+4. **`prisma`/`tsx` são devDependencies, e `NODE_ENV=production` já estava setado na imagem** —
+   isso faz o `npm install` omitir devDependencies por padrão, mesmo pedidas explicitamente na
+   linha de comando. Rodar com `--include=dev` resolve, mas reconcilia contra o `package.json`
+   inteiro do projeto e traz TODA devDependency (vitest, playwright, eslint, tailwind...) — inflava
+   a imagem de ~300MB pra 2.7GB. Corrigido instalando num diretório isolado (`package.json`
+   próprio, vazio) e copiando só o resultado — imagem final ficou em 1.16GB.
+5. **`cp -r node_modules/* destino/`** não copia `.bin/` (começa com ponto, `*` não pega
+   dotfiles) — trocado por `cp -r node_modules/. destino/`.
+6. **`prisma db push --skip-generate`** — Prisma 7 removeu essa flag; o `entrypoint.sh` quebrava
+   logo na primeira subida do container. Removida (generate já roda no build, não precisa pular
+   nada em runtime).
+7. **`npx prisma db seed` não achava comando de seed** — Prisma 7 moveu essa config de
+   `package.json` (`"prisma": {"seed": ...}`, ainda existe mas não é mais lido) pra
+   `prisma.config.ts` (`migrations.seed`). Nunca dava erro localmente porque `npm run db:seed`
+   chama `tsx prisma/seed.ts` direto, sem passar por esse caminho — só apareceu testando o
+   comando exato que o `quickstart.md` documentava pra VPS.
+8. **`ERR_MODULE_NOT_FOUND: @prisma/driver-adapter-utils`** — copiar só
+   `node_modules/@prisma/{client,adapter-pg}` isolados perde pacotes irmãos internos que o npm
+   hoisteia soltos em `node_modules/@prisma/*`. Trocado por copiar o escopo `@prisma` inteiro do
+   builder.
+9. **`scripts/create-admin.ts` nunca era copiado pro runner** — `npm run admin:create` (bootstrap
+   do primeiro PLATFORM_ADMIN) falharia na hora H, na VPS, sem nenhum sinal de alerta antes disso.
+   Adicionado ao Dockerfile.
+
+**Verificado de ponta a ponta localmente** antes de publicar: build da imagem, `docker compose`
+equivalente (app + Postgres real), `prisma db push` automático no boot, `prisma db seed` (42
+perguntas), `npm run admin:create`, e login de administrador real via navegador — tudo passou.
+Suíte completa (43 unit + `tsc` + `next build`) também revalidada depois de todas as correções.
+
+Código publicado em <https://github.com/stefanos-alexakis/ergonomic> — repositório criado pelo
+usuário, primeiro commit e push feitos nesta sessão.

@@ -145,16 +145,24 @@ ser esquecidas por serem invisíveis quando tudo "parece funcionar".
   6/6 specs E2E de todas as fases passando juntas.
 
 ## Fase 7 — Deploy no ambiente de teste (pesquisa.agtrade.com.br)
-Arquitetura e ordem verificada: `review.md` §7.
-- Confirmar rede/certresolver Traefik reais da VPS e DNS propagado **antes** de subir
-  (🔒 evita bloqueio por limite de emissão do Let's Encrypt).
-- `docker-compose.yml` de produção com nomes exclusivos (`pesquisa-app`, `pesquisa-db`,
+Arquitetura e ordem verificada: `review.md` §7 e §10.
+- ✅ `docker-compose.yml` de produção com nomes exclusivos (`pesquisa-app`, `pesquisa-db`,
   `pesquisanet`, `pesquisa_pgdata`, `pesquisa_uploads`, middleware `pesquisa-https-redirect`),
-  banco sem porta publicada, `COMPOSE_PROJECT_NAME=pesquisa`.
-- `.env` com segredos gerados do zero (nunca reaproveitados do CRM/OSManager).
-- `prisma db push` (schema novo) → seed do questionário, 🔒 com asserção de 25 + 17 = 42.
-- Criar primeiro usuário `PLATFORM_ADMIN`.
-- 🔒 Access log do Traefik desligado/anonimizado nas rotas públicas da pesquisa.
+  banco sem porta publicada.
+- ✅ Imagem Docker construída e testada de ponta a ponta localmente (build, `db push` automático
+  no boot, `db seed`, `admin:create`, login real) — 9 bugs reais encontrados e corrigidos só
+  rodando a imagem de verdade (review.md §10). `.dockerignore` criado.
+- ✅ Código publicado em <https://github.com/stefanos-alexakis/ergonomic> (primeiro commit).
+- ⬜ **Confirmar rede/certresolver Traefik reais da VPS e DNS propagado antes de subir** (🔒 evita
+  bloqueio por limite de emissão do Let's Encrypt) — depende de acesso à VPS, não feito nesta
+  sessão.
+- ⬜ `.env` de produção com segredos gerados do zero na própria VPS (nunca reaproveitados do
+  CRM/OSManager, nunca meus) — gate humano, só quem tem acesso root faz isso.
+- ⬜ `docker compose up -d --build`, `db seed`, criar primeiro `PLATFORM_ADMIN` — comandos prontos
+  em `quickstart.md`, a rodar na VPS.
+- ⬜ 🔒 Access log do Traefik desligado/anonimizado nas rotas públicas da pesquisa — configuração
+  do Traefik em si, fora do repositório desta app; confirmar antes de considerar o deploy
+  completo (constitution.md — anonimato do colaborador).
 - Verificar: acesso público funcional em `https://pesquisa.agtrade.com.br`, HTTPS válido.
 
 ## Fase 8 — Hardening e aceite
