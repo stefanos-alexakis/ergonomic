@@ -49,6 +49,9 @@ export async function gerarRelatorioPdf(params: {
           </Text>
         ) : (
           <>
+            <Text>
+              Score Base (Eixo 1): {dashboard.scoreBase} / {dashboard.scoreBaseMaximo} pontos — quanto maior, melhor.
+            </Text>
             <Text>Média geral de risco: {dashboard.mediaGeral?.toFixed(2)} (escala 1–5)</Text>
 
             <Text style={styles.h2}>Por dimensão</Text>

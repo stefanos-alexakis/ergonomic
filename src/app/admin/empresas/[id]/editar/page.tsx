@@ -5,12 +5,17 @@ import { EditarEmpresaForm } from "./form";
 
 export const dynamic = "force-dynamic";
 
+const NAV = [
+  { href: "/admin", label: "Empresas" },
+  { href: "/admin/perguntas", label: "Pesos das perguntas" },
+];
+
 export default async function EditarEmpresaPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const { workspace, gestor } = await carregarEmpresaOuNotFound(id);
 
   return (
-    <AppShell contexto="Administração" homeHref="/admin" nav={[{ href: "/admin", label: "Empresas" }]}>
+    <AppShell contexto="Administração" homeHref="/admin" nav={NAV}>
       <div className="max-w-lg">
         <PageHeader eyebrow="Plataforma" title={workspace.nome} />
         <EditarEmpresaForm workspace={workspace} gestor={gestor} />

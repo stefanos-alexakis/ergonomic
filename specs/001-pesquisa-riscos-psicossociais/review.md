@@ -804,3 +804,45 @@ de organização normalmente.
 **Ambos verificados de ponta a ponta em produção** (não só localmente): upload real de logotipo
 funcionando, acesso real com código funcionando. Suíte local completa (43 unit + `tsc` + build)
 revalidada antes de cada deploy.
+
+## Parte 12 — Score Base (Eixo 1) e pesos configuráveis por pergunta
+
+Pesquisei a metodologia dos 3 eixos (`D:\2026-v2\Ergonomic\Metodologia` + as duas planilhas de
+cruzamento já rascunhadas pela Hozana) a pedido do usuário, pra propor um modelo de score. Achado
+principal: os modelos internacionais que fundamentam o instrumento (Karasek/Theorell,
+Siegrist, COPSOQ) **não** definem um peso universal entre dimensões — eles mantêm o risco
+multidimensional de propósito, porque exposição a violência não é "compensável" por boa
+instrução de trabalho. Isso reforça peso igual como ponto de partida defensável, com a
+possibilidade de calibração manual depois.
+
+**Decisão do usuário**: Eixo 1 (percepção) vale até 80% da pontuação final (0–800 de uma escala
+0–1000 estilo Serasa, "quanto maior, melhor"), com os 20% restantes reservados para os
+multiplicadores dos Eixos 2 (políticas, atenuante) e 3 (atestados, agravante) — ainda não
+implementados, ficam para uma próxima etapa. Pesos por pergunta são configuráveis pela Hozana
+(padrão 1, todas iguais), e mudanças recalculam ao vivo, inclusive pesquisas antigas — decisão
+explícita do usuário, dado que a metodologia ainda está sendo calibrada (um laudo já baixado em
+PDF fica congelado no que foi na hora do download; só o dashboard ao vivo muda).
+
+**Implementado:**
+- `Pergunta.peso` (`Float @default(1)`) no schema — novo campo, não quebra nenhuma pergunta
+  existente (upsert do seed nunca sobrescreve peso).
+- `calcularMedia` em `dashboard.ts` virou média ponderada (peso ausente conta como 1 —
+  retrocompatível com qualquer chamada antiga).
+- `calcularScoreBase(media)` = `800 × (5 − média) / 4` — média 1 (nunca) dá 800 pontos, média 5
+  (sempre) dá 0.
+- `/admin/perguntas` — nova página, lista as 42 perguntas agrupadas por bloco/dimensão com campo
+  de peso editável, action única salva tudo de uma vez.
+- Score Base exibido no painel do gestor e no relatório em PDF, ao lado da média geral existente
+  (não substituiu nada, só adicionou).
+
+**Testado**: 5 testes novos (`calcularMedia` com peso, `calcularScoreBase` nos extremos e no meio
+da escala) + fluxo real no navegador (login admin, abrir `/admin/perguntas`, mudar um peso, salvar,
+confirmar no banco que persistiu, reverter). Achado no caminho: depois de rodar `prisma generate`
+com o servidor de dev já no ar, o processo antigo continuou servindo o Prisma Client anterior (sem
+o campo `peso`) até eu reiniciá-lo — mudança de schema em dev sempre exige reiniciar o `next dev`,
+não só regenerar o client.
+
+**Pendente, fora do escopo desta etapa**: Eixos 2 e 3 ainda não têm nenhuma tela de coleta de dados
+na plataforma (Eixo 2 é hoje um checklist de entrevista por setor; Eixo 3 é uma planilha de RH com
+atestados CID-F) — quando entrarem, a fórmula de multiplicador/agravante-atenuante sobre os 200
+pontos restantes precisa ser desenhada e validada com o usuário antes de implementar.

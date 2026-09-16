@@ -86,6 +86,15 @@ export default async function DashboardPage({ params }: { params: Promise<{ id: 
         </p>
       ) : (
         <>
+          <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-5 py-4 mb-6 flex items-baseline gap-3">
+            <span className="text-3xl font-bold text-zinc-900">{dashboard.scoreBase}</span>
+            <span className="text-sm text-zinc-500">
+              / {dashboard.scoreBaseMaximo} pontos — Score Base (Eixo 1: percepção dos colaboradores). Quanto maior,
+              melhor. Os {1000 - dashboard.scoreBaseMaximo} pontos restantes (Eixos 2 e 3) ainda não entram nesse
+              número.
+            </span>
+          </div>
+
           <p className="text-sm text-zinc-700 mb-6">
             Média geral de risco: <strong className="font-semibold">{dashboard.mediaGeral?.toFixed(2)}</strong>{" "}
             <span className="text-zinc-500">(escala 1–5, quanto maior, mais exposição a risco)</span>

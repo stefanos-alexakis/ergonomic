@@ -11,6 +11,11 @@ import { Badge } from "@/components/ui/badge";
 // nunca deve ser pré-renderizada estaticamente no build.
 export const dynamic = "force-dynamic";
 
+const NAV = [
+  { href: "/admin", label: "Empresas" },
+  { href: "/admin/perguntas", label: "Pesos das perguntas" },
+];
+
 export default async function AdminHomePage() {
   const actor = await getActor();
   const usuario = actor ? await db.user.findUnique({ where: { id: actor.userId } }) : null;
@@ -21,7 +26,7 @@ export default async function AdminHomePage() {
   });
 
   return (
-    <AppShell contexto="Administração" homeHref="/admin" userLabel={usuario?.email} nav={[]}>
+    <AppShell contexto="Administração" homeHref="/admin" userLabel={usuario?.email} nav={NAV}>
       <PageHeader
         eyebrow="Plataforma"
         title="Empresas clientes"

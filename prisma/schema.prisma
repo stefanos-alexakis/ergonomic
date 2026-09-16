@@ -119,6 +119,11 @@ model Pergunta {
   texto               String
   ordemGlobal         Int
   polaridade          Polaridade @default(MAIOR_PIOR)
+  // Peso no cálculo do Score Base (Eixo 1) — 1 = peso normal, todas as
+  // perguntas nascem iguais. Editável pela Hozana na área administrativa;
+  // o dashboard recalcula ao vivo com o peso vigente (não é congelado por
+  // pesquisa — ver review.md sobre a decisão do usuário).
+  peso                Float      @default(1)
 
   fatorRisco    FatorRisco     @relation(fields: [fatorRiscoId], references: [id], onDelete: Cascade)
   respostaItens RespostaItem[]
