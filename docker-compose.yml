@@ -21,7 +21,12 @@ services:
       SMTP_PASS: ${SMTP_PASS}
       SMTP_FROM: ${SMTP_FROM}
     volumes:
-      - pesquisa_uploads:/app/uploads
+      # src/lib/upload.ts grava em public/uploads/, não em /app/uploads —
+      # o volume tinha que estar montado no caminho de verdade, senão os
+      # logotipos enviados nunca sobreviveriam a um `docker compose up
+      # --build` (achado em produção: escrita falhava com EACCES antes
+      # disso ser notado, porque o caminho errado nem tinha permissão).
+      - pesquisa_uploads:/app/public/uploads
     depends_on:
       db:
         condition: service_healthy

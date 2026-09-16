@@ -24,7 +24,7 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
@@ -60,7 +60,12 @@ COPY --from=builder --chown=nextjs:nodejs /app/entrypoint.sh ./entrypoint.sh
 COPY --from=builder /app/scripts ./scripts
 COPY --from=builder /app/package.json ./package.json
 
-RUN mkdir -p /app/uploads && chown -R nextjs:nodejs /app/uploads
+# src/lib/upload.ts grava em `public/uploads/` (join(process.cwd(), "public",
+# "uploads")), não em `/app/uploads` — o mkdir/chown daqui tinha que
+# apontar pro caminho de verdade. Sem isso, o usuário "nextjs" batia em
+# EACCES tentando criar a pasta em runtime (achado em produção, não local:
+# localmente roda como usuário dono da máquina, sem essa restrição).
+RUN mkdir -p /app/public/uploads && chown -R nextjs:nodejs /app/public/uploads
 
 USER nextjs
 EXPOSE 3000
