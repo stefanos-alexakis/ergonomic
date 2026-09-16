@@ -1,0 +1,273 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ── Plataforma / tenancy ────────────────────────────────────────────────
+
+model Workspace {
+  id            String    @id @default(cuid())
+  nome          String
+  slug          String    @unique
+  logoUrl       String?
+  corPrimaria   String? // hex "#RRGGBB"; nulo = tema cinza padrão
+  corSecundaria String?
+  timezone      String    @default("America/Sao_Paulo")
+  isActive      Boolean   @default(true)
+  deletedAt     DateTime?
+  createdAt     DateTime  @default(now())
+
+  memberships   Membership[]
+  setores       SetorOrg[]
+  departamentos Departamento[]
+  segmentos     Segmento[]
+  funcoes       Funcao[]
+  pesquisas     Pesquisa[]
+
+  @@index([slug])
+}
+
+model User {
+  id              String   @id @default(cuid())
+  nome            String
+  email           String   @unique
+  passwordHash    String
+  isPlatformAdmin Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  memberships Membership[]
+}
+
+enum MembershipRole {
+  GESTOR
+  VIEWER
+}
+
+model Membership {
+  id          String         @id @default(cuid())
+  userId      String
+  workspaceId String
+  role        MembershipRole @default(GESTOR)
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, workspaceId])
+  @@index([workspaceId])
+}
+
+// ── Catálogo global do questionário ─────────────────────────────────────
+
+model Questionario {
+  id        String   @id @default(cuid())
+  nome      String
+  versao    Int      @default(1)
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  blocos    Bloco[]
+  pesquisas Pesquisa[]
+}
+
+model Bloco {
+  id             String @id @default(cuid())
+  questionarioId String
+  nome           String
+  ordem          Int
+
+  questionario Questionario @relation(fields: [questionarioId], references: [id], onDelete: Cascade)
+  dimensoes    Dimensao[]
+
+  @@index([questionarioId])
+}
+
+model Dimensao {
+  id      String @id @default(cuid())
+  blocoId String
+  nome    String
+  ordem   Int
+
+  bloco        Bloco        @relation(fields: [blocoId], references: [id], onDelete: Cascade)
+  fatoresRisco FatorRisco[]
+
+  @@index([blocoId])
+}
+
+model FatorRisco {
+  id         String @id @default(cuid())
+  dimensaoId String
+  nome       String
+
+  dimensao  Dimensao   @relation(fields: [dimensaoId], references: [id], onDelete: Cascade)
+  perguntas Pergunta[]
+
+  @@index([dimensaoId])
+}
+
+enum Polaridade {
+  MAIOR_PIOR
+  MAIOR_MELHOR
+}
+
+model Pergunta {
+  id                  String     @id @default(cuid())
+  fatorRiscoId        String
+  situacaoInvestigada String
+  texto               String
+  ordemGlobal         Int
+  polaridade          Polaridade @default(MAIOR_PIOR)
+
+  fatorRisco    FatorRisco     @relation(fields: [fatorRiscoId], references: [id], onDelete: Cascade)
+  respostaItens RespostaItem[]
+
+  @@index([fatorRiscoId])
+  @@index([ordemGlobal])
+}
+
+// ── Estrutura organizacional (por empresa) ──────────────────────────────
+
+model SetorOrg {
+  id          String @id @default(cuid())
+  workspaceId String
+  nome        String
+
+  workspace Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  respostas Resposta[]
+
+  @@unique([workspaceId, nome])
+  @@index([workspaceId])
+}
+
+model Departamento {
+  id          String @id @default(cuid())
+  workspaceId String
+  nome        String
+
+  workspace Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  respostas Resposta[]
+
+  @@unique([workspaceId, nome])
+  @@index([workspaceId])
+}
+
+model Segmento {
+  id          String @id @default(cuid())
+  workspaceId String
+  nome        String
+
+  workspace Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  respostas Resposta[]
+
+  @@unique([workspaceId, nome])
+  @@index([workspaceId])
+}
+
+model Funcao {
+  id          String @id @default(cuid())
+  workspaceId String
+  nome        String
+
+  workspace Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  respostas Resposta[]
+
+  @@unique([workspaceId, nome])
+  @@index([workspaceId])
+}
+
+// ── Pesquisa, licenças e respostas ───────────────────────────────────────
+
+enum PesquisaStatus {
+  RASCUNHO
+  AGENDADA
+  ABERTA
+  ENCERRADA
+}
+
+model Pesquisa {
+  id                   String         @id @default(cuid())
+  workspaceId          String
+  questionarioId       String
+  nome                 String
+  slug                 String
+  status               PesquisaStatus @default(RASCUNHO)
+  dataInicio           DateTime
+  dataFim              DateTime
+  licencasSolicitadas  Int
+  limiteSupressaoGrupo Int            @default(5)
+  createdAt            DateTime       @default(now())
+
+  workspace    Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  questionario Questionario   @relation(fields: [questionarioId], references: [id])
+  codigos      CodigoAcesso[]
+
+  @@unique([workspaceId, slug])
+  @@index([workspaceId])
+}
+
+enum CodigoTipo {
+  PARTICIPANTE
+  TESTE
+}
+
+enum CodigoStatus {
+  DISPONIVEL
+  INICIADO
+  CONCLUIDO
+  EXPIRADO
+  BLOQUEADO
+}
+
+model CodigoAcesso {
+  id         String       @id @default(cuid())
+  pesquisaId String
+  codigo     String       @unique
+  tipo       CodigoTipo
+  status     CodigoStatus @default(DISPONIVEL)
+  createdAt  DateTime     @default(now())
+
+  pesquisa Pesquisa  @relation(fields: [pesquisaId], references: [id], onDelete: Cascade)
+  resposta Resposta?
+
+  @@index([pesquisaId])
+  @@index([status])
+}
+
+model Resposta {
+  id             String    @id @default(cuid())
+  codigoAcessoId String    @unique
+  setorId        String?
+  departamentoId String?
+  segmentoId     String?
+  funcaoId       String?
+  iniciadoEm     DateTime  @default(now())
+  concluidoEm    DateTime?
+
+  codigoAcesso CodigoAcesso   @relation(fields: [codigoAcessoId], references: [id], onDelete: Cascade)
+  setor        SetorOrg?      @relation(fields: [setorId], references: [id])
+  departamento Departamento?  @relation(fields: [departamentoId], references: [id])
+  segmento     Segmento?      @relation(fields: [segmentoId], references: [id])
+  funcao       Funcao?        @relation(fields: [funcaoId], references: [id])
+  itens        RespostaItem[]
+
+  @@index([setorId])
+  @@index([departamentoId])
+  @@index([segmentoId])
+  @@index([funcaoId])
+}
+
+model RespostaItem {
+  id           String   @id @default(cuid())
+  respostaId   String
+  perguntaId   String
+  valor        Int
+  respondidoEm DateTime @default(now())
+
+  resposta Resposta @relation(fields: [respostaId], references: [id], onDelete: Cascade)
+  pergunta Pergunta @relation(fields: [perguntaId], references: [id])
+
+  @@unique([respostaId, perguntaId])
+  @@index([perguntaId])
+}

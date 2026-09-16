@@ -1,0 +1,62 @@
+{
+  "name": "pesquisa-riscos-psicossociais",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts",
+    "admin:create": "tsx scripts/create-admin.ts"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "overrides": {
+    "uuid": "^11.1.1"
+  },
+  "dependencies": {
+    "next": "16.3.5",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "@prisma/client": "7.1.0",
+    "@prisma/adapter-pg": "7.1.0",
+    "pg": "8.13.1",
+    "next-auth": "5.0.0-beta.32",
+    "bcryptjs": "3.0.2",
+    "zod": "3.24.1",
+    "exceljs": "4.4.0",
+    "qrcode": "1.5.4",
+    "@react-pdf/renderer": "4.9.0",
+    "recharts": "3.10.1",
+    "nodemailer": "10.0.10",
+    "node-cron": "4.6.0",
+    "clsx": "2.1.1",
+    "tailwind-merge": "2.6.0"
+  },
+  "devDependencies": {
+    "typescript": "5.7.2",
+    "tsx": "4.19.2",
+    "@types/node": "22.10.2",
+    "@types/react": "19.0.2",
+    "@types/react-dom": "19.0.2",
+    "@types/bcryptjs": "2.4.6",
+    "@types/qrcode": "1.5.5",
+    "@types/node-cron": "3.0.11",
+    "prisma": "7.1.0",
+    "tailwindcss": "3.4.17",
+    "postcss": "8.4.49",
+    "autoprefixer": "10.4.20",
+    "eslint": "9.17.0",
+    "eslint-config-next": "16.3.5",
+    "@eslint/eslintrc": "3.2.0",
+    "vitest": "2.1.8",
+    "@playwright/test": "1.63.0"
+  }
+}

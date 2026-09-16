@@ -1,0 +1,338 @@
+[
+  {
+    "ordemGlobal": 1,
+    "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
+    "dimensao": "1.Instrução de trabalho",
+    "fatorRisco": "Instruções de trabalho e/ou cargo mal definidos",
+    "situacaoInvestigada": "Ausência/desatualização de descrição de cargo formalizado",
+    "texto": "Você sente falta de clareza sobre qual é sua função ou atividade de trabalho?"
+  },
+  {
+    "ordemGlobal": 2,
+    "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
+    "dimensao": "1.Instrução de trabalho",
+    "fatorRisco": "Instruções de trabalho e/ou cargo mal definidos",
+    "situacaoInvestigada": "Exigências contraditórias de superiores distintos",
+    "texto": "Você recebe ordens diferentes de mais de um superior sobre a mesma tarefa?"
+  },
+  {
+    "ordemGlobal": 3,
+    "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
+    "dimensao": "1.Instrução de trabalho",
+    "fatorRisco": "Instruções de trabalho e/ou cargo mal definidos",
+    "situacaoInvestigada": "Insuficiência de treinamentos / instrução de trabalho",
+    "texto": "Você sente falta de treinamento para realizar bem o seu trabalho?"
+  },
+  {
+    "ordemGlobal": 4,
+    "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
+    "dimensao": "2. Demandas de Trabalho",
+    "fatorRisco": "Demandas de Trabalho inadequadas",
+    "situacaoInvestigada": "Dimensionamento /equipe insuficiente",
+    "texto": "Você sente falta de gente na sua equipe para dar conta do trabalho do dia a dia?"
+  },
+  {
+    "ordemGlobal": 5,
+    "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
+    "dimensao": "2. Demandas de Trabalho",
+    "fatorRisco": "Demandas de Trabalho inadequadas",
+    "situacaoInvestigada": "Metas acima da capacidade real",
+    "texto": "As metas que você precisa cumprir são difíceis de alcançar, mesmo se esforçando bastante?"
+  },
+  {
+    "ordemGlobal": 6,
+    "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
+    "dimensao": "2. Demandas de Trabalho",
+    "fatorRisco": "Demandas de Trabalho inadequadas",
+    "situacaoInvestigada": "Distribuição de demandas desigual entre cargos",
+    "texto": "Você sente que o trabalho é dividido de forma desigual entre você e seus colegas?"
+  },
+  {
+    "ordemGlobal": 7,
+    "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
+    "dimensao": "2. Demandas de Trabalho",
+    "fatorRisco": "Demandas de Trabalho inadequadas",
+    "situacaoInvestigada": "Excesso de demandas de trabalho (acima da possibilidade de horas para entrega dia/semana/ mês)",
+    "texto": "A quantidade de trabalho que você recebe é maior do que dá para entregar no seu horário?"
+  },
+  {
+    "ordemGlobal": 8,
+    "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
+    "dimensao": "2. Demandas de Trabalho",
+    "fatorRisco": "Demandas de Trabalho inadequadas",
+    "situacaoInvestigada": "Trabalho monótono: Repetitividade, estereotipia, padrão sonoro",
+    "texto": "Seu trabalho é repetitivo, com os mesmos movimentos ou tarefas o tempo todo?"
+  },
+  {
+    "ordemGlobal": 9,
+    "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
+    "dimensao": "2. Demandas de Trabalho",
+    "fatorRisco": "Demandas de Trabalho inadequadas",
+    "situacaoInvestigada": "Ausência de rotação/alternância de tarefas",
+    "texto": "Falta rodízio ou variedade de tarefas no seu dia a dia de trabalho?"
+  },
+  {
+    "ordemGlobal": 10,
+    "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
+    "dimensao": "2. Demandas de Trabalho",
+    "fatorRisco": "Demandas de Trabalho inadequadas",
+    "situacaoInvestigada": "Baixas demandas de trabalho / subutilização",
+    "texto": "Você fica parado(a), com pouco trabalho para fazer durante o expediente?"
+  },
+  {
+    "ordemGlobal": 11,
+    "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
+    "dimensao": "3. Controle e Autonomia",
+    "fatorRisco": "Autonomia no trabalho",
+    "situacaoInvestigada": "Baixa autonomia no trabalho",
+    "texto": "Falta oportunidade para você dar sua opinião ou sugestão sobre como o trabalho é feito?"
+  },
+  {
+    "ordemGlobal": 12,
+    "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
+    "dimensao": "3. Controle e Autonomia",
+    "fatorRisco": "Autonomia no trabalho",
+    "situacaoInvestigada": "Sequência de execução e/ou modo operatório imposto",
+    "texto": "A ordem e o jeito de fazer cada tarefa são impostos, sem oportunidade ou autonomia para você ajustar/ definir a melhor forma?"
+  },
+  {
+    "ordemGlobal": 13,
+    "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
+    "dimensao": "4. Ritmo e Cadência",
+    "fatorRisco": "Ritmo de Trabalho imposto e /ou intenso",
+    "situacaoInvestigada": "Ritmo imposto por processo contínuo sem pausas",
+    "texto": "O ritmo do seu trabalho é imposto pela máquina ou linha de produção, sem parar para descansar?"
+  },
+  {
+    "ordemGlobal": 14,
+    "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
+    "dimensao": "4. Ritmo e Cadência",
+    "fatorRisco": "Ritmo de Trabalho imposto e /ou intenso",
+    "situacaoInvestigada": "Ritmo intenso sem pausas adequadas",
+    "texto": "O ritmo do seu trabalho é acelerado, com pausas insuficientes para descansar?"
+  },
+  {
+    "ordemGlobal": 15,
+    "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
+    "dimensao": "4. Ritmo e Cadência",
+    "fatorRisco": "Ritmo de Trabalho imposto e /ou intenso",
+    "situacaoInvestigada": "Prazos/metas inalcançáveis e/ou sem folga para pausa",
+    "texto": "Os prazos são tão apertados que fica difícil até parar para uma pausa?"
+  },
+  {
+    "ordemGlobal": 16,
+    "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
+    "dimensao": "4. Ritmo e Cadência",
+    "fatorRisco": "Ritmo de Trabalho imposto e /ou intenso",
+    "situacaoInvestigada": "Remuneração por produção",
+    "texto": "Você sente pressão para produzir mais rápido devido acordo de remuneração por produção ?"
+  },
+  {
+    "ordemGlobal": 17,
+    "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
+    "dimensao": "4. Ritmo e Cadência",
+    "fatorRisco": "Ritmo de Trabalho imposto e /ou intenso",
+    "situacaoInvestigada": "Trabalho sob pressão constante por prazos e entregas (urgência)",
+    "texto": "Você sente pressão no trabalho por prazos e entregas?"
+  },
+  {
+    "ordemGlobal": 18,
+    "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
+    "dimensao": "5. Horários e Jornada",
+    "fatorRisco": "Jornada / Pausas / Regime de Trabalho Inadequados",
+    "situacaoInvestigada": "Jornadas acima de 8/ 10 ou 12 h de forma frequente além do contratual/legal",
+    "texto": "Você trabalha mais horas do que o combinado no seu contrato?"
+  },
+  {
+    "ordemGlobal": 19,
+    "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
+    "dimensao": "5. Horários e Jornada",
+    "fatorRisco": "Jornada / Pausas / Regime de Trabalho Inadequados",
+    "situacaoInvestigada": "Horas extras frequentes, acima de 3 x semana, além do contratual/legal",
+    "texto": "Você faz hora extra mais de 3 vezes por semana?"
+  },
+  {
+    "ordemGlobal": 20,
+    "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
+    "dimensao": "5. Horários e Jornada",
+    "fatorRisco": "Jornada / Pausas / Regime de Trabalho Inadequados",
+    "situacaoInvestigada": "Imprevisibilidade de escala",
+    "texto": "Sua escala de trabalho muda de última hora sem avisos?"
+  },
+  {
+    "ordemGlobal": 21,
+    "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
+    "dimensao": "5. Horários e Jornada",
+    "fatorRisco": "Jornada / Pausas / Regime de Trabalho Inadequados",
+    "situacaoInvestigada": "Não concessão efetiva de pausas obrigatórias (NR-17) e/ ou pausas livres",
+    "texto": "Você sente que falta pausas mínimas e obrigatórias durante o trabalho?"
+  },
+  {
+    "ordemGlobal": 22,
+    "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
+    "dimensao": "6. Segurança no Emprego",
+    "fatorRisco": "Insegurança quanto à continuidade do vínculo empregatício",
+    "situacaoInvestigada": "Vínculos precários por trabalho informal ou falta de comunicação",
+    "texto": "Você sente insegurança sobre seu vínculo/ contrato de trabalho?"
+  },
+  {
+    "ordemGlobal": 23,
+    "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
+    "dimensao": "6. Segurança no Emprego",
+    "fatorRisco": "Insegurança quanto à continuidade do vínculo empregatício",
+    "situacaoInvestigada": "Ameaça de demissão como ferramenta de pressão",
+    "texto": "Alguém usa a ameaça de demissão para pressionar você a trabalhar mais ou de determinado jeito?"
+  },
+  {
+    "ordemGlobal": 24,
+    "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
+    "dimensao": "6. Segurança no Emprego",
+    "fatorRisco": "Insegurança quanto à continuidade do vínculo empregatício",
+    "situacaoInvestigada": "Instabilidade salarial",
+    "texto": "Seu salário varia ou atrasa de um jeito que te deixa inseguro(a)?"
+  },
+  {
+    "ordemGlobal": 25,
+    "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
+    "dimensao": "7. Gestão de Mudanças",
+    "fatorRisco": "Gestão Inadequada nas mudanças Organizacionais",
+    "situacaoInvestigada": "Ausência de processo de comunicação/alinhamento sobre mudanças",
+    "texto": "Mudanças na empresa acontecem sem que você seja avisado(a) ou preparado(a) para elas?"
+  },
+  {
+    "ordemGlobal": 26,
+    "bloco": "BLOCO 2 — FATORES SOCIAIS NO TRABALHO",
+    "dimensao": "8. Relações Interpessoais",
+    "fatorRisco": "Conflitos e Comunicação Deficiente entre a(s) equipe(s)",
+    "situacaoInvestigada": "Conflitos interpessoais",
+    "texto": "Existem conflitos entre você, seu superior e/ou seus colegas de trabalho?"
+  },
+  {
+    "ordemGlobal": 27,
+    "bloco": "BLOCO 2 — FATORES SOCIAIS NO TRABALHO",
+    "dimensao": "8. Relações Interpessoais",
+    "fatorRisco": "Conflitos e Comunicação Deficiente entre a(s) equipe(s)",
+    "situacaoInvestigada": "Falta de apoio entre colegas",
+    "texto": "Falta apoio dos colegas quando você precisa?"
+  },
+  {
+    "ordemGlobal": 28,
+    "bloco": "BLOCO 2 — FATORES SOCIAIS NO TRABALHO",
+    "dimensao": "9. Liderança",
+    "fatorRisco": "Gestão e/ou Liderança Inadequada",
+    "situacaoInvestigada": "Autoritarismo",
+    "texto": "Sua liderança impõe decisões de forma autoritária, enérgica e/ou inflexível?"
+  },
+  {
+    "ordemGlobal": 29,
+    "bloco": "BLOCO 2 — FATORES SOCIAIS NO TRABALHO",
+    "dimensao": "9. Liderança",
+    "fatorRisco": "Gestão e/ou Liderança Inadequada",
+    "situacaoInvestigada": "injustiça nas decisões",
+    "texto": "Você sente que as decisões da liderança são injustas entre você ou seus colegas?"
+  },
+  {
+    "ordemGlobal": 30,
+    "bloco": "BLOCO 2 — FATORES SOCIAIS NO TRABALHO",
+    "dimensao": "9. Liderança",
+    "fatorRisco": "Gestão e/ou Liderança Inadequada",
+    "situacaoInvestigada": "Monitoramento/vigilância digital além do exigido pela natureza regulatória",
+    "texto": "Você se sente vigiado(a) além do que seu trabalho realmente exige (câmeras, sistemas, etc.)?"
+  },
+  {
+    "ordemGlobal": 31,
+    "bloco": "BLOCO 2 — FATORES SOCIAIS NO TRABALHO",
+    "dimensao": "9. Liderança",
+    "fatorRisco": "Gestão e/ou Liderança Inadequada",
+    "situacaoInvestigada": "Falta de reconhecimento",
+    "texto": "Você sente falta de reconhecimento sobre seu trabalho por parte da liderança?"
+  },
+  {
+    "ordemGlobal": 32,
+    "bloco": "BLOCO 2 — FATORES SOCIAIS NO TRABALHO",
+    "dimensao": "9. Liderança",
+    "fatorRisco": "Gestão e/ou Liderança Inadequada",
+    "situacaoInvestigada": "Falta de feedback construtivo",
+    "texto": "Você sente falta de retorno sobre como está o seu desempenho?"
+  },
+  {
+    "ordemGlobal": 33,
+    "bloco": "BLOCO 2 — FATORES SOCIAIS NO TRABALHO",
+    "dimensao": "9. Liderança",
+    "fatorRisco": "Gestão e/ou Liderança Inadequada",
+    "situacaoInvestigada": "Ausência de suporte para resolução de problemas",
+    "texto": "Você sente falta de apoio do seu superior quando surge um problema no trabalho?"
+  },
+  {
+    "ordemGlobal": 34,
+    "bloco": "BLOCO 2 — FATORES SOCIAIS NO TRABALHO",
+    "dimensao": "10. Equilíbrio Trabalho-Vida",
+    "fatorRisco": "Desequilíbrio Trabalho-Vida",
+    "situacaoInvestigada": "Contato fora do horário além do previsto contratualmente",
+    "texto": "Você é procurado(a) para assuntos de trabalho fora do seu horário?"
+  },
+  {
+    "ordemGlobal": 35,
+    "bloco": "BLOCO 2 — FATORES SOCIAIS NO TRABALHO",
+    "dimensao": "11. Violência no Trabalho",
+    "fatorRisco": "Exposição a Violência e/ ou assédio",
+    "situacaoInvestigada": "Agressão verbal/física, ameaças ou violência de gênero por terceiros",
+    "texto": "Você já sofreu agressão verbal, física, ameaça ou violência de gênero por parte de clientes, fornecedores ou outras pessoas de fora da empresa?"
+  },
+  {
+    "ordemGlobal": 36,
+    "bloco": "BLOCO 2 — FATORES SOCIAIS NO TRABALHO",
+    "dimensao": "11. Violência no Trabalho",
+    "fatorRisco": "Exposição a Violência e/ ou assédio",
+    "situacaoInvestigada": "Assédio",
+    "texto": "Você já sofreu ou presenciou alguma situação de assédio de qualquer natureza internamente (entre superiores e colegas)?"
+  },
+  {
+    "ordemGlobal": 37,
+    "bloco": "BLOCO 2 — FATORES SOCIAIS NO TRABALHO",
+    "dimensao": "12. Tarefas com Exposição a Situações Extremas",
+    "fatorRisco": "Exposição a Situações Extremas Inerentes à Função",
+    "situacaoInvestigada": "Contato habitual com pessoas em sofrimento (saúde, social, educação)",
+    "texto": "Se seu trabalho exige lidar com pessoas em sofrimento e você sente que falta suporte para você?"
+  },
+  {
+    "ordemGlobal": 38,
+    "bloco": "BLOCO 2 — FATORES SOCIAIS NO TRABALHO",
+    "dimensao": "12. Tarefas com Exposição a Situações Extremas",
+    "fatorRisco": "Exposição a Situações Extremas Inerentes à Função",
+    "situacaoInvestigada": "Exposição a eventos traumáticos (morte, violência, acidentes graves)",
+    "texto": "Você presencia ou é exposto(a) a situações traumáticas no trabalho (morte, violência, acidente grave)"
+  },
+  {
+    "ordemGlobal": 39,
+    "bloco": "BLOCO 2 — FATORES SOCIAIS NO TRABALHO",
+    "dimensao": "12. Tarefas com Exposição a Situações Extremas",
+    "fatorRisco": "Exposição a Situações Extremas Inerentes à Função",
+    "situacaoInvestigada": "Trabalho em condições de risco físico continuo",
+    "texto": "Seu trabalho te expõe a risco físico continuo?"
+  },
+  {
+    "ordemGlobal": 40,
+    "bloco": "BLOCO 2 — FATORES SOCIAIS NO TRABALHO",
+    "dimensao": "12. Tarefas com Exposição a Situações Extremas",
+    "fatorRisco": "Exposição a Situações Extremas Inerentes à Função",
+    "situacaoInvestigada": "Decisões com alto impacto em terceiros (saúde, segurança pública)",
+    "texto": "Você precisa tomar decisões que podem afetar seriamente a saúde ou segurança de outras pessoas, sem suporte suficiente?"
+  },
+  {
+    "ordemGlobal": 41,
+    "bloco": "BLOCO 2 — FATORES SOCIAIS NO TRABALHO",
+    "dimensao": "13. Trabalho Isolado ou Remoto",
+    "fatorRisco": "Trabalho isolado",
+    "situacaoInvestigada": "Natureza do cargo exige isolamento físico (ex. vigilância, trabalho remoto, trabalho separado e isolado)",
+    "texto": "Seu trabalho é fisicamente isolado(a) da equipe?"
+  },
+  {
+    "ordemGlobal": 42,
+    "bloco": "BLOCO 2 — FATORES SOCIAIS NO TRABALHO",
+    "dimensao": "13. Trabalho Isolado ou Remoto",
+    "fatorRisco": "Trabalho isolado",
+    "situacaoInvestigada": "Ausência de rotina formal de contato com trabalhadores isolados/remotos",
+    "texto": "Mesmo trabalhando isolado(a) ou remoto, falta um contato regular organizado com a empresa/equipe?"
+  }
+]

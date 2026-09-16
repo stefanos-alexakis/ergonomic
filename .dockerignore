@@ -1,0 +1,16 @@
+node_modules
+.next
+.git
+.env
+.env.*
+!.env.example
+*.log
+test-results
+playwright-report
+e2e
+.specify
+specs
+*.docx
+*.xlsx
+.DS_Store
+Thumbs.db

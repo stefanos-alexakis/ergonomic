@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: var(--font-sans), system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    @apply bg-white text-zinc-900;
+  }
+
+  /* Números tabulares em qualquer lugar que exiba contagem/estatística —
+     sem isso, "10" e "17" numa mesma coluna não alinham. */
+  table {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Polimento de interação da jornada do colaborador (guia
+   emilkowalski-design): curva de ease-out forte, sem "transition: all",
+   sem animar de scale(0). Ver review.md. */
+@layer utilities {
+  @keyframes jornada-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .anim-fade-up {
+    animation: jornada-fade-up 220ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  /* Acordeão com altura animada via grid-template-rows — funciona com
+     conteúdo de altura variável sem medir pixels em JS. */
+  .accordion-content {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 220ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .accordion-content.aberto {
+    grid-template-rows: 1fr;
+  }
+
+  .accordion-inner {
+    overflow: hidden;
+    min-height: 0;
+  }
+}
