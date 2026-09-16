@@ -1,10 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { criarEmpresaComGestor } from "@/lib/workspace";
-import { adicionarItemCatalogo } from "@/lib/estrutura";
-import { criarPesquisa } from "@/lib/pesquisa";
-import { gerarLicencas } from "@/lib/licenca";
-import { db } from "@/lib/db";
+import bcrypt from "bcryptjs";
+import { randomInt } from "node:crypto";
 
 /**
  * Popula uma empresa de demonstração com dados simulados, mas realistas,
@@ -15,8 +12,34 @@ import { db } from "@/lib/db";
  * interessante (grupos com risco alto/baixo, e um grupo pequeno o
  * bastante pra aparecer suprimido, testando essa regra também).
  *
+ * Autocontido de propósito (sem importar de src/lib/*): esse script
+ * roda tanto localmente quanto dentro do container de produção via
+ * `docker exec`, e a imagem final não inclui a pasta src/ (só
+ * .next/standalone + scripts/ + prisma/ — ver Dockerfile). Mesma
+ * decisão de scripts/create-admin.ts.
+ *
  * Uso: npx tsx scripts/seed-empresa-teste.ts
  */
+
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const db = new PrismaClient({ adapter });
+
+function gerarSlug(nome: string): string {
+  return nome
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+const ALFABETO_CODIGO = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+function gerarCodigo(): string {
+  let codigo = "";
+  for (let i = 0; i < 8; i++) codigo += ALFABETO_CODIGO[randomInt(ALFABETO_CODIGO.length)];
+  return codigo;
+}
 
 type PerfilRisco = {
   base: number; // média-alvo em 1–5 (5 = pior)
@@ -67,53 +90,82 @@ function gerarValor(perfil: PerfilRisco, nomeDimensao: string): number {
   return Math.round(alvo);
 }
 
+async function upsertCatalogo(workspaceId: string, tipo: "setorOrg" | "departamento" | "segmento" | "funcao", nome: string) {
+  const where = { workspaceId_nome: { workspaceId, nome } };
+  const data = { workspaceId, nome };
+  switch (tipo) {
+    case "setorOrg":
+      return db.setorOrg.upsert({ where, update: {}, create: data });
+    case "departamento":
+      return db.departamento.upsert({ where, update: {}, create: data });
+    case "segmento":
+      return db.segmento.upsert({ where, update: {}, create: data });
+    case "funcao":
+      return db.funcao.upsert({ where, update: {}, create: data });
+  }
+}
+
 async function main() {
   console.log("Criando empresa de demonstração...");
 
-  const resultadoEmpresa = await criarEmpresaComGestor({
-    nomeEmpresa: "Empresa Demonstração",
-    corPrimaria: "#0f6e6e",
-    corSecundaria: "#edf1ef",
-    gestorNome: "Gestor Demonstração",
-    gestorEmail: "gestor@demonstracao.teste",
-    gestorSenha: "demoForte123",
-  });
-
-  if (!resultadoEmpresa.ok) {
-    console.error("Falha ao criar empresa:", resultadoEmpresa.erro);
-    console.error("Se já existe, apague antes: a empresa 'Empresa Demonstração' talvez já tenha sido seedada.");
+  const nomeEmpresa = "Empresa Demonstração";
+  const slugBase = gerarSlug(nomeEmpresa);
+  const emailExistente = await db.user.findUnique({ where: { email: "gestor@demonstracao.teste" } });
+  if (emailExistente) {
+    console.error("Já existe um usuário com e-mail gestor@demonstracao.teste — empresa já foi seedada antes.");
     process.exit(1);
   }
+  let slug = slugBase;
+  let sufixo = 1;
+  while (await db.workspace.findUnique({ where: { slug } })) slug = `${slugBase}-${++sufixo}`;
 
-  const workspaceId = resultadoEmpresa.workspaceId;
-  console.log(`Workspace criado: ${resultadoEmpresa.slug} (${workspaceId})`);
+  const senhaHash = await bcrypt.hash("demoForte123", 12);
+
+  const workspace = await db.$transaction(async (tx) => {
+    const ws = await tx.workspace.create({
+      data: { nome: nomeEmpresa, slug, corPrimaria: "#0f6e6e", corSecundaria: "#edf1ef" },
+    });
+    const gestor = await tx.user.create({
+      data: {
+        nome: "Gestor Demonstração",
+        email: "gestor@demonstracao.teste",
+        passwordHash: senhaHash,
+        isPlatformAdmin: false,
+      },
+    });
+    await tx.membership.create({ data: { userId: gestor.id, workspaceId: ws.id, role: "GESTOR" } });
+    return ws;
+  });
+
+  const workspaceId = workspace.id;
+  console.log(`Workspace criado: ${workspace.slug} (${workspaceId})`);
 
   // ── Catálogo organizacional ────────────────────────────────────────
   const [setorProducao, setorAdministrativo, setorComercial] = await Promise.all([
-    adicionarItemCatalogo(workspaceId, "setor", "Produção"),
-    adicionarItemCatalogo(workspaceId, "setor", "Administrativo"),
-    adicionarItemCatalogo(workspaceId, "setor", "Comercial"),
+    upsertCatalogo(workspaceId, "setorOrg", "Produção"),
+    upsertCatalogo(workspaceId, "setorOrg", "Administrativo"),
+    upsertCatalogo(workspaceId, "setorOrg", "Comercial"),
   ]);
 
   const [deptoLinha, deptoManutencao, deptoFinanceiro, deptoRH, deptoVendas] = await Promise.all([
-    adicionarItemCatalogo(workspaceId, "departamento", "Linha de Montagem"),
-    adicionarItemCatalogo(workspaceId, "departamento", "Manutenção"),
-    adicionarItemCatalogo(workspaceId, "departamento", "Financeiro"),
-    adicionarItemCatalogo(workspaceId, "departamento", "Recursos Humanos"),
-    adicionarItemCatalogo(workspaceId, "departamento", "Vendas"),
+    upsertCatalogo(workspaceId, "departamento", "Linha de Montagem"),
+    upsertCatalogo(workspaceId, "departamento", "Manutenção"),
+    upsertCatalogo(workspaceId, "departamento", "Financeiro"),
+    upsertCatalogo(workspaceId, "departamento", "Recursos Humanos"),
+    upsertCatalogo(workspaceId, "departamento", "Vendas"),
   ]);
 
   const [segOperacional, segAdministrativo] = await Promise.all([
-    adicionarItemCatalogo(workspaceId, "segmento", "Operacional"),
-    adicionarItemCatalogo(workspaceId, "segmento", "Administrativo"),
+    upsertCatalogo(workspaceId, "segmento", "Operacional"),
+    upsertCatalogo(workspaceId, "segmento", "Administrativo"),
   ]);
 
   const [funcOperador, funcTecnico, funcAnalistaFin, funcAnalistaRH, funcVendedor] = await Promise.all([
-    adicionarItemCatalogo(workspaceId, "funcao", "Operador de Produção"),
-    adicionarItemCatalogo(workspaceId, "funcao", "Técnico de Manutenção"),
-    adicionarItemCatalogo(workspaceId, "funcao", "Analista Financeiro"),
-    adicionarItemCatalogo(workspaceId, "funcao", "Analista de RH"),
-    adicionarItemCatalogo(workspaceId, "funcao", "Vendedor"),
+    upsertCatalogo(workspaceId, "funcao", "Operador de Produção"),
+    upsertCatalogo(workspaceId, "funcao", "Técnico de Manutenção"),
+    upsertCatalogo(workspaceId, "funcao", "Analista Financeiro"),
+    upsertCatalogo(workspaceId, "funcao", "Analista de RH"),
+    upsertCatalogo(workspaceId, "funcao", "Vendedor"),
   ]);
 
   console.log("Catálogo organizacional criado.");
@@ -126,29 +178,36 @@ async function main() {
   }
 
   const agora = new Date();
-  const resultadoPesquisa = await criarPesquisa({
-    workspaceId,
-    questionarioId: questionario.id,
-    nome: "Diagnóstico Psicossocial — Demonstração",
-    dataInicio: new Date(agora.getTime() - 30 * 24 * 60 * 60 * 1000),
-    dataFim: new Date(agora.getTime() + 30 * 24 * 60 * 60 * 1000),
-    licencasSolicitadas: 25,
+  const nomePesquisa = "Diagnóstico Psicossocial — Demonstração";
+  const slugPesquisaBase = gerarSlug(nomePesquisa) || "pesquisa";
+  let slugPesquisa = slugPesquisaBase;
+  let sufixoPesquisa = 1;
+  while (
+    await db.pesquisa.findUnique({ where: { workspaceId_slug: { workspaceId, slug: slugPesquisa } } })
+  ) {
+    slugPesquisa = `${slugPesquisaBase}-${++sufixoPesquisa}`;
+  }
+
+  const pesquisa = await db.pesquisa.create({
+    data: {
+      workspaceId,
+      questionarioId: questionario.id,
+      nome: nomePesquisa,
+      slug: slugPesquisa,
+      dataInicio: new Date(agora.getTime() - 30 * 24 * 60 * 60 * 1000),
+      dataFim: new Date(agora.getTime() + 30 * 24 * 60 * 60 * 1000),
+      licencasSolicitadas: 25,
+      status: "ABERTA",
+    },
   });
+  const pesquisaId = pesquisa.id;
 
-  if (!resultadoPesquisa.ok) {
-    console.error("Falha ao criar pesquisa:", resultadoPesquisa.erro);
-    process.exit(1);
-  }
-
-  await db.pesquisa.update({ where: { id: resultadoPesquisa.pesquisaId }, data: { status: "ABERTA" } });
-  const pesquisaId = resultadoPesquisa.pesquisaId;
-
-  const licencas = await gerarLicencas(pesquisaId);
-  if (!licencas.ok) {
-    console.error("Falha ao gerar licenças:", licencas.erro);
-    process.exit(1);
-  }
-  console.log(`Pesquisa criada com ${licencas.participantes} códigos de participante.`);
+  const codigosParaCriar = Array.from({ length: 25 }, () => gerarCodigo());
+  await db.codigoAcesso.createMany({
+    data: codigosParaCriar.map((codigo) => ({ pesquisaId, codigo, tipo: "PARTICIPANTE" as const })),
+    skipDuplicates: true,
+  });
+  console.log("Pesquisa criada com 25 códigos de participante.");
 
   const codigosDisponiveis = await db.codigoAcesso.findMany({
     where: { pesquisaId, tipo: "PARTICIPANTE" },
@@ -248,7 +307,7 @@ async function main() {
     });
   }
 
-  console.log(`Pronto. ${perfis.length} respostas simuladas na pesquisa "${resultadoPesquisa.pesquisaId}".`);
+  console.log(`Pronto. ${perfis.length} respostas simuladas na pesquisa "${pesquisaId}".`);
   console.log(`Login do gestor: gestor@demonstracao.teste / demoForte123`);
   await db.$disconnect();
 }
