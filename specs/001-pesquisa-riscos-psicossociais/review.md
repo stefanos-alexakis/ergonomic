@@ -882,3 +882,29 @@ exatamente com a linha da tabela agregada, filtro estreito (Comercial) mostrando
 supressão corretamente, lista de respostas individuais, detalhe de uma resposta com as 42
 perguntas, acesso direto por URL a um recorte suprimido bloqueado (404), e o relatório em PDF
 gerando com o Score incluído (200, `application/pdf`, 5.4KB).
+
+## Parte 14 — Piso de 100 pontos no Score Base (decisão do usuário)
+
+Sem piso, o pior cenário possível (média 5, todo mundo respondendo "sempre" em tudo) dava
+Score Base = 0. Usuário identificou o problema: um agravante do Eixo 3 (atestados) aplicado sobre
+um score já zerado não tem efeito nenhum — `0 × qualquer coisa = 0`, exatamente no cenário mais
+grave, onde o agravante mais precisa aparecer.
+
+Corrigido reescalando a fórmula pra nunca zerar: `Score = 100 + 700 × (5 − média) / 4` — mesmo
+teto de 800 (nota máxima, média 1), mas o pior caso agora trava em **100**, não em 0. Constante
+nova `SCORE_BASE_MINIMO = 100` em `dashboard.ts`, usada tanto no cálculo quanto no texto
+explicativo do painel e do relatório em PDF.
+
+**Provocação separada do usuário, só para reflexão (não implementada)**: e se a escala de resposta
+fosse 0–4 em vez de 1–5? Respondido em texto: matematicamente não muda nada (a fórmula já
+normaliza pela amplitude, é só deslocar a régua), mas mudaria na prática — encontrei pelo menos
+dois lugares no código (`revisao.tsx` e o detalhe de resposta individual, Parte 13) que checam
+"a pergunta foi respondida?" com `item.valor ? ... : "sem resposta"`, um padrão que trata `0` como
+"vazio" em JavaScript. Se "Nunca" virasse `0`, isso confundiria uma resposta real de "Nunca" com
+"não respondeu" — um bug silencioso, para ganho matemático zero. Recomendei manter 1–5.
+
+**Testado**: 3 testes de `calcularScoreBase` atualizados pro novo piso (média 5 → 100, não 0),
+suíte completa revalidada (48 testes). Verificação manual da conta contra os dados de demonstração
+não foi possível nesta rodada porque o Docker Desktop local parou de responder (ambiente da
+máquina, não bug de código) — confiei nos testes unitários + validação aritmética manual da
+fórmula antes de publicar; revalidado depois direto em produção.

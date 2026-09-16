@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getActor } from "@/lib/tenant";
 import { getWorkspaceDoGestor, resolvePesquisaDoWorkspace } from "@/lib/pesquisa";
 import { listarCatalogoOrganizacional } from "@/lib/estrutura";
-import { calcularDashboard, calcularScoreBase, type ResumoGrupo } from "@/lib/dashboard";
+import { calcularDashboard, calcularScoreBase, SCORE_BASE_MINIMO, type ResumoGrupo } from "@/lib/dashboard";
 import type { GrupoComSupressao } from "@/lib/agregacao";
 import { AppShell } from "@/components/shell/app-shell";
 import { PageHeader } from "@/components/ui/page-header";
@@ -182,8 +182,9 @@ export default async function DashboardPage({
                 <span className="text-3xl font-bold text-zinc-900">{dashboard.scoreBase}</span>
                 <span className="text-sm text-zinc-500">
                   / {dashboard.scoreBaseMaximo} pontos — Score Base (Eixo 1: percepção dos colaboradores). Quanto
-                  maior, melhor. Os {1000 - dashboard.scoreBaseMaximo} pontos restantes (Eixos 2 e 3) ainda não
-                  entram nesse número.
+                  maior, melhor. Mesmo no cenário mais grave a nota não zera (piso de {SCORE_BASE_MINIMO} pontos) —
+                  isso mantém espaço para os Eixos 2 e 3 (ainda não implementados) ajustarem o resultado nos{" "}
+                  {1000 - dashboard.scoreBaseMaximo} pontos restantes.
                 </span>
               </div>
 

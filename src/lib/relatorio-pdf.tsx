@@ -1,5 +1,5 @@
 import { Document, Page, View, Text, StyleSheet, renderToBuffer } from "@react-pdf/renderer";
-import { calcularScoreBase, type DashboardPesquisa } from "@/lib/dashboard";
+import { calcularScoreBase, SCORE_BASE_MINIMO, type DashboardPesquisa } from "@/lib/dashboard";
 
 const styles = StyleSheet.create({
   page: { padding: 32, fontSize: 10 },
@@ -50,7 +50,8 @@ export async function gerarRelatorioPdf(params: {
         ) : (
           <>
             <Text>
-              Score Base (Eixo 1): {dashboard.scoreBase} / {dashboard.scoreBaseMaximo} pontos — quanto maior, melhor.
+              Score Base (Eixo 1): {dashboard.scoreBase} / {dashboard.scoreBaseMaximo} pontos — quanto maior, melhor
+              (piso de {SCORE_BASE_MINIMO} pontos, mesmo no cenário mais grave).
             </Text>
             <Text>Média geral de risco: {dashboard.mediaGeral?.toFixed(2)} (escala 1–5)</Text>
 

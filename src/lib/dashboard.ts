@@ -37,12 +37,21 @@ export function calcularMedia(itens: { valor: number; polaridade: Polaridade; pe
 // ficam reservados para os multiplicadores dos Eixos 2 (políticas,
 // atenuante) e 3 (atestados, agravante), ainda não implementados
 // (decisão do usuário, ver review.md). Escala estilo Serasa: 1000 =
-// melhor cenário possível, 0 = pior.
+// melhor cenário possível.
 export const SCORE_BASE_MAXIMO = 800;
+
+// Piso: mesmo no pior cenário possível (todo mundo respondeu "sempre" em
+// tudo), a nota base não zera — trava em 100. Sem piso, um agravante do
+// Eixo 3 aplicado sobre um score já em 0 não teria efeito nenhum (0 ×
+// qualquer coisa = 0, ou 0 − qualquer coisa continua ilegível como
+// "nota"), justo no cenário mais grave, onde o agravante mais precisa
+// aparecer (decisão do usuário).
+export const SCORE_BASE_MINIMO = 100;
 
 /** média está sempre em 1–5 (1 = nunca/melhor, 5 = sempre/pior) após normalizarValor. */
 export function calcularScoreBase(mediaGeral: number): number {
-  return Math.round((SCORE_BASE_MAXIMO * (5 - mediaGeral)) / 4);
+  const amplitude = SCORE_BASE_MAXIMO - SCORE_BASE_MINIMO;
+  return Math.round(SCORE_BASE_MINIMO + (amplitude * (5 - mediaGeral)) / 4);
 }
 
 export type ResumoGrupo = { nome: string; total: number; mediaGeral: number };

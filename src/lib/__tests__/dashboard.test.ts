@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { agruparEResumir, calcularMedia, calcularScoreBase, normalizarValor, SCORE_BASE_MAXIMO } from "@/lib/dashboard";
+import {
+  agruparEResumir,
+  calcularMedia,
+  calcularScoreBase,
+  normalizarValor,
+  SCORE_BASE_MAXIMO,
+  SCORE_BASE_MINIMO,
+} from "@/lib/dashboard";
 
 describe("normalizarValor", () => {
   it("mantém o valor quando maior = pior (as 42 perguntas atuais)", () => {
@@ -44,17 +51,18 @@ describe("calcularMedia", () => {
   });
 });
 
-describe("calcularScoreBase — Eixo 1 vale até 80% da pontuação (0–800 de 0–1000)", () => {
+describe("calcularScoreBase — Eixo 1 vale até 80% da pontuação, com piso de 100 (100–800 de 0–1000)", () => {
   it("média 1 (nunca — melhor cenário) dá o score máximo", () => {
     expect(calcularScoreBase(1)).toBe(SCORE_BASE_MAXIMO);
   });
 
-  it("média 5 (sempre — pior cenário) dá score zero", () => {
-    expect(calcularScoreBase(5)).toBe(0);
+  it("média 5 (sempre — pior cenário) trava no piso, nunca zera (senão um agravante do Eixo 3 não teria efeito)", () => {
+    expect(calcularScoreBase(5)).toBe(SCORE_BASE_MINIMO);
+    expect(calcularScoreBase(5)).toBe(100);
   });
 
-  it("média 3 (às vezes) fica na metade do Score Base", () => {
-    expect(calcularScoreBase(3)).toBe(SCORE_BASE_MAXIMO / 2);
+  it("média 3 (às vezes) fica no meio do caminho entre o piso e o teto", () => {
+    expect(calcularScoreBase(3)).toBe(SCORE_BASE_MINIMO + (SCORE_BASE_MAXIMO - SCORE_BASE_MINIMO) / 2);
   });
 });
 
