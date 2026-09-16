@@ -755,3 +755,52 @@ Suíte completa (43 unit + `tsc` + `next build`) também revalidada depois de to
 
 Código publicado em <https://github.com/stefanos-alexakis/ergonomic> — repositório criado pelo
 usuário, primeiro commit e push feitos nesta sessão.
+
+## Parte 11 — Dois bugs reais encontrados pelo usuário já em produção, corrigidos com acesso à VPS
+
+A partir daqui o usuário autorizou acesso SSH direto à VPS (`root@2.24.75.225`, chave já
+configurada na máquina local, achada em anotações de outra sessão — `HANDOFF-agtrade-site.md`).
+Isso trocou o ciclo de "ele cola comando por comando" por diagnóstico e correção direta.
+
+### 11a. `EACCES: permission denied, mkdir '/app/public/uploads'` — logotipo quebrava o cadastro de empresa
+
+`src/lib/upload.ts` grava em `public/uploads/` (`join(process.cwd(), "public", "uploads")`), mas
+o Dockerfile só criava/dava permissão em `/app/uploads` (caminho errado, nunca usado por nenhum
+código) e o volume nomeado do `docker-compose.yml` montava exatamente nesse mesmo caminho errado.
+Em produção, o usuário `nextjs` (non-root, por segurança) não tinha permissão de escrita no
+diretório real — qualquer tentativa de cadastrar empresa com logotipo derrubava a página inteira
+("This page couldn't load"). Corrigido: Dockerfile cria/chowna `/app/public/uploads`, e o volume
+do compose monta lá — sem isso, mesmo corrigindo a permissão, os uploads se perderiam a cada
+`docker compose up --build` (o volume nunca estava realmente protegendo o diretório certo).
+
+Efeito colateral encontrado ao verificar a correção: depois de consertar e o usuário reenviar um
+logotipo de verdade, a imagem continuava quebrada no navegador — não por causa do arquivo (ele
+existia em disco, confirmado por `docker exec`), mas porque o Next.js tinha cacheado em memória
+uma resposta 404 para aquela URL específica, de uma tentativa anterior (de antes da correção,
+quando o arquivo genuinamente não existia). `docker restart pesquisa-app` limpou o cache e a
+imagem passou a carregar. Não é um bug recorrente — só aconteceu por causa da sequência exata de
+testes durante a investigação do bug original.
+
+### 11b. Pesquisa aparecia "encerrada" antes da hora — fuso horário
+
+Usuário criou uma pesquisa às 09:58–11:58 (horário de Brasília, pretendido) e, minutos depois, ao
+testar com um código real, a página mostrava "Esta pesquisa está encerrada". O formulário usa
+`<input type="datetime-local">`, que manda o horário sem indicar fuso (`"2026-09-16T09:58"`). O
+container roda em UTC por padrão (confirmado: `date` no host e dentro do container mostravam UTC)
+— o servidor interpretou "09:58" como 09:58 UTC, 3h adiantado do horário real de Brasília
+(UTC-3), fazendo o `dataFim` salvo ficar 3h no passado do que o gestor pretendia.
+
+`src/lib/vigencia-pesquisa.ts` já trabalha só com epoch (`.getTime()`), sem nenhuma suposição de
+fuso — a correção ficou isolada em fixar `TZ=America/Sao_Paulo` na imagem (mais o pacote `tzdata`,
+necessário no Alpine pra resolver o nome da zona, não só um offset numérico). Isso corrige tanto o
+parsing de `new Date(string-sem-fuso)` quanto qualquer `toLocaleString("pt-BR")` usado na
+exibição, sem mudar nenhuma lógica de negócio.
+
+A pesquisa de teste já criada (`Risco1`, com 11 códigos já gerados) tinha os horários salvos com o
+bug — corrigida em produção com um `UPDATE` direto (`dataInicio`/`dataFim` + 3 horas), confirmado
+com o usuário antes de rodar. Testado depois com um código real: aceitou e avançou pro formulário
+de organização normalmente.
+
+**Ambos verificados de ponta a ponta em produção** (não só localmente): upload real de logotipo
+funcionando, acesso real com código funcionando. Suíte local completa (43 unit + `tsc` + build)
+revalidada antes de cada deploy.
