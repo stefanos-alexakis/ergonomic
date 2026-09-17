@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   agruparEResumir,
   calcularMedia,
+  calcularNivelRisco,
   calcularScoreBase,
   normalizarValor,
   SCORE_BASE_MAXIMO,
@@ -63,6 +64,32 @@ describe("calcularScoreBase — Eixo 1 vale até 80% da pontuação, com piso de
 
   it("média 3 (às vezes) fica no meio do caminho entre o piso e o teto", () => {
     expect(calcularScoreBase(3)).toBe(SCORE_BASE_MINIMO + (SCORE_BASE_MAXIMO - SCORE_BASE_MINIMO) / 2);
+  });
+});
+
+describe("calcularNivelRisco — faixas pedidas pelo cliente: <400 alto, 401-600 moderado, >600 baixo", () => {
+  it("score bem abaixo de 400 é risco alto (perigo)", () => {
+    expect(calcularNivelRisco(100)).toEqual({ rotulo: "Risco alto", tom: "perigo" });
+  });
+
+  it("400 exato cai no corte de risco alto", () => {
+    expect(calcularNivelRisco(400)).toEqual({ rotulo: "Risco alto", tom: "perigo" });
+  });
+
+  it("401 já é risco moderado", () => {
+    expect(calcularNivelRisco(401)).toEqual({ rotulo: "Risco moderado", tom: "atencao" });
+  });
+
+  it("600 exato ainda é risco moderado", () => {
+    expect(calcularNivelRisco(600)).toEqual({ rotulo: "Risco moderado", tom: "atencao" });
+  });
+
+  it("601 já é risco baixo (sucesso)", () => {
+    expect(calcularNivelRisco(601)).toEqual({ rotulo: "Risco baixo", tom: "sucesso" });
+  });
+
+  it("score máximo (800) é risco baixo", () => {
+    expect(calcularNivelRisco(SCORE_BASE_MAXIMO)).toEqual({ rotulo: "Risco baixo", tom: "sucesso" });
   });
 });
 

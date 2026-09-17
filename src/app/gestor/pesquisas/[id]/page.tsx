@@ -4,6 +4,7 @@ import { getActor } from "@/lib/tenant";
 import { getWorkspaceDoGestor, resolvePesquisaDoWorkspace } from "@/lib/pesquisa";
 import { listarCodigos } from "@/lib/licenca";
 import { AppShell } from "@/components/shell/app-shell";
+import { BannerImpersonacao } from "@/components/shell/banner-impersonacao";
 import { PageHeader } from "@/components/ui/page-header";
 import { Table, Thead, Th, Tr, Td } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -33,7 +34,14 @@ export default async function PesquisaDetalhePage({
   const teste = codigos.filter((c) => c.tipo === "TESTE");
 
   return (
-    <AppShell contexto={workspace.nome} homeHref="/gestor" nav={NAV} accentColor={workspace.corPrimaria} secondaryColor={workspace.corSecundaria}>
+    <AppShell
+      contexto={workspace.nome}
+      homeHref="/gestor"
+      nav={NAV}
+      accentColor={workspace.corPrimaria}
+      secondaryColor={workspace.corSecundaria}
+      banner={actor.isPlatformAdmin ? <BannerImpersonacao workspaceNome={workspace.nome} /> : undefined}
+    >
       <PageHeader
         eyebrow={
           <>

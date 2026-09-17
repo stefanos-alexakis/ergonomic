@@ -3,6 +3,7 @@ import { getActor } from "@/lib/tenant";
 import { getWorkspaceDoGestor } from "@/lib/pesquisa";
 import { db } from "@/lib/db";
 import { AppShell } from "@/components/shell/app-shell";
+import { BannerImpersonacao } from "@/components/shell/banner-impersonacao";
 import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
 import { Table, Thead, Th, Tr, Td } from "@/components/ui/table";
@@ -33,7 +34,15 @@ export default async function GestorHomePage() {
   });
 
   return (
-    <AppShell contexto={workspace.nome} homeHref="/gestor" userLabel={usuario?.email} nav={NAV} accentColor={workspace.corPrimaria} secondaryColor={workspace.corSecundaria}>
+    <AppShell
+      contexto={workspace.nome}
+      homeHref="/gestor"
+      userLabel={usuario?.email}
+      nav={NAV}
+      accentColor={workspace.corPrimaria}
+      secondaryColor={workspace.corSecundaria}
+      banner={actor.isPlatformAdmin ? <BannerImpersonacao workspaceNome={workspace.nome} /> : undefined}
+    >
       <PageHeader
         eyebrow={workspace.nome}
         title="Pesquisas"

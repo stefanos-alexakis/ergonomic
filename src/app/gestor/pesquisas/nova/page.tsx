@@ -1,6 +1,7 @@
 import { getActor } from "@/lib/tenant";
 import { getWorkspaceDoGestor } from "@/lib/pesquisa";
 import { AppShell } from "@/components/shell/app-shell";
+import { BannerImpersonacao } from "@/components/shell/banner-impersonacao";
 import { PageHeader } from "@/components/ui/page-header";
 import { NovaPesquisaForm } from "./form";
 
@@ -15,7 +16,14 @@ export default async function NovaPesquisaPage() {
   if (!workspace) return <p>Usuário sem empresa vinculada.</p>;
 
   return (
-    <AppShell contexto="Nova pesquisa" homeHref="/gestor" nav={NAV} accentColor={workspace.corPrimaria} secondaryColor={workspace.corSecundaria}>
+    <AppShell
+      contexto="Nova pesquisa"
+      homeHref="/gestor"
+      nav={NAV}
+      accentColor={workspace.corPrimaria}
+      secondaryColor={workspace.corSecundaria}
+      banner={actor.isPlatformAdmin ? <BannerImpersonacao workspaceNome={workspace.nome} /> : undefined}
+    >
       <div className="max-w-md">
         <PageHeader title="Nova pesquisa" />
         <NovaPesquisaForm />

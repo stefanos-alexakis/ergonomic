@@ -1,5 +1,5 @@
 import { Document, Page, View, Text, StyleSheet, renderToBuffer } from "@react-pdf/renderer";
-import { calcularScoreBase, SCORE_BASE_MINIMO, type DashboardPesquisa } from "@/lib/dashboard";
+import { calcularScoreBase, calcularNivelRisco, SCORE_BASE_MINIMO, type DashboardPesquisa } from "@/lib/dashboard";
 
 const styles = StyleSheet.create({
   page: { padding: 32, fontSize: 10 },
@@ -13,6 +13,14 @@ const styles = StyleSheet.create({
   colNome: { flex: 2 },
   colValor: { flex: 1, textAlign: "right" },
 });
+
+// Mesmas 3 faixas de src/components/ui/badge.tsx, em hex pro react-pdf (não
+// lê classes Tailwind) — cores emparelhadas com o tom (perigo/atencao/sucesso).
+const COR_POR_TOM: Record<ReturnType<typeof calcularNivelRisco>["tom"], string> = {
+  perigo: "#B91C1C",
+  atencao: "#B45309",
+  sucesso: "#047857",
+};
 
 export async function gerarRelatorioPdf(params: {
   pesquisaNome: string;
@@ -50,8 +58,11 @@ export async function gerarRelatorioPdf(params: {
         ) : (
           <>
             <Text>
-              Score Base (Eixo 1): {dashboard.scoreBase} / {dashboard.scoreBaseMaximo} pontos — quanto maior, melhor
-              (piso de {SCORE_BASE_MINIMO} pontos, mesmo no cenário mais grave).
+              Score Base (Eixo 1): {dashboard.scoreBase} / {dashboard.scoreBaseMaximo} pontos —{" "}
+              <Text style={{ color: COR_POR_TOM[calcularNivelRisco(dashboard.scoreBase!).tom], fontWeight: 700 }}>
+                {calcularNivelRisco(dashboard.scoreBase!).rotulo}
+              </Text>{" "}
+              (quanto maior, melhor; piso de {SCORE_BASE_MINIMO} pontos, mesmo no cenário mais grave).
             </Text>
             <Text>Média geral de risco: {dashboard.mediaGeral?.toFixed(2)} (escala 1–5)</Text>
 
@@ -72,16 +83,25 @@ export async function gerarRelatorioPdf(params: {
               grupos.length === 0 ? null : (
                 <View key={titulo}>
                   <Text style={styles.h2}>{titulo}</Text>
-                  {grupos.map((g) => (
-                    <View key={g.nome} style={styles.linha}>
-                      <Text style={styles.colNome}>{g.nome}</Text>
-                      <Text style={styles.colValor}>
-                        {g.suprimido
-                          ? "dados insuficientes"
-                          : `${g.total} · média ${g.mediaGeral.toFixed(2)} · score ${calcularScoreBase(g.mediaGeral)}`}
-                      </Text>
-                    </View>
-                  ))}
+                  {grupos.map((g) => {
+                    const scoreGrupo = g.suprimido ? null : calcularScoreBase(g.mediaGeral);
+                    return (
+                      <View key={g.nome} style={styles.linha}>
+                        <Text style={styles.colNome}>{g.nome}</Text>
+                        <Text
+                          style={
+                            scoreGrupo !== null
+                              ? { ...styles.colValor, color: COR_POR_TOM[calcularNivelRisco(scoreGrupo).tom] }
+                              : styles.colValor
+                          }
+                        >
+                          {g.suprimido
+                            ? "dados insuficientes"
+                            : `${g.total} · média ${g.mediaGeral.toFixed(2)} · score ${scoreGrupo}`}
+                        </Text>
+                      </View>
+                    );
+                  })}
                 </View>
               ),
             )}

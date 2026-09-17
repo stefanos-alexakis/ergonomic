@@ -2,6 +2,7 @@ import { getActor } from "@/lib/tenant";
 import { getWorkspaceDoGestor } from "@/lib/pesquisa";
 import { listarCatalogoOrganizacional } from "@/lib/estrutura";
 import { AppShell } from "@/components/shell/app-shell";
+import { BannerImpersonacao } from "@/components/shell/banner-impersonacao";
 import { PageHeader } from "@/components/ui/page-header";
 import { Card } from "@/components/ui/card";
 import { AdicionarItemForm } from "./adicionar-item-form";
@@ -30,11 +31,22 @@ export default async function EstruturaPage() {
   } as const;
 
   return (
-    <AppShell contexto={workspace.nome} homeHref="/gestor" nav={NAV} accentColor={workspace.corPrimaria} secondaryColor={workspace.corSecundaria}>
+    <AppShell
+      contexto={workspace.nome}
+      homeHref="/gestor"
+      nav={NAV}
+      accentColor={workspace.corPrimaria}
+      secondaryColor={workspace.corSecundaria}
+      banner={actor.isPlatformAdmin ? <BannerImpersonacao workspaceNome={workspace.nome} /> : undefined}
+    >
       <PageHeader title="Setores e departamentos" />
       <p className="text-sm text-zinc-500 mb-6 max-w-2xl">
         Cadastre um por um ou importe uma planilha .xlsx com as colunas &quot;Setor&quot; e
-        &quot;Departamento&quot; (uma aba, cabeçalho na primeira linha).
+        &quot;Departamento&quot; (uma aba, cabeçalho na primeira linha).{" "}
+        <a href="/gestor/estrutura/modelo" className="text-zinc-700 underline hover:text-zinc-900">
+          Baixar modelo de planilha
+        </a>
+        .
       </p>
 
       <ImportarPlanilhaForm />

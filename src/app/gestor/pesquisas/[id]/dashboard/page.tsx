@@ -3,13 +3,21 @@ import Link from "next/link";
 import { getActor } from "@/lib/tenant";
 import { getWorkspaceDoGestor, resolvePesquisaDoWorkspace } from "@/lib/pesquisa";
 import { listarCatalogoOrganizacional } from "@/lib/estrutura";
-import { calcularDashboard, calcularScoreBase, SCORE_BASE_MINIMO, type ResumoGrupo } from "@/lib/dashboard";
+import {
+  calcularDashboard,
+  calcularScoreBase,
+  calcularNivelRisco,
+  SCORE_BASE_MINIMO,
+  type ResumoGrupo,
+} from "@/lib/dashboard";
 import type { GrupoComSupressao } from "@/lib/agregacao";
 import { AppShell } from "@/components/shell/app-shell";
+import { BannerImpersonacao } from "@/components/shell/banner-impersonacao";
 import { PageHeader } from "@/components/ui/page-header";
 import { Table, Thead, Th, Tr, Td } from "@/components/ui/table";
 import { Select } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 export const dynamic = "force-dynamic";
 
@@ -41,7 +49,14 @@ function TabelaGrupo({ titulo, grupos }: { titulo: string; grupos: GrupoComSupre
                 <>
                   <Td>{g.total}</Td>
                   <Td className="font-medium">{g.mediaGeral.toFixed(2)}</Td>
-                  <Td className="font-medium">{calcularScoreBase(g.mediaGeral)}</Td>
+                  <Td className="font-medium">
+                    <span className="flex items-center gap-2">
+                      {calcularScoreBase(g.mediaGeral)}
+                      <Badge tom={calcularNivelRisco(calcularScoreBase(g.mediaGeral)).tom}>
+                        {calcularNivelRisco(calcularScoreBase(g.mediaGeral)).rotulo}
+                      </Badge>
+                    </span>
+                  </Td>
                 </>
               )}
             </Tr>
@@ -90,7 +105,14 @@ export default async function DashboardPage({
   ).toString();
 
   return (
-    <AppShell contexto={workspace.nome} homeHref="/gestor" nav={NAV} accentColor={workspace.corPrimaria} secondaryColor={workspace.corSecundaria}>
+    <AppShell
+      contexto={workspace.nome}
+      homeHref="/gestor"
+      nav={NAV}
+      accentColor={workspace.corPrimaria}
+      secondaryColor={workspace.corSecundaria}
+      banner={actor.isPlatformAdmin ? <BannerImpersonacao workspaceNome={workspace.nome} /> : undefined}
+    >
       <PageHeader eyebrow={pesquisa.nome} title="Painel" />
 
       <div className="flex gap-10 mb-8">
@@ -154,6 +176,9 @@ export default async function DashboardPage({
             <>
               <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-5 py-4 mb-6 flex items-baseline gap-3">
                 <span className="text-3xl font-bold text-zinc-900">{dashboard.scoreBase}</span>
+                <Badge tom={calcularNivelRisco(dashboard.scoreBase!).tom}>
+                  {calcularNivelRisco(dashboard.scoreBase!).rotulo}
+                </Badge>
                 <span className="text-sm text-zinc-500">
                   / {dashboard.scoreBaseMaximo} pontos — Score Base (Eixo 1: percepção dos colaboradores). Quanto
                   maior, melhor. Mesmo no cenário mais grave a nota não zera (piso de {SCORE_BASE_MINIMO} pontos) —

@@ -54,6 +54,18 @@ export function calcularScoreBase(mediaGeral: number): number {
   return Math.round(SCORE_BASE_MINIMO + (amplitude * (5 - mediaGeral)) / 4);
 }
 
+/**
+ * Faixa de risco a partir do Score Base, pedida pelo cliente: abaixo de
+ * 400 é risco alto, de 401 a 600 é moderado, acima de 600 é baixo (quanto
+ * maior o score, melhor). 400 cai no corte "alto" — sem essa convenção o
+ * valor exato ficaria indefinido entre as duas faixas descritas.
+ */
+export function calcularNivelRisco(scoreBase: number): { rotulo: string; tom: "perigo" | "atencao" | "sucesso" } {
+  if (scoreBase <= 400) return { rotulo: "Risco alto", tom: "perigo" };
+  if (scoreBase <= 600) return { rotulo: "Risco moderado", tom: "atencao" };
+  return { rotulo: "Risco baixo", tom: "sucesso" };
+}
+
 export type ResumoGrupo = { nome: string; total: number; mediaGeral: number };
 
 /** Agrupa respondentes (já com a média pessoal calculada) por um nome de grupo. */

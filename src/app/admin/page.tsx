@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
 import { Table, Thead, Th, Tr, Td } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { assumirVisaoGestorAction } from "./actions";
 
 // Depende de dados de banco em tempo real e de sessão autenticada —
 // nunca deve ser pré-renderizada estaticamente no build.
@@ -53,9 +54,23 @@ export default async function AdminHomePage() {
             {empresas.map((e) => (
               <Tr key={e.id}>
                 <Td>
-                  <Link href={`/admin/empresas/${e.id}/editar`} className="font-medium text-zinc-900 hover:underline">
-                    {e.nome}
-                  </Link>
+                  <span className="flex items-center gap-2">
+                    <Link href={`/admin/empresas/${e.id}/editar`} className="font-medium text-zinc-900 hover:underline">
+                      {e.nome}
+                    </Link>
+                    {e.isActive && (
+                      <form action={assumirVisaoGestorAction.bind(null, e.id)}>
+                        <button
+                          type="submit"
+                          title="Acessar como gestor desta empresa"
+                          aria-label="Acessar como gestor desta empresa"
+                          className="text-zinc-400 hover:text-zinc-900 cursor-pointer"
+                        >
+                          →
+                        </button>
+                      </form>
+                    )}
+                  </span>
                 </Td>
                 <Td>
                   <code className="text-xs text-zinc-500">{e.slug}</code>

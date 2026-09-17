@@ -2,10 +2,12 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getActor } from "@/lib/tenant";
 import { getWorkspaceDoGestor, resolvePesquisaDoWorkspace } from "@/lib/pesquisa";
-import { calcularDashboard, listarRespostasIndividuais } from "@/lib/dashboard";
+import { calcularDashboard, calcularNivelRisco, listarRespostasIndividuais } from "@/lib/dashboard";
 import { AppShell } from "@/components/shell/app-shell";
+import { BannerImpersonacao } from "@/components/shell/banner-impersonacao";
 import { PageHeader } from "@/components/ui/page-header";
 import { Table, Thead, Th, Tr, Td } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 
 export const dynamic = "force-dynamic";
 
@@ -36,7 +38,14 @@ export default async function RespostasIndividuaisPage({
   const respostas = await listarRespostasIndividuais(pesquisa.id, filtros);
 
   return (
-    <AppShell contexto={workspace.nome} homeHref="/gestor" nav={NAV} accentColor={workspace.corPrimaria} secondaryColor={workspace.corSecundaria}>
+    <AppShell
+      contexto={workspace.nome}
+      homeHref="/gestor"
+      nav={NAV}
+      accentColor={workspace.corPrimaria}
+      secondaryColor={workspace.corSecundaria}
+      banner={actor.isPlatformAdmin ? <BannerImpersonacao workspaceNome={workspace.nome} /> : undefined}
+    >
       <PageHeader eyebrow={pesquisa.nome} title="Respostas individuais" />
 
       <p className="text-sm text-zinc-500 mb-6 max-w-2xl">
@@ -62,9 +71,11 @@ export default async function RespostasIndividuaisPage({
               <Td>
                 <Link
                   href={`/gestor/pesquisas/${pesquisa.id}/dashboard/respostas/${r.id}`}
-                  className="font-medium text-zinc-900 hover:underline"
+                  className="flex items-center gap-2 font-medium text-zinc-900 hover:underline"
                 >
-                  {r.scoreBase} →
+                  {r.scoreBase}
+                  <Badge tom={calcularNivelRisco(r.scoreBase).tom}>{calcularNivelRisco(r.scoreBase).rotulo}</Badge>
+                  →
                 </Link>
               </Td>
             </Tr>

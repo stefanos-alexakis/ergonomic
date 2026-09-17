@@ -8,6 +8,7 @@ export function AppShell({
   nav,
   accentColor,
   secondaryColor,
+  banner,
   children,
 }: {
   contexto: string;
@@ -22,6 +23,10 @@ export function AppShell({
   // cor única.
   accentColor?: string | null;
   secondaryColor?: string | null;
+  // Faixa opcional entre a Topbar e o conteúdo — hoje só o aviso de
+  // impersonação (src/components/shell/banner-impersonacao.tsx), mas
+  // deixado genérico caso surja outro aviso de contexto no futuro.
+  banner?: ReactNode;
   children: ReactNode;
 }) {
   const temaEmpresa: CSSProperties | undefined =
@@ -36,6 +41,7 @@ export function AppShell({
   return (
     <div className="min-h-screen bg-white" style={temaEmpresa}>
       <Topbar contexto={contexto} homeHref={homeHref} userLabel={userLabel} nav={nav} />
+      {banner}
       <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
     </div>
   );

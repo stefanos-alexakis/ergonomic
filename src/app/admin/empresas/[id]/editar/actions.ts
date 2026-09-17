@@ -3,7 +3,7 @@
 import { redirect, notFound } from "next/navigation";
 import { getActor } from "@/lib/tenant";
 import { workspaceInputSchema } from "@/lib/validation";
-import { atualizarEmpresa, getEmpresaParaEditar } from "@/lib/workspace";
+import { atualizarEmpresa, getEmpresaParaEditar, redefinirSenhaGestor } from "@/lib/workspace";
 import { salvarLogoWorkspace } from "@/lib/upload";
 
 export type EstadoEditarEmpresa = { erro?: string } | undefined;
@@ -56,6 +56,23 @@ export async function atualizarEmpresaAction(
   if (!resultado.ok) return { erro: resultado.erro };
 
   redirect("/admin");
+}
+
+export type EstadoRedefinirSenha = { erro?: string; mensagem?: string } | undefined;
+
+export async function redefinirSenhaGestorAction(
+  gestorUserId: string,
+  _estadoAnterior: EstadoRedefinirSenha,
+  formData: FormData,
+): Promise<EstadoRedefinirSenha> {
+  const actor = await getActor();
+  if (!actor?.isPlatformAdmin) return { erro: "Sem permissão." };
+
+  const novaSenha = String(formData.get("novaSenha") ?? "");
+  const resultado = await redefinirSenhaGestor(gestorUserId, novaSenha);
+  if (!resultado.ok) return { erro: resultado.erro };
+
+  return { mensagem: "Senha redefinida com sucesso." };
 }
 
 export async function carregarEmpresaOuNotFound(workspaceId: string) {

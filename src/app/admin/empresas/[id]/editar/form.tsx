@@ -83,7 +83,7 @@ export function EditarEmpresaForm({
               <Input id="gestorEmail" name="gestorEmail" type="email" required defaultValue={gestor.email} />
             </Field>
             <p className="text-xs text-zinc-500">
-              A senha não é alterada aqui — o gestor pode trocá-la depois de logado.
+              A senha não é alterada aqui — use o quadro &quot;Redefinir senha do gestor&quot; abaixo.
             </p>
           </Fieldset>
         </Card>

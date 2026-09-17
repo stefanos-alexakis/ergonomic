@@ -51,6 +51,11 @@ model Membership {
   userId      String
   workspaceId String
   role        MembershipRole @default(GESTOR)
+  // true = vínculo temporário criado quando um admin da plataforma
+  // "assume" a visão de gestor de uma empresa (src/lib/impersonacao.ts) —
+  // nunca um vínculo real de gestor. Permite limpar exatamente essas
+  // linhas sem tocar nas de verdade.
+  impersonada Boolean        @default(false)
 
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)

@@ -145,3 +145,25 @@ export async function atualizarEmpresa(
 
   return { ok: true };
 }
+
+export type RedefinirSenhaResultado = { ok: true } | { ok: false; erro: string };
+
+/**
+ * Redefine a senha do gestor de uma empresa — só o admin da plataforma
+ * chama isto (checagem de `isPlatformAdmin` fica na action, não aqui).
+ * A sessão é JWT stateless (`src/lib/auth.ts`): isso barra *novos* logins
+ * com a senha antiga, mas não derruba uma sessão já aberta na hora —
+ * invalidar sessão ativa exigiria trocar a estratégia pra sessão em
+ * banco, fora do escopo pedido.
+ */
+export async function redefinirSenhaGestor(
+  gestorUserId: string,
+  novaSenha: string,
+): Promise<RedefinirSenhaResultado> {
+  if (novaSenha.length < 8) {
+    return { ok: false, erro: "Senha precisa ter 8 ou mais caracteres." };
+  }
+  const senhaHash = await bcrypt.hash(novaSenha, 12);
+  await db.user.update({ where: { id: gestorUserId }, data: { passwordHash: senhaHash } });
+  return { ok: true };
+}

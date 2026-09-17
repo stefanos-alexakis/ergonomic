@@ -6,6 +6,7 @@ import { calcularDashboard } from "@/lib/dashboard";
 import { carregarPaginasQuestionario, carregarRespostasSalvas } from "@/lib/resposta";
 import { db } from "@/lib/db";
 import { AppShell } from "@/components/shell/app-shell";
+import { BannerImpersonacao } from "@/components/shell/banner-impersonacao";
 import { PageHeader } from "@/components/ui/page-header";
 
 export const dynamic = "force-dynamic";
@@ -68,7 +69,14 @@ export default async function DetalheRespostaPage({
   }
 
   return (
-    <AppShell contexto={workspace.nome} homeHref="/gestor" nav={NAV} accentColor={workspace.corPrimaria} secondaryColor={workspace.corSecundaria}>
+    <AppShell
+      contexto={workspace.nome}
+      homeHref="/gestor"
+      nav={NAV}
+      accentColor={workspace.corPrimaria}
+      secondaryColor={workspace.corSecundaria}
+      banner={actor.isPlatformAdmin ? <BannerImpersonacao workspaceNome={workspace.nome} /> : undefined}
+    >
       <PageHeader
         eyebrow={pesquisa.nome}
         title="Resposta individual"
