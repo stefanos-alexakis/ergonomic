@@ -10,7 +10,7 @@ import { PageHeader } from "@/components/ui/page-header";
 
 export const dynamic = "force-dynamic";
 
-const NAV = [{ href: "/gestor/estrutura", label: "Setores e funções" }];
+const NAV = [{ href: "/gestor/estrutura", label: "Setores e departamentos" }];
 
 const ROTULO_VALOR: Record<number, string> = {
   1: "Não/Nunca",
@@ -42,7 +42,7 @@ export default async function DetalheRespostaPage({
       concluidoEm: { not: null },
       codigoAcesso: { pesquisaId: pesquisa.id, tipo: "PARTICIPANTE" },
     },
-    include: { setor: true, departamento: true, segmento: true, funcao: true },
+    include: { setor: true, departamento: true },
   });
   if (!resposta) notFound();
 
@@ -76,8 +76,7 @@ export default async function DetalheRespostaPage({
 
       <p className="text-sm text-zinc-500 mb-6">
         Resposta anônima — {resposta.concluidoEm!.toLocaleDateString("pt-BR")}. Setor:{" "}
-        {resposta.setor?.nome ?? "não informado"} · Departamento: {resposta.departamento?.nome ?? "não informado"} ·
-        Segmento: {resposta.segmento?.nome ?? "não informado"} · Função: {resposta.funcao?.nome ?? "não informado"}
+        {resposta.setor?.nome ?? "não informado"} · Departamento: {resposta.departamento?.nome ?? "não informado"}
       </p>
 
       <div className="flex flex-col gap-6 mb-8">

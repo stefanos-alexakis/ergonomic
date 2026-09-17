@@ -8,15 +8,12 @@ function paraDatetimeLocal(d: Date): string {
 }
 
 async function responderTodasAsPaginas(page: Page) {
-  // Responde a primeira opção em cada pergunta da página atual e avança,
-  // repetindo até a URL cair em "?pagina=revisar". Espera a URL mudar de
-  // verdade — "networkidle" não é sinal confiável para navegação
-  // client-side do App Router (a URL muda via history API, sem os
-  // eventos de carregamento clássicos que networkidle observa).
+  // Responde a primeira opção em cada pergunta da página atual e avança.
+  // Sem tela de revisão (a pedido do cliente, ver review.md): a última
+  // página mostra "Concluir a pesquisa" em vez de "Próximo" — o helper
+  // clica no que estiver visível e retorna quando concluir, já na tela
+  // de agradecimento.
   for (let seguranca = 0; seguranca < 10; seguranca++) {
-    if (page.url().includes("pagina=revisar")) return;
-
-    const urlAntes = page.url();
     // O rádio fica visualmente escondido (sr-only) atrás de um rótulo
     // clicável estilizado — clicar no rótulo é como uma pessoa de
     // verdade interage; clicar no input escondido diretamente esbarra
@@ -26,13 +23,21 @@ async function responderTodasAsPaginas(page: Page) {
     for (let i = 0; i < total; i++) {
       await rotulosPrimeiraOpcao.nth(i).click();
     }
+
+    const botaoConcluir = page.getByRole("button", { name: "Concluir a pesquisa" });
+    if (await botaoConcluir.isVisible()) {
+      await botaoConcluir.click();
+      return;
+    }
+
+    const urlAntes = page.url();
     await page.getByRole("button", { name: "Próximo" }).click();
     await page.waitForURL((url) => url.toString() !== urlAntes, { timeout: 15_000 });
   }
-  throw new Error("Não chegou à revisão depois de várias páginas — possível loop.");
+  throw new Error("Não concluiu depois de várias páginas — possível loop.");
 }
 
-test("jornada completa do colaborador: código → organização → questionário paginado → revisar → concluir", async ({
+test("jornada completa do colaborador: código → organização → questionário paginado → concluir", async ({
   browser,
 }) => {
   const sufixo = Date.now();
@@ -66,7 +71,7 @@ test("jornada completa do colaborador: código → organização → questionár
   await gestorPage.getByRole("button", { name: "Entrar" }).click();
   await expect(gestorPage).toHaveURL(/\/gestor$/);
 
-  await gestorPage.getByRole("link", { name: "Setores e funções" }).click();
+  await gestorPage.getByRole("link", { name: "Setores e departamentos" }).click();
   const inputSetor = gestorPage.locator('form:has(input[value="setor"]) input[name="nome"]');
   await inputSetor.fill("Setor Jornada E2E");
   await inputSetor.press("Enter");
@@ -127,22 +132,12 @@ test("jornada completa do colaborador: código → organização → questionár
   await expect(page.getByRole("heading", { name: "Onde você trabalha" })).toBeVisible({ timeout: 10_000 });
   await page.getByLabel("Setor").selectOption({ label: "Setor Jornada E2E" });
   await page.getByLabel("Departamento").selectOption({ label: "Depto Jornada E2E" });
-  await page.getByText("Prefiro não informar o segmento").click();
-  await page.getByText("Prefiro não informar a função").click();
   await page.getByRole("button", { name: "Continuar para o questionário" }).click();
 
   await expect(page.getByText(/Página 1 de/)).toBeVisible();
+  // Sem tela de revisão (a pedido do cliente): responder a última página
+  // já conclui direto, o helper clica em "Concluir a pesquisa" sozinho.
   await responderTodasAsPaginas(page);
-
-  await expect(page.getByRole("heading", { name: "Revisar suas respostas" })).toBeVisible();
-  // As seções vêm recolhidas por padrão (review.md §3.5) — abre a primeira
-  // para confirmar que a resposta salva aparece. O acordeão é um botão
-  // customizado (não mais <details>/<summary> nativo, ver review.md sobre
-  // o polimento de interação aplicado à revisão).
-  await page.locator('[aria-expanded="false"]').first().click();
-  await expect(page.getByText("Não/Nunca").first()).toBeVisible();
-
-  await page.getByRole("button", { name: "Concluir a pesquisa" }).click();
   await expect(page.getByRole("heading", { name: "Obrigado por participar!" })).toBeVisible();
 
   // O link "nu" (sem ?pagina=) SEMPRE volta a pedir o código — mesmo

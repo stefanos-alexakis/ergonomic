@@ -18,6 +18,19 @@ import QRCode from "qrcode";
 
 const styles = StyleSheet.create({
   page: { padding: 24, flexDirection: "column" },
+  cabecalho: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    marginBottom: 16,
+    paddingBottom: 12,
+    borderBottom: "1pt solid #C3CFCB",
+  },
+  logo: { width: 40, height: 40, objectFit: "contain" },
+  cabecalhoInfo: { flexDirection: "column", gap: 2 },
+  cabecalhoEmpresa: { fontSize: 13, fontWeight: 700 },
+  cabecalhoPesquisa: { fontSize: 10, color: "#5F7378" },
+  cabecalhoValidade: { fontSize: 9, color: "#5F7378" },
   grade: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
   cartao: {
     width: "47%",
@@ -45,21 +58,53 @@ async function gerarQrDataUrl(url: string): Promise<string> {
   return QRCode.toDataURL(url, { margin: 1, width: 200 });
 }
 
+/**
+ * Buffer da imagem vira data URL — mesma técnica já usada pro QR
+ * (linha acima), simples e sem depender de servir o arquivo por HTTP.
+ * `formato` é passado por quem chama (route.ts), que já valida contra
+ * PNG/JPEG antes de ler o arquivo — @react-pdf/renderer não decodifica
+ * WebP.
+ */
+function logoParaDataUrl(buffer: Buffer, formato: "png" | "jpeg"): string {
+  return `data:image/${formato};base64,${buffer.toString("base64")}`;
+}
+
 export async function gerarCartoesPdf(params: {
   pesquisaNome: string;
   urlBase: string; // ex.: https://pesquisa.agtrade.com.br/p/<workspaceSlug>/<pesquisaSlug> — igual em todo cartão
   cartoes: CartaoInput[];
+  workspaceNome?: string;
+  dataFim?: Date;
+  logo?: { buffer: Buffer; formato: "png" | "jpeg" };
 }): Promise<Buffer> {
-  const { pesquisaNome, urlBase, cartoes } = params;
+  const { pesquisaNome, urlBase, cartoes, workspaceNome, dataFim, logo } = params;
 
   // Um único QR para toda a pesquisa — nunca um por código, para o link
   // impresso ser idêntico em todos os cartões.
   const qr = await gerarQrDataUrl(urlBase);
   const urlExibicao = urlBase.replace(/^https?:\/\//, "");
+  const logoDataUrl = logo ? logoParaDataUrl(logo.buffer, logo.formato) : null;
 
   const doc = (
     <Document>
       <Page size="A4" style={styles.page}>
+        {(workspaceNome || dataFim) && (
+          // fixed: repete em todas as páginas, não só na primeira — os
+          // cartões quebram de página automaticamente quando passam de
+          // uma grade (react-pdf cuida disso sozinho via flexWrap).
+          <View style={styles.cabecalho} fixed>
+            {logoDataUrl && <Image src={logoDataUrl} style={styles.logo} />}
+            <View style={styles.cabecalhoInfo}>
+              {workspaceNome && <Text style={styles.cabecalhoEmpresa}>{workspaceNome}</Text>}
+              <Text style={styles.cabecalhoPesquisa}>{pesquisaNome}</Text>
+              {dataFim && (
+                <Text style={styles.cabecalhoValidade}>
+                  Válido até {dataFim.toLocaleDateString("pt-BR")}
+                </Text>
+              )}
+            </View>
+          </View>
+        )}
         <View style={styles.grade}>
           {cartoes.map((c) => (
             <View key={c.codigo} style={styles.cartao}>

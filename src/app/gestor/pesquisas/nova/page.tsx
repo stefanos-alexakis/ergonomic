@@ -6,7 +6,7 @@ import { NovaPesquisaForm } from "./form";
 
 export const dynamic = "force-dynamic";
 
-const NAV = [{ href: "/gestor/estrutura", label: "Setores e funções" }];
+const NAV = [{ href: "/gestor/estrutura", label: "Setores e departamentos" }];
 
 export default async function NovaPesquisaPage() {
   const actor = await getActor();

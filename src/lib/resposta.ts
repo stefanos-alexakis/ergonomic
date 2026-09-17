@@ -74,8 +74,7 @@ export type EstadoJornada =
   | { tipo: "encerrada" }
   | { tipo: "concluido" }
   | { tipo: "selecionar_organizacao"; respostaId: string }
-  | { tipo: "questionario"; respostaId: string }
-  | { tipo: "revisar"; respostaId: string };
+  | { tipo: "questionario"; respostaId: string };
 
 /**
  * Carrega o estado atual da resposta a partir do código guardado no
@@ -111,38 +110,32 @@ export async function carregarEstadoJornada(
 export type ResultadoSalvarOrganizacao = { ok: true } | { ok: false; erro: string };
 
 /**
- * Grava setor/departamento/segmento/função — confirmando que cada id
- * recebido pertence de verdade ao workspace desta pesquisa antes de
- * salvar (review.md R6b: nenhum dado da rota pública entra sem essa
- * checagem, senão uma resposta poderia ficar marcada com estrutura de
- * outra empresa).
+ * Grava setor/departamento — confirmando que cada id recebido pertence
+ * de verdade ao workspace desta pesquisa antes de salvar (review.md
+ * R6b: nenhum dado da rota pública entra sem essa checagem, senão uma
+ * resposta poderia ficar marcada com estrutura de outra empresa).
+ *
+ * Segmento/função saíram da interface (a pedido do cliente) — as
+ * colunas continuam existindo em Resposta, apenas nunca mais são
+ * escritas por aqui; pesquisas antigas mantêm o dado histórico.
  */
 export async function salvarOrganizacao(
   respostaId: string,
   workspaceId: string,
-  input: { setorId: string; departamentoId: string; segmentoId?: string; funcaoId?: string },
+  input: { setorId: string; departamentoId: string },
 ): Promise<ResultadoSalvarOrganizacao> {
-  const [setor, departamento, segmento, funcao] = await Promise.all([
+  const [setor, departamento] = await Promise.all([
     db.setorOrg.findFirst({ where: { id: input.setorId, workspaceId } }),
     db.departamento.findFirst({ where: { id: input.departamentoId, workspaceId } }),
-    input.segmentoId ? db.segmento.findFirst({ where: { id: input.segmentoId, workspaceId } }) : null,
-    input.funcaoId ? db.funcao.findFirst({ where: { id: input.funcaoId, workspaceId } }) : null,
   ]);
 
   if (!setor || !departamento) {
     return { ok: false, erro: "Setor ou departamento inválido para esta empresa." };
   }
-  if (input.segmentoId && !segmento) return { ok: false, erro: "Segmento inválido para esta empresa." };
-  if (input.funcaoId && !funcao) return { ok: false, erro: "Função inválida para esta empresa." };
 
   await db.resposta.update({
     where: { id: respostaId },
-    data: {
-      setorId: setor.id,
-      departamentoId: departamento.id,
-      segmentoId: segmento?.id ?? null,
-      funcaoId: funcao?.id ?? null,
-    },
+    data: { setorId: setor.id, departamentoId: departamento.id },
   });
   return { ok: true };
 }

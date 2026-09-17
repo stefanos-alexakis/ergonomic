@@ -11,7 +11,7 @@ import { GerarLicencasButton } from "./gerar-licencas-button";
 
 export const dynamic = "force-dynamic";
 
-const NAV = [{ href: "/gestor/estrutura", label: "Setores e funções" }];
+const NAV = [{ href: "/gestor/estrutura", label: "Setores e departamentos" }];
 
 export default async function PesquisaDetalhePage({
   params,

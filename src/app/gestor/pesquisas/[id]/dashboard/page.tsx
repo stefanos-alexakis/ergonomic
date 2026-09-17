@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
 
-const NAV = [{ href: "/gestor/estrutura", label: "Setores e funções" }];
+const NAV = [{ href: "/gestor/estrutura", label: "Setores e departamentos" }];
 
 function TabelaGrupo({ titulo, grupos }: { titulo: string; grupos: GrupoComSupressao<ResumoGrupo>[] }) {
   if (grupos.length === 0) return null;
@@ -68,7 +68,7 @@ export default async function DashboardPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ setorId?: string; departamentoId?: string; segmentoId?: string; funcaoId?: string }>;
+  searchParams: Promise<{ setorId?: string; departamentoId?: string }>;
 }) {
   const { id } = await params;
   const filtros = await searchParams;
@@ -84,7 +84,7 @@ export default async function DashboardPage({
     listarCatalogoOrganizacional(workspace.id),
   ]);
 
-  const filtroAtivo = Boolean(filtros.setorId || filtros.departamentoId || filtros.segmentoId || filtros.funcaoId);
+  const filtroAtivo = Boolean(filtros.setorId || filtros.departamentoId);
   const queryRespostas = new URLSearchParams(
     Object.entries(filtros).filter(([, v]) => v) as [string, string][],
   ).toString();
@@ -129,32 +129,6 @@ export default async function DashboardPage({
                 {catalogo.departamentos.map((d) => (
                   <option key={d.id} value={d.id}>
                     {d.nome}
-                  </option>
-                ))}
-              </Select>
-            </div>
-            <div className="flex flex-col gap-1">
-              <label htmlFor="segmentoId" className="text-xs font-medium text-zinc-500">
-                Segmento
-              </label>
-              <Select id="segmentoId" name="segmentoId" defaultValue={filtros.segmentoId ?? ""} className="w-44">
-                <option value="">Todos</option>
-                {catalogo.segmentos.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.nome}
-                  </option>
-                ))}
-              </Select>
-            </div>
-            <div className="flex flex-col gap-1">
-              <label htmlFor="funcaoId" className="text-xs font-medium text-zinc-500">
-                Função
-              </label>
-              <Select id="funcaoId" name="funcaoId" defaultValue={filtros.funcaoId ?? ""} className="w-44">
-                <option value="">Todas</option>
-                {catalogo.funcoes.map((f) => (
-                  <option key={f.id} value={f.id}>
-                    {f.nome}
                   </option>
                 ))}
               </Select>
@@ -212,8 +186,6 @@ export default async function DashboardPage({
                 <>
                   <TabelaGrupo titulo="Por setor" grupos={dashboard.porSetor} />
                   <TabelaGrupo titulo="Por departamento" grupos={dashboard.porDepartamento} />
-                  <TabelaGrupo titulo="Por segmento" grupos={dashboard.porSegmento} />
-                  <TabelaGrupo titulo="Por função" grupos={dashboard.porFuncao} />
                 </>
               )}
 

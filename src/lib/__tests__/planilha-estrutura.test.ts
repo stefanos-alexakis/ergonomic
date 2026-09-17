@@ -2,32 +2,44 @@ import { describe, expect, it } from "vitest";
 import ExcelJS from "exceljs";
 import { parsePlanilhaEstrutura } from "@/lib/planilha-estrutura";
 
-async function gerarPlanilha(linhas: (string | number)[][]): Promise<Buffer> {
+async function gerarPlanilha(cabecalho: string[], linhas: (string | number)[][]): Promise<Buffer> {
   const wb = new ExcelJS.Workbook();
   const sheet = wb.addWorksheet("Estrutura");
-  sheet.addRow(["Setor", "Departamento", "Segmento", "Função"]);
+  sheet.addRow(cabecalho);
   for (const linha of linhas) sheet.addRow(linha);
   const arrayBuffer = await wb.xlsx.writeBuffer();
   return Buffer.from(arrayBuffer);
 }
 
 describe("parsePlanilhaEstrutura", () => {
-  it("lê setores/departamentos/segmentos/funções e remove duplicados", async () => {
-    const buf = await gerarPlanilha([
-      ["Produção", "Linha 1", "", "Operador"],
-      ["Produção", "Linha 2", "", "Operador"], // "Produção" e "Operador" repetidos
-      ["Administrativo", "Financeiro", "Backoffice", "Analista"],
-    ]);
+  it("lê setores/departamentos e remove duplicados", async () => {
+    const buf = await gerarPlanilha(
+      ["Setor", "Departamento"],
+      [
+        ["Produção", "Linha 1"],
+        ["Produção", "Linha 2"], // "Produção" repetido
+        ["Administrativo", "Financeiro"],
+      ],
+    );
     const r = await parsePlanilhaEstrutura(buf);
     expect(r.erros).toHaveLength(0);
     expect(r.setores.sort()).toEqual(["Administrativo", "Produção"]);
     expect(r.departamentos.sort()).toEqual(["Financeiro", "Linha 1", "Linha 2"]);
-    expect(r.segmentos).toEqual(["Backoffice"]);
-    expect(r.funcoes.sort()).toEqual(["Analista", "Operador"]);
+  });
+
+  it("importa planilha antiga de 4 colunas ignorando Segmento/Função (retrocompatibilidade)", async () => {
+    const buf = await gerarPlanilha(
+      ["Setor", "Departamento", "Segmento", "Função"],
+      [["Produção", "Linha 1", "Backoffice", "Operador"]],
+    );
+    const r = await parsePlanilhaEstrutura(buf);
+    expect(r.erros).toHaveLength(0);
+    expect(r.setores).toEqual(["Produção"]);
+    expect(r.departamentos).toEqual(["Linha 1"]);
   });
 
   it("ignora células vazias sem quebrar", async () => {
-    const buf = await gerarPlanilha([["Só Setor", "", "", ""]]);
+    const buf = await gerarPlanilha(["Setor", "Departamento"], [["Só Setor", ""]]);
     const r = await parsePlanilhaEstrutura(buf);
     expect(r.setores).toEqual(["Só Setor"]);
     expect(r.departamentos).toEqual([]);
@@ -47,10 +59,13 @@ describe("parsePlanilhaEstrutura", () => {
 
   it("reporta erro por linha/coluna quando o valor é absurdamente longo, sem parar a importação", async () => {
     const valorLongo = "x".repeat(200);
-    const buf = await gerarPlanilha([
-      ["Setor Válido", "", "", ""],
-      [valorLongo, "", "", ""],
-    ]);
+    const buf = await gerarPlanilha(
+      ["Setor", "Departamento"],
+      [
+        ["Setor Válido", ""],
+        [valorLongo, ""],
+      ],
+    );
     const r = await parsePlanilhaEstrutura(buf);
     expect(r.setores).toEqual(["Setor Válido"]);
     expect(r.erros).toHaveLength(1);

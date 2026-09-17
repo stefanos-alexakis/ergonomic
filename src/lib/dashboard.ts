@@ -75,8 +75,6 @@ export function agruparEResumir(respondentes: { grupoNome: string; media: number
 export type FiltrosDashboard = {
   setorId?: string;
   departamentoId?: string;
-  segmentoId?: string;
-  funcaoId?: string;
 };
 
 export type DashboardPesquisa = {
@@ -89,8 +87,6 @@ export type DashboardPesquisa = {
   porDimensao: { nome: string; media: number }[];
   porSetor: GrupoComSupressao<ResumoGrupo>[];
   porDepartamento: GrupoComSupressao<ResumoGrupo>[];
-  porSegmento: GrupoComSupressao<ResumoGrupo>[];
-  porFuncao: GrupoComSupressao<ResumoGrupo>[];
   // Total de respostas concluídas já considerando o filtro atual — usado
   // pra decidir se a navegação por resposta individual pode ser liberada
   // (mesma regra de supressão de grupo pequeno, constitution.md §3: um
@@ -98,8 +94,8 @@ export type DashboardPesquisa = {
   // reidentificação que um grupo pequeno).
   totalFiltrado: number;
   // true quando há dados suficientes na pesquisa toda, mas o filtro atual
-  // (setor/departamento/segmento/função) afunilou pra menos gente que o
-  // limite de supressão — distinto de `suficiente: false`, que significa
+  // (setor/departamento) afunilou pra menos gente que o limite de
+  // supressão — distinto de `suficiente: false`, que significa
   // que a pesquisa inteira ainda não tem respostas suficientes.
   filtroSuprimido: boolean;
 };
@@ -130,8 +126,6 @@ export async function calcularDashboard(
       porDimensao: [],
       porSetor: [],
       porDepartamento: [],
-      porSegmento: [],
-      porFuncao: [],
       totalFiltrado: 0,
       filtroSuprimido: false,
     };
@@ -145,14 +139,10 @@ export async function calcularDashboard(
       codigoAcesso: { pesquisaId, tipo: "PARTICIPANTE" },
       ...(filtros.setorId ? { setorId: filtros.setorId } : {}),
       ...(filtros.departamentoId ? { departamentoId: filtros.departamentoId } : {}),
-      ...(filtros.segmentoId ? { segmentoId: filtros.segmentoId } : {}),
-      ...(filtros.funcaoId ? { funcaoId: filtros.funcaoId } : {}),
     },
     include: {
       setor: true,
       departamento: true,
-      segmento: true,
-      funcao: true,
       itens: {
         include: { pergunta: { select: { polaridade: true, peso: true, fatorRisco: { select: { dimensao: true } } } } },
       },
@@ -173,8 +163,6 @@ export async function calcularDashboard(
       porDimensao: [],
       porSetor: [],
       porDepartamento: [],
-      porSegmento: [],
-      porFuncao: [],
       totalFiltrado: respostas.length,
       filtroSuprimido: true,
     };
@@ -208,7 +196,7 @@ export async function calcularDashboard(
     .map(([nome, itens]) => ({ nome, media: calcularMedia(itens) ?? 0 }))
     .sort((a, b) => b.media - a.media);
 
-  const resumirCampo = (campo: "setor" | "departamento" | "segmento" | "funcao") => {
+  const resumirCampo = (campo: "setor" | "departamento") => {
     const respondentesDoCampo = mediasPessoais
       .filter((m) => m.resposta[campo] != null)
       .map((m) => ({ grupoNome: m.resposta[campo]!.nome, media: m.media }));
@@ -229,8 +217,6 @@ export async function calcularDashboard(
     porDimensao,
     porSetor: resumirCampo("setor"),
     porDepartamento: resumirCampo("departamento"),
-    porSegmento: resumirCampo("segmento"),
-    porFuncao: resumirCampo("funcao"),
     totalFiltrado: respostas.length,
     filtroSuprimido: false,
   };
@@ -240,8 +226,6 @@ export type RespostaIndividual = {
   id: string;
   setor: string | null;
   departamento: string | null;
-  segmento: string | null;
-  funcao: string | null;
   concluidoEm: Date;
   media: number;
   scoreBase: number;
@@ -264,15 +248,11 @@ export async function listarRespostasIndividuais(
       codigoAcesso: { pesquisaId, tipo: "PARTICIPANTE" },
       ...(filtros.setorId ? { setorId: filtros.setorId } : {}),
       ...(filtros.departamentoId ? { departamentoId: filtros.departamentoId } : {}),
-      ...(filtros.segmentoId ? { segmentoId: filtros.segmentoId } : {}),
-      ...(filtros.funcaoId ? { funcaoId: filtros.funcaoId } : {}),
     },
     orderBy: { concluidoEm: "desc" },
     include: {
       setor: true,
       departamento: true,
-      segmento: true,
-      funcao: true,
       itens: {
         include: { pergunta: { select: { polaridade: true, peso: true } } },
       },
@@ -287,8 +267,6 @@ export async function listarRespostasIndividuais(
       id: r.id,
       setor: r.setor?.nome ?? null,
       departamento: r.departamento?.nome ?? null,
-      segmento: r.segmento?.nome ?? null,
-      funcao: r.funcao?.nome ?? null,
       concluidoEm: r.concluidoEm!,
       media,
       scoreBase: calcularScoreBase(media),

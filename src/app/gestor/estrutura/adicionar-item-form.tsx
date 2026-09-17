@@ -6,11 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/ui/field";
 
-export function AdicionarItemForm({
-  tipo,
-}: {
-  tipo: "setor" | "departamento" | "segmento" | "funcao";
-}) {
+export function AdicionarItemForm({ tipo }: { tipo: "setor" | "departamento" }) {
   const [estado, formAction, pendente] = useActionState(adicionarItemAction, undefined);
   const formRef = useRef<HTMLFormElement>(null);
 

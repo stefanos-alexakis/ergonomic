@@ -1,11 +1,10 @@
 "use client";
 
-import { useActionState, useMemo, useState } from "react";
+import { useActionState, useMemo } from "react";
 import { salvarOrganizacaoAction, type EstadoFormulario } from "./actions";
 import { Field, FieldError } from "@/components/ui/field";
 import { Select } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { CheckboxLabel } from "@/components/ui/checkbox";
 
 type Item = { id: string; nome: string };
 
@@ -15,16 +14,12 @@ export function FormularioOrganizacao({
   respostaId,
   setores,
   departamentos,
-  segmentos,
-  funcoes,
 }: {
   workspaceSlug: string;
   pesquisaSlug: string;
   respostaId: string;
   setores: Item[];
   departamentos: Item[];
-  segmentos: Item[];
-  funcoes: Item[];
 }) {
   // useMemo evita recriar a action a cada render — ver nota em
   // questionario.tsx sobre o bug que isso causa com useActionState.
@@ -33,8 +28,6 @@ export function FormularioOrganizacao({
     [workspaceSlug, pesquisaSlug, respostaId],
   );
   const [estado, formAction, pendente] = useActionState<EstadoFormulario, FormData>(acao, undefined);
-  const [semSegmento, setSemSegmento] = useState(false);
-  const [semFuncao, setSemFuncao] = useState(false);
 
   return (
     <main className="max-w-lg mx-auto mt-14 px-5">
@@ -71,44 +64,6 @@ export function FormularioOrganizacao({
             ))}
           </Select>
         </Field>
-
-        <div className="border-t border-zinc-100 pt-5 flex flex-col gap-5">
-          <div className="flex flex-col gap-2">
-            <CheckboxLabel checked={semSegmento} onChange={(e) => setSemSegmento(e.target.checked)}>
-              Prefiro não informar o segmento
-            </CheckboxLabel>
-            {!semSegmento && (
-              <Field label="Segmento" htmlFor="segmentoId">
-                <Select id="segmentoId" name="segmentoId" defaultValue="">
-                  <option value="">Selecione (opcional)</option>
-                  {segmentos.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.nome}
-                    </option>
-                  ))}
-                </Select>
-              </Field>
-            )}
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <CheckboxLabel checked={semFuncao} onChange={(e) => setSemFuncao(e.target.checked)}>
-              Prefiro não informar a função
-            </CheckboxLabel>
-            {!semFuncao && (
-              <Field label="Função" htmlFor="funcaoId">
-                <Select id="funcaoId" name="funcaoId" defaultValue="">
-                  <option value="">Selecione (opcional)</option>
-                  {funcoes.map((f) => (
-                    <option key={f.id} value={f.id}>
-                      {f.nome}
-                    </option>
-                  ))}
-                </Select>
-              </Field>
-            )}
-          </div>
-        </div>
 
         {estado?.erro && <FieldError>{estado.erro}</FieldError>}
         <Button type="submit" disabled={pendente} className="w-full">

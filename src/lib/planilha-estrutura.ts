@@ -2,21 +2,23 @@ import ExcelJS from "exceljs";
 
 /**
  * Formato esperado da planilha de importação (tasks.md Fase 3):
- * uma aba com 4 colunas, cabeçalho na primeira linha —
- * "Setor" | "Departamento" | "Segmento" | "Função" — cada célula
- * preenchida é um valor a cadastrar naquele catálogo; células vazias são
- * ignoradas (nem toda linha precisa ter as 4 colunas preenchidas).
+ * uma aba com 2 colunas, cabeçalho na primeira linha —
+ * "Setor" | "Departamento" — cada célula preenchida é um valor a
+ * cadastrar naquele catálogo; células vazias são ignoradas (nem toda
+ * linha precisa ter as 2 colunas preenchidas).
+ *
+ * Segmento e Função saíram da interface (review.md) — o parser casa por
+ * NOME de coluna, então uma planilha antiga com essas colunas extras
+ * continua importando normalmente, só ignora o que sobra.
  */
 
-const COLUNAS_ESPERADAS = ["setor", "departamento", "segmento", "funcao", "função"];
+const COLUNAS_ESPERADAS = ["setor", "departamento"];
 
 export type ErroLinhaPlanilha = { linha: number; coluna: string; mensagem: string };
 
 export type ResultadoParsePlanilha = {
   setores: string[];
   departamentos: string[];
-  segmentos: string[];
-  funcoes: string[];
   erros: ErroLinhaPlanilha[];
 };
 
@@ -34,8 +36,6 @@ export async function parsePlanilhaEstrutura(
   const resultado: ResultadoParsePlanilha = {
     setores: [],
     departamentos: [],
-    segmentos: [],
-    funcoes: [],
     erros: [],
   };
 
@@ -52,8 +52,7 @@ export async function parsePlanilhaEstrutura(
   cabecalho.eachCell((cell, colNumber) => {
     const nome = normalizarCabecalho(cell.value);
     if (COLUNAS_ESPERADAS.includes(nome)) {
-      const chave = nome === "função" ? "funcao" : nome;
-      indiceColuna[chave] = colNumber;
+      indiceColuna[nome] = colNumber;
     }
   });
 
@@ -61,8 +60,7 @@ export async function parsePlanilhaEstrutura(
     resultado.erros.push({
       linha: 1,
       coluna: "-",
-      mensagem:
-        'Cabeçalho não reconhecido. Use as colunas "Setor", "Departamento", "Segmento", "Função".',
+      mensagem: 'Cabeçalho não reconhecido. Use as colunas "Setor", "Departamento".',
     });
     return resultado;
   }
@@ -70,8 +68,6 @@ export async function parsePlanilhaEstrutura(
   const vistos = {
     setor: new Set<string>(),
     departamento: new Set<string>(),
-    segmento: new Set<string>(),
-    funcao: new Set<string>(),
   };
 
   for (let linha = 2; linha <= sheet.rowCount; linha++) {
@@ -96,8 +92,6 @@ export async function parsePlanilhaEstrutura(
 
   resultado.setores = Array.from(vistos.setor);
   resultado.departamentos = Array.from(vistos.departamento);
-  resultado.segmentos = Array.from(vistos.segmento);
-  resultado.funcoes = Array.from(vistos.funcao);
 
   return resultado;
 }

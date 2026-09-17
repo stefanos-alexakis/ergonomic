@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 
 export const dynamic = "force-dynamic";
 
-const NAV = [{ href: "/gestor/estrutura", label: "Setores e funções" }];
+const NAV = [{ href: "/gestor/estrutura", label: "Setores e departamentos" }];
 
 export default async function GestorHomePage() {
   const actor = await getActor();

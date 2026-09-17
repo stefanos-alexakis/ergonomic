@@ -84,7 +84,7 @@ test("painel do gestor: estado insuficiente, depois contagem e supressão corret
   await page.getByRole("button", { name: "Entrar" }).click();
   await expect(page).toHaveURL(/\/gestor$/);
 
-  await page.getByRole("link", { name: "Setores e funções" }).click();
+  await page.getByRole("link", { name: "Setores e departamentos" }).click();
   const inputDepto = page.locator('form:has(input[value="departamento"]) input[name="nome"]');
   await inputDepto.fill("Depto Dashboard E2E");
   await inputDepto.press("Enter");
@@ -141,8 +141,8 @@ test("painel do gestor: estado insuficiente, depois contagem e supressão corret
   await expect(page.getByTestId("contador-distribuidos")).toHaveText("37"); // 20 do botão + 17 semeados
   await expect(page.getByText(/Média geral de risco: 3\.00/)).toBeVisible();
 
-  await expect(page.getByText("Setor Grande E2E")).toBeVisible();
   const linhaGrande = page.locator("tr", { hasText: "Setor Grande E2E" });
+  await expect(linhaGrande).toBeVisible();
   await expect(linhaGrande.getByText("10", { exact: true })).toBeVisible();
 
   const linhaMedio = page.locator("tr", { hasText: "Setor Medio E2E" });

@@ -10,7 +10,6 @@ import { listarCatalogoOrganizacional } from "@/lib/estrutura";
 import { FormularioCodigo } from "./formulario-codigo";
 import { FormularioOrganizacao } from "./formulario-organizacao";
 import { Questionario } from "./questionario";
-import { Revisao } from "./revisao";
 
 export const dynamic = "force-dynamic";
 
@@ -97,43 +96,15 @@ export default async function JornadaColaboradorPage({
         respostaId={estado.respostaId}
         setores={catalogo.setores}
         departamentos={catalogo.departamentos}
-        segmentos={catalogo.segmentos}
-        funcoes={catalogo.funcoes}
       />
     );
   }
 
-  // estado.tipo === "questionario" — paginado, ou a revisão final.
+  // estado.tipo === "questionario" — paginado. Sem tela de revisão: a
+  // última página conclui direto (a pedido do cliente, ver review.md) —
+  // salvarPaginaAction já cuida disso no redirect.
   const paginas = await carregarPaginasQuestionario(pesquisa.questionarioId);
   const respostasSalvas = await carregarRespostasSalvas(estado.respostaId);
-  const totalPerguntas = paginas.reduce((acc, p) => acc + p.perguntas.length, 0);
-
-  if (paginaParam === "revisar") {
-    const blocosVistos = new Map<
-      string,
-      { pagina: number; texto: string; perguntaId: string; ordemGlobal: number }[]
-    >();
-    for (const p of paginas) {
-      const lista = blocosVistos.get(p.blocoNome) ?? [];
-      for (const q of p.perguntas) {
-        lista.push({ pagina: p.numeroPagina, texto: q.texto, perguntaId: q.id, ordemGlobal: q.ordemGlobal });
-      }
-      blocosVistos.set(p.blocoNome, lista);
-    }
-    const blocos = Array.from(blocosVistos.entries()).map(([blocoNome, itensBrutos]) => ({
-      blocoNome,
-      itens: itensBrutos.map((i) => ({ ...i, valor: respostasSalvas.get(i.perguntaId) })),
-    }));
-
-    return (
-      <Revisao
-        workspaceSlug={workspaceSlug}
-        pesquisaSlug={pesquisaSlug}
-        respostaId={estado.respostaId}
-        blocos={blocos}
-      />
-    );
-  }
 
   const numeroPagina = Math.min(Math.max(Number.parseInt(paginaParam ?? "1", 10) || 1, 1), paginas.length);
   const pagina = paginas[numeroPagina - 1];
@@ -152,7 +123,6 @@ export default async function JornadaColaboradorPage({
       respostaId={estado.respostaId}
       pagina={pagina}
       totalPaginas={paginas.length}
-      totalPerguntas={totalPerguntas}
       respostasSalvas={respostasSalvas}
     />
   );

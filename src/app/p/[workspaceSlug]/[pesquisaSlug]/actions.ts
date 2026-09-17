@@ -66,8 +66,6 @@ export async function salvarOrganizacaoAction(
 
   const setorId = String(formData.get("setorId") ?? "");
   const departamentoId = String(formData.get("departamentoId") ?? "");
-  const segmentoId = String(formData.get("segmentoId") ?? "") || undefined;
-  const funcaoId = String(formData.get("funcaoId") ?? "") || undefined;
 
   if (!setorId || !departamentoId) {
     return { erro: "Selecione setor e departamento." };
@@ -76,8 +74,6 @@ export async function salvarOrganizacaoAction(
   const resultado = await salvarOrganizacao(respostaId, pesquisa.workspaceId, {
     setorId,
     departamentoId,
-    segmentoId,
-    funcaoId,
   });
   if (!resultado.ok) return { erro: resultado.erro };
 
@@ -107,10 +103,12 @@ export async function salvarPaginaAction(
 
   const caminho = caminhoBase(workspaceSlug, pesquisaSlug);
   const proximaPagina = paginas.find((p) => p.numeroPagina === paginaAtual + 1);
-  redirect(proximaPagina ? `${caminho}?pagina=${proximaPagina.numeroPagina}` : `${caminho}?pagina=revisar`);
-}
 
-export async function concluirAction(workspaceSlug: string, pesquisaSlug: string, respostaId: string) {
-  await concluirResposta(respostaId);
-  redirect(`${caminhoBase(workspaceSlug, pesquisaSlug)}?pagina=1`);
+  // Sem tela de revisão (a pedido do cliente, ver review.md): a última
+  // página já conclui a pesquisa direto, sem etapa intermediária.
+  if (!proximaPagina) {
+    await concluirResposta(respostaId);
+    redirect(`${caminho}?pagina=1`);
+  }
+  redirect(`${caminho}?pagina=${proximaPagina.numeroPagina}`);
 }

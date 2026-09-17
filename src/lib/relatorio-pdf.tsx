@@ -67,8 +67,6 @@ export async function gerarRelatorioPdf(params: {
               [
                 ["Por setor", dashboard.porSetor],
                 ["Por departamento", dashboard.porDepartamento],
-                ["Por segmento", dashboard.porSegmento],
-                ["Por função", dashboard.porFuncao],
               ] as const
             ).map(([titulo, grupos]) =>
               grupos.length === 0 ? null : (

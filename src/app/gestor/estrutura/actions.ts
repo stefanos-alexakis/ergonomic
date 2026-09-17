@@ -3,11 +3,21 @@
 import { revalidatePath } from "next/cache";
 import { getActor } from "@/lib/tenant";
 import { getWorkspaceDoGestor } from "@/lib/pesquisa";
-import { adicionarItemCatalogo, importarPlanilhaEstrutura } from "@/lib/estrutura";
+import {
+  adicionarItemCatalogo,
+  importarPlanilhaEstrutura,
+  removerItemCatalogo,
+  renomearItemCatalogo,
+  type TipoCatalogo,
+} from "@/lib/estrutura";
 
 export type EstadoEstrutura = { erro?: string; mensagem?: string } | undefined;
 
-const TIPOS = ["setor", "departamento", "segmento", "funcao"] as const;
+const TIPOS = ["setor", "departamento"] as const;
+
+function tipoValido(tipo: string): tipo is TipoCatalogo {
+  return (TIPOS as readonly string[]).includes(tipo);
+}
 
 export async function adicionarItemAction(
   _estadoAnterior: EstadoEstrutura,
@@ -20,12 +30,47 @@ export async function adicionarItemAction(
 
   const tipo = String(formData.get("tipo") ?? "");
   const nome = String(formData.get("nome") ?? "").trim();
-  if (!TIPOS.includes(tipo as (typeof TIPOS)[number])) return { erro: "Tipo inválido." };
+  if (!tipoValido(tipo)) return { erro: "Tipo inválido." };
   if (!nome) return { erro: "Nome não pode ser vazio." };
 
-  await adicionarItemCatalogo(workspace.id, tipo as (typeof TIPOS)[number], nome);
+  await adicionarItemCatalogo(workspace.id, tipo, nome);
   revalidatePath("/gestor/estrutura");
   return { mensagem: "Adicionado." };
+}
+
+export async function renomearItemAction(
+  tipo: TipoCatalogo,
+  id: string,
+  _estadoAnterior: EstadoEstrutura,
+  formData: FormData,
+): Promise<EstadoEstrutura> {
+  const actor = await getActor();
+  if (!actor) return { erro: "Sem sessão." };
+  const workspace = await getWorkspaceDoGestor(actor.userId);
+  if (!workspace) return { erro: "Usuário sem empresa vinculada." };
+
+  const novoNome = String(formData.get("nome") ?? "");
+  const resultado = await renomearItemCatalogo(workspace.id, tipo, id, novoNome);
+  if (!resultado.ok) return { erro: resultado.erro };
+
+  revalidatePath("/gestor/estrutura");
+  return { mensagem: "Renomeado." };
+}
+
+export async function removerItemAction(
+  tipo: TipoCatalogo,
+  id: string,
+): Promise<EstadoEstrutura> {
+  const actor = await getActor();
+  if (!actor) return { erro: "Sem sessão." };
+  const workspace = await getWorkspaceDoGestor(actor.userId);
+  if (!workspace) return { erro: "Usuário sem empresa vinculada." };
+
+  const resultado = await removerItemCatalogo(workspace.id, tipo, id);
+  if (!resultado.ok) return { erro: resultado.erro };
+
+  revalidatePath("/gestor/estrutura");
+  return { mensagem: "Removido." };
 }
 
 export async function importarPlanilhaAction(

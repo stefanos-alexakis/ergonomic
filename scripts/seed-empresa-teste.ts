@@ -90,7 +90,7 @@ function gerarValor(perfil: PerfilRisco, nomeDimensao: string): number {
   return Math.round(alvo);
 }
 
-async function upsertCatalogo(workspaceId: string, tipo: "setorOrg" | "departamento" | "segmento" | "funcao", nome: string) {
+async function upsertCatalogo(workspaceId: string, tipo: "setorOrg" | "departamento", nome: string) {
   const where = { workspaceId_nome: { workspaceId, nome } };
   const data = { workspaceId, nome };
   switch (tipo) {
@@ -98,10 +98,6 @@ async function upsertCatalogo(workspaceId: string, tipo: "setorOrg" | "departame
       return db.setorOrg.upsert({ where, update: {}, create: data });
     case "departamento":
       return db.departamento.upsert({ where, update: {}, create: data });
-    case "segmento":
-      return db.segmento.upsert({ where, update: {}, create: data });
-    case "funcao":
-      return db.funcao.upsert({ where, update: {}, create: data });
   }
 }
 
@@ -153,19 +149,6 @@ async function main() {
     upsertCatalogo(workspaceId, "departamento", "Financeiro"),
     upsertCatalogo(workspaceId, "departamento", "Recursos Humanos"),
     upsertCatalogo(workspaceId, "departamento", "Vendas"),
-  ]);
-
-  const [segOperacional, segAdministrativo] = await Promise.all([
-    upsertCatalogo(workspaceId, "segmento", "Operacional"),
-    upsertCatalogo(workspaceId, "segmento", "Administrativo"),
-  ]);
-
-  const [funcOperador, funcTecnico, funcAnalistaFin, funcAnalistaRH, funcVendedor] = await Promise.all([
-    upsertCatalogo(workspaceId, "funcao", "Operador de Produção"),
-    upsertCatalogo(workspaceId, "funcao", "Técnico de Manutenção"),
-    upsertCatalogo(workspaceId, "funcao", "Analista Financeiro"),
-    upsertCatalogo(workspaceId, "funcao", "Analista de RH"),
-    upsertCatalogo(workspaceId, "funcao", "Vendedor"),
   ]);
 
   console.log("Catálogo organizacional criado.");
@@ -228,44 +211,32 @@ async function main() {
     perfil: PerfilRisco;
     setorId: string;
     departamentoId: string;
-    segmentoId: string;
-    funcaoId: string;
   };
   const perfis: Perfil[] = [
     ...Array.from({ length: 5 }, () => ({
       perfil: PERFIL_PRODUCAO,
       setorId: setorProducao.id,
       departamentoId: deptoLinha.id,
-      segmentoId: segOperacional.id,
-      funcaoId: funcOperador.id,
     })),
     ...Array.from({ length: 3 }, () => ({
       perfil: PERFIL_PRODUCAO,
       setorId: setorProducao.id,
       departamentoId: deptoManutencao.id,
-      segmentoId: segOperacional.id,
-      funcaoId: funcTecnico.id,
     })),
     ...Array.from({ length: 3 }, () => ({
       perfil: PERFIL_ADMINISTRATIVO,
       setorId: setorAdministrativo.id,
       departamentoId: deptoFinanceiro.id,
-      segmentoId: segAdministrativo.id,
-      funcaoId: funcAnalistaFin.id,
     })),
     ...Array.from({ length: 3 }, () => ({
       perfil: PERFIL_ADMINISTRATIVO,
       setorId: setorAdministrativo.id,
       departamentoId: deptoRH.id,
-      segmentoId: segAdministrativo.id,
-      funcaoId: funcAnalistaRH.id,
     })),
     ...Array.from({ length: 4 }, () => ({
       perfil: PERFIL_COMERCIAL,
       setorId: setorComercial.id,
       departamentoId: deptoVendas.id,
-      segmentoId: segAdministrativo.id,
-      funcaoId: funcVendedor.id,
     })),
   ];
 
@@ -287,8 +258,6 @@ async function main() {
           codigoAcessoId: codigo.id,
           setorId: p.setorId,
           departamentoId: p.departamentoId,
-          segmentoId: p.segmentoId,
-          funcaoId: p.funcaoId,
           iniciadoEm,
           concluidoEm,
         },

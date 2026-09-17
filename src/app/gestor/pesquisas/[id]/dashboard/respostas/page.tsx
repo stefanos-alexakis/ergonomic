@@ -9,14 +9,14 @@ import { Table, Thead, Th, Tr, Td } from "@/components/ui/table";
 
 export const dynamic = "force-dynamic";
 
-const NAV = [{ href: "/gestor/estrutura", label: "Setores e funções" }];
+const NAV = [{ href: "/gestor/estrutura", label: "Setores e departamentos" }];
 
 export default async function RespostasIndividuaisPage({
   params,
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ setorId?: string; departamentoId?: string; segmentoId?: string; funcaoId?: string }>;
+  searchParams: Promise<{ setorId?: string; departamentoId?: string }>;
 }) {
   const { id } = await params;
   const filtros = await searchParams;
@@ -41,8 +41,7 @@ export default async function RespostasIndividuaisPage({
 
       <p className="text-sm text-zinc-500 mb-6 max-w-2xl">
         Cada linha é uma resposta anônima — nenhum dado identifica quem respondeu (nome, e-mail,
-        matrícula). Só a organização declarada (setor/departamento/segmento/função) e as respostas
-        em si.
+        matrícula). Só a organização declarada (setor/departamento) e as respostas em si.
       </p>
 
       <Table>
@@ -51,8 +50,6 @@ export default async function RespostasIndividuaisPage({
             <Th>Concluída em</Th>
             <Th>Setor</Th>
             <Th>Departamento</Th>
-            <Th>Segmento</Th>
-            <Th>Função</Th>
             <Th>Score Base</Th>
           </Tr>
         </Thead>
@@ -62,8 +59,6 @@ export default async function RespostasIndividuaisPage({
               <Td className="text-zinc-500">{r.concluidoEm.toLocaleDateString("pt-BR")}</Td>
               <Td>{r.setor ?? "—"}</Td>
               <Td>{r.departamento ?? "—"}</Td>
-              <Td>{r.segmento ?? "—"}</Td>
-              <Td>{r.funcao ?? "—"}</Td>
               <Td>
                 <Link
                   href={`/gestor/pesquisas/${pesquisa.id}/dashboard/respostas/${r.id}`}

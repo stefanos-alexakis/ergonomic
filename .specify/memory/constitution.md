@@ -29,9 +29,11 @@
 
 ## 3. Estatística nunca compromete o anonimato
 
-- Nenhum agregado (setor × departamento × segmento × função, cruzado ou não) pode ser exibido
-  isoladamente quando representa menos de N respostas concluídas (padrão N=5, configurável por
-  workspace). Grupos abaixo do limite são suprimidos ou agrupados em "outros".
+- Nenhum agregado (setor × departamento, cruzado ou não) pode ser exibido isoladamente quando
+  representa menos de N respostas concluídas (padrão N=5, configurável por workspace). Grupos
+  abaixo do limite são suprimidos ou agrupados em "outros". (Segmento e Função saíram da
+  interface a pedido do cliente — as colunas continuam no banco para pesquisas antigas, mas não
+  são mais coletadas nem exibidas; ver review.md.)
 - A supressão precisa resistir à dedução por subtração: se apenas um grupo for suprimido, o
   segundo menor também é — senão o total visível revela o valor escondido.
 - Horário individual de resposta nunca é exibido ou exportado, nem em listagens ordenáveis —

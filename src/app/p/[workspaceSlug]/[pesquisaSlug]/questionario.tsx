@@ -21,7 +21,6 @@ export function Questionario({
   respostaId,
   pagina,
   totalPaginas,
-  totalPerguntas,
   respostasSalvas,
 }: {
   workspaceSlug: string;
@@ -29,9 +28,9 @@ export function Questionario({
   respostaId: string;
   pagina: PaginaQuestionario;
   totalPaginas: number;
-  totalPerguntas: number;
   respostasSalvas: Map<string, number>;
 }) {
+  const ultimaPagina = pagina.numeroPagina === totalPaginas;
   // useMemo é essencial aqui, não só otimização: .bind() cria uma função
   // nova a cada render, e o useActionState do React 19 ficava confuso com
   // a identidade da action mudando — o primeiro "Próximo" de cada página
@@ -72,10 +71,7 @@ export function Questionario({
           >
             <legend className="sr-only">{p.texto}</legend>
             <p className="font-medium text-zinc-900 mb-4 leading-relaxed">
-              <span className="text-zinc-400 font-normal">
-                {p.ordemGlobal} de {totalPerguntas}.
-              </span>{" "}
-              {p.texto}
+              <span className="text-zinc-400 font-normal">{p.ordemGlobal}.</span> {p.texto}
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
               {OPCOES.map((op) => (
@@ -114,7 +110,7 @@ export function Questionario({
             <span />
           )}
           <Button type="submit" disabled={pendente}>
-            {pendente ? "Salvando..." : "Próximo"}
+            {pendente ? "Enviando..." : ultimaPagina ? "Concluir a pesquisa" : "Próximo"}
           </Button>
         </div>
       </form>

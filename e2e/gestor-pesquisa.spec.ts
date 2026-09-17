@@ -7,9 +7,9 @@ const ADMIN_SENHA = process.env.E2E_ADMIN_SENHA ?? "senhaForte123";
 async function gerarPlanilhaTeste(): Promise<Buffer> {
   const wb = new ExcelJS.Workbook();
   const sheet = wb.addWorksheet("Estrutura");
-  sheet.addRow(["Setor", "Departamento", "Segmento", "Função"]);
-  sheet.addRow(["Produção E2E", "Linha 1", "", "Operador E2E"]);
-  sheet.addRow(["Administrativo E2E", "Financeiro", "Backoffice", "Analista E2E"]);
+  sheet.addRow(["Setor", "Departamento"]);
+  sheet.addRow(["Produção E2E", "Linha 1"]);
+  sheet.addRow(["Administrativo E2E", "Financeiro"]);
   return Buffer.from(await wb.xlsx.writeBuffer());
 }
 
@@ -71,7 +71,7 @@ test("gestor cria pesquisa e importa estrutura organizacional por planilha", asy
   await expect(page).toHaveURL(/\/gestor\/pesquisas\/nova$/);
 
   // 4. Importa a planilha de estrutura organizacional.
-  await page.getByRole("link", { name: "Setores e funções" }).click();
+  await page.getByRole("link", { name: "Setores e departamentos" }).click();
   const buffer = await gerarPlanilhaTeste();
   await page.locator('input[name="planilha"]').setInputFiles({
     name: "estrutura.xlsx",
@@ -81,12 +81,31 @@ test("gestor cria pesquisa e importa estrutura organizacional por planilha", asy
   await page.getByRole("button", { name: "Importar planilha" }).click();
   await expect(page.getByText(/itens importados com sucesso/)).toBeVisible();
   await expect(page.getByText("Produção E2E")).toBeVisible();
-  await expect(page.getByText("Analista E2E")).toBeVisible();
-  await expect(page.getByText("Backoffice")).toBeVisible();
+  await expect(page.getByText("Administrativo E2E")).toBeVisible();
 
   // 5. Cadastro manual de mais um setor.
   const primeiroFormNome = page.locator('form:has(input[name="tipo"][value="setor"]) input[name="nome"]');
   await primeiroFormNome.fill("Setor Manual E2E");
   await primeiroFormNome.press("Enter");
   await expect(page.getByText("Setor Manual E2E")).toBeVisible();
+
+  // 6. Editar e excluir um item do catálogo — antes só dava para adicionar,
+  // um setor digitado errado ficava errado pra sempre (pedido do cliente).
+  const linhaSetorManual = page.locator("li", { hasText: "Setor Manual E2E" });
+  await linhaSetorManual.getByText("editar").click();
+  // Ao entrar em modo edição o texto "Setor Manual E2E" some do <li> (vira
+  // `value` de um <input>, que não conta como texto para `hasText`) — por
+  // isso a partir daqui a linha precisa ser localizada pelo próprio input,
+  // não mais pelo texto (achado rodando este E2E: `linhaSetorManual` ficava
+  // stale e o `.fill()` seguinte nunca encontrava nada).
+  const linhaEmEdicao = page.locator('li:has(input[name="nome"][value="Setor Manual E2E"])');
+  await linhaEmEdicao.locator('input[name="nome"]').fill("Setor Manual E2E Renomeado");
+  await linhaEmEdicao.getByRole("button", { name: "Salvar" }).click();
+  await expect(page.getByText("Setor Manual E2E Renomeado")).toBeVisible();
+  await expect(page.getByText("Setor Manual E2E", { exact: true })).not.toBeVisible();
+
+  const linhaRenomeada = page.locator("li", { hasText: "Setor Manual E2E Renomeado" });
+  await linhaRenomeada.getByText("excluir").click();
+  await linhaRenomeada.getByRole("button", { name: "Confirmar" }).click();
+  await expect(page.getByText("Setor Manual E2E Renomeado")).not.toBeVisible();
 });
