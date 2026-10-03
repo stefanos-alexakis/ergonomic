@@ -1,4 +1,6 @@
+import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
+import { getActor } from "@/lib/tenant";
 import { AppShell } from "@/components/shell/app-shell";
 import { PageHeader } from "@/components/ui/page-header";
 import { PesosForm } from "./form";
@@ -11,6 +13,10 @@ const NAV = [
 ];
 
 export default async function PerguntasPage() {
+  // Não depender só do middleware — mesmo padrão de carregarEmpresaOuNotFound.
+  const actor = await getActor();
+  if (!actor?.isPlatformAdmin) notFound();
+
   const questionario = await db.questionario.findFirst({
     where: { ativo: true },
     include: {
