@@ -5,7 +5,7 @@
  * a quantidade não é múltipla exata.
  */
 
-export type PerguntaResumo = { id: string; texto: string; ordemGlobal: number };
+export type PerguntaResumo = { id: string; texto: string; exemplo?: string | null; ordemGlobal: number };
 export type BlocoComPerguntas = { blocoId: string; blocoNome: string; perguntas: PerguntaResumo[] };
 export type PaginaQuestionario = {
   blocoId: string;

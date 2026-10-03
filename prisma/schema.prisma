@@ -122,6 +122,9 @@ model Pergunta {
   fatorRiscoId        String
   situacaoInvestigada String
   texto               String
+  // Explicação opcional mostrada abaixo da pergunta ("Exemplo: ..."),
+  // introduzida no questionário v2 (revisão da cliente, set/2026).
+  exemplo             String?
   ordemGlobal         Int
   polaridade          Polaridade @default(MAIOR_PIOR)
   // Peso no cálculo do Score Base (Eixo 1) — 1 = peso normal, todas as

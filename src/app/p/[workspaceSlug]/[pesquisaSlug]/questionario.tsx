@@ -22,6 +22,7 @@ export function Questionario({
   pagina,
   totalPaginas,
   respostasSalvas,
+  mostrarInstrucaoPeriodo = false,
 }: {
   workspaceSlug: string;
   pesquisaSlug: string;
@@ -29,6 +30,7 @@ export function Questionario({
   pagina: PaginaQuestionario;
   totalPaginas: number;
   respostasSalvas: Map<string, number>;
+  mostrarInstrucaoPeriodo?: boolean;
 }) {
   const ultimaPagina = pagina.numeroPagina === totalPaginas;
   // useMemo é essencial aqui, não só otimização: .bind() cria uma função
@@ -59,6 +61,11 @@ export function Questionario({
           />
         </div>
         <h2 className="text-lg font-bold text-zinc-900 mt-4">{pagina.blocoNome}</h2>
+        {mostrarInstrucaoPeriodo && pagina.numeroPagina === 1 && (
+          <p className="text-sm text-zinc-500 mt-1">
+            Responda pensando nos últimos 6 meses de trabalho nesta função.
+          </p>
+        )}
       </div>
 
       {/* o componente inteiro já remonta a cada página (key no page.tsx),
@@ -69,10 +76,18 @@ export function Questionario({
             key={p.id}
             className={`border-0 p-0 py-7 ${i > 0 ? "border-t border-[var(--ws-line,#e4e4e7)]" : ""}`}
           >
-            <legend className="sr-only">{p.texto}</legend>
-            <p className="font-medium text-zinc-900 mb-4 leading-relaxed">
-              <span className="text-zinc-400 font-normal">{p.ordemGlobal}.</span> {p.texto}
-            </p>
+            <legend className="sr-only">
+              {p.texto}
+              {p.exemplo && ` Exemplo: ${p.exemplo}`}
+            </legend>
+            <div className="mb-4">
+              <p className="font-medium text-zinc-900 leading-relaxed">
+                <span className="text-zinc-400 font-normal">{p.ordemGlobal}.</span> {p.texto}
+              </p>
+              {p.exemplo && (
+                <p className="text-sm text-zinc-500 mt-1 leading-relaxed">Exemplo: {p.exemplo}</p>
+              )}
+            </div>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
               {OPCOES.map((op) => (
                 <label

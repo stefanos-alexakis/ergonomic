@@ -19,7 +19,7 @@ export async function resolveWorkspacePublico(workspaceSlug: string) {
 export async function resolvePesquisaPublica(workspaceSlug: string, pesquisaSlug: string) {
   return db.pesquisa.findFirst({
     where: { slug: pesquisaSlug, workspace: { slug: workspaceSlug, isActive: true, deletedAt: null } },
-    include: { workspace: true },
+    include: { workspace: true, questionario: { select: { versao: true } } },
   });
 }
 
@@ -154,12 +154,19 @@ export async function carregarPaginasQuestionario(questionarioId: string, tamanh
     },
   });
 
+  // Ordena pela numeração da pergunta, não pela ordem em que os fatores
+  // voltam do banco (fatoresRisco não tem ordem própria) — garante que o
+  // colaborador sempre vê 1, 2, 3… em sequência.
   const blocosComPerguntas = blocos.map((b) => ({
     blocoId: b.id,
     blocoNome: b.nome,
-    perguntas: b.dimensoes.flatMap((d) =>
-      d.fatoresRisco.flatMap((f) => f.perguntas.map((p) => ({ id: p.id, texto: p.texto, ordemGlobal: p.ordemGlobal }))),
-    ),
+    perguntas: b.dimensoes
+      .flatMap((d) =>
+        d.fatoresRisco.flatMap((f) =>
+          f.perguntas.map((p) => ({ id: p.id, texto: p.texto, exemplo: p.exemplo, ordemGlobal: p.ordemGlobal })),
+        ),
+      )
+      .sort((a, b) => a.ordemGlobal - b.ordemGlobal),
   }));
 
   return montarPaginas(blocosComPerguntas, tamanhoPagina);

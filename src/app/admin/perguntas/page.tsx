@@ -53,13 +53,14 @@ export default async function PerguntasPage() {
     <AppShell contexto="Administração" homeHref="/admin" nav={NAV}>
       <PageHeader
         eyebrow="Plataforma"
-        title="Pesos das perguntas — Score Base (Eixo 1)"
+        title={`Pesos das perguntas — Score Base (Eixo 1)${questionario ? ` · versão ${questionario.versao}` : ""}`}
       />
       <p className="text-sm text-zinc-500 mb-6 max-w-2xl">
         Todas as perguntas nascem com peso 1 (mesma influência no cálculo). Aumentar o peso de
         uma pergunta faz ela pesar mais na média — e portanto no Score Base — de quem respondeu.
-        Mudanças valem para todas as empresas e recalculam os painéis já existentes na hora,
-        inclusive de pesquisas antigas.
+        Os pesos abaixo são do questionário em uso nas pesquisas novas e valem para todas as
+        empresas, recalculando na hora os painéis das pesquisas desta versão. Pesquisas criadas
+        com uma versão anterior do questionário mantêm as perguntas e os pesos daquela versão.
       </p>
       {blocos.length === 0 ? (
         <p className="text-sm text-zinc-500">Nenhum questionário ativo cadastrado.</p>

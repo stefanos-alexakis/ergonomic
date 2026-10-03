@@ -15,45 +15,79 @@ type PerguntaSeed = {
   fatorRisco: string;
   situacaoInvestigada: string;
   texto: string;
+  exemplo?: string | null;
+};
+
+type VersaoQuestionario = {
+  id: string;
+  versao: number;
+  arquivo: string;
+  bloco1: number;
+  bloco2: number;
 };
 
 /**
- * Fonte oficial: perguntas-pesquisa.xlsx, coluna E. Reextraído do xlsx
- * resolvendo os intervalos de mesclagem reais das colunas A/B/C — a
- * planilha tem fator de risco desalinhado da primeira linha de algumas
- * dimensões (ver review.md), então não dá para usar "carregar o último
- * valor visto" ingenuamente.
+ * Cada versão do questionário é um conjunto próprio de linhas no banco —
+ * nunca se edita uma versão anterior no lugar: as respostas antigas
+ * apontam para as perguntas que de fato foram respondidas, e reescrever o
+ * texto delas mudaria o sentido do que a pessoa marcou. Pesquisas já
+ * criadas continuam na versão delas; só pesquisas novas pegam a ativa.
+ *
+ * v1: perguntas-pesquisa.xlsx (42 perguntas), reextraído resolvendo as
+ *     mesclagens reais das colunas A/B/C (ver review.md).
+ * v2: revisão da cliente em EIXO_01_PERCEPCAO_COLABORADOR_REVISADO.docx
+ *     (35 perguntas, set/2026), extraída respeitando as células mescladas
+ *     do Word; dimensões seguem o documento ao pé da letra (decisão do
+ *     usuário) e o grupo que ficou sem nome virou "6. Segurança e Mudanças".
  */
-function carregarPerguntas(): PerguntaSeed[] {
-  const path = join(__dirname, "seed-data", "perguntas.json");
+const V1: VersaoQuestionario = {
+  id: "questionario-riscos-psicossociais-v1",
+  versao: 1,
+  arquivo: "perguntas.json",
+  bloco1: 25,
+  bloco2: 17,
+};
+
+const V2: VersaoQuestionario = {
+  id: "questionario-riscos-psicossociais-v2",
+  versao: 2,
+  arquivo: "perguntas-v2.json",
+  bloco1: 21,
+  bloco2: 14,
+};
+
+const NOME_QUESTIONARIO = "Mapeamento dos Fatores de Risco Psicossociais Relacionados ao Trabalho (FRPRT)";
+
+function carregarPerguntas(v: VersaoQuestionario): PerguntaSeed[] {
+  const path = join(__dirname, "seed-data", v.arquivo);
   const data = JSON.parse(readFileSync(path, "utf-8")) as PerguntaSeed[];
-  if (data.length !== 42) {
+  const total = v.bloco1 + v.bloco2;
+  if (data.length !== total) {
     throw new Error(
-      `Esperado 42 perguntas (25 Bloco 1 + 17 Bloco 2), encontrado ${data.length}. ` +
-        `Não seedando — confira perguntas-pesquisa.xlsx e prisma/seed-data/perguntas.json.`,
+      `Versão ${v.versao}: esperado ${total} perguntas (${v.bloco1} Bloco 1 + ${v.bloco2} Bloco 2), ` +
+        `encontrado ${data.length}. Não seedando — confira prisma/seed-data/${v.arquivo}.`,
     );
   }
   const bloco1 = data.filter((p) => p.bloco.toUpperCase().startsWith("BLOCO 1")).length;
   const bloco2 = data.filter((p) => p.bloco.toUpperCase().startsWith("BLOCO 2")).length;
-  if (bloco1 !== 25 || bloco2 !== 17) {
+  if (bloco1 !== v.bloco1 || bloco2 !== v.bloco2) {
     throw new Error(
-      `Esperado 25 perguntas no Bloco 1 e 17 no Bloco 2, encontrado ${bloco1} + ${bloco2}.`,
+      `Versão ${v.versao}: esperado ${v.bloco1} perguntas no Bloco 1 e ${v.bloco2} no Bloco 2, ` +
+        `encontrado ${bloco1} + ${bloco2}.`,
     );
   }
   return data;
 }
 
-async function seedQuestionario() {
-  const perguntas = carregarPerguntas();
+async function seedQuestionario(v: VersaoQuestionario) {
+  const perguntas = carregarPerguntas(v);
 
+  // update vazio: reexecutar o seed nunca mexe em `ativo` aqui — quem
+  // decide a versão ativa é ativarVersao(), no fim.
   const questionario = await prisma.questionario.upsert({
-    where: { id: "questionario-riscos-psicossociais-v1" },
+    where: { id: v.id },
     update: {},
-    create: {
-      id: "questionario-riscos-psicossociais-v1",
-      nome: "Mapeamento dos Fatores de Risco Psicossociais Relacionados ao Trabalho (FRPRT)",
-      versao: 1,
-    },
+    create: { id: v.id, nome: NOME_QUESTIONARIO, versao: v.versao, ativo: false },
   });
 
   // Agrupa mantendo a ordem de primeira ocorrência (bloco -> dimensão -> fator)
@@ -121,8 +155,11 @@ async function seedQuestionario() {
         for (const p of perguntasDoFator) {
           await prisma.pergunta.upsert({
             where: { id: `${fator.id}-p-${p.ordemGlobal}` },
+            // `peso` fica de fora do update de propósito: é configurado
+            // pela Hozana em /admin/perguntas e não pode voltar a 1 a cada seed.
             update: {
               texto: p.texto,
+              exemplo: p.exemplo ?? null,
               situacaoInvestigada: p.situacaoInvestigada,
               ordemGlobal: p.ordemGlobal,
             },
@@ -130,6 +167,7 @@ async function seedQuestionario() {
               id: `${fator.id}-p-${p.ordemGlobal}`,
               fatorRiscoId: fator.id,
               texto: p.texto,
+              exemplo: p.exemplo ?? null,
               situacaoInvestigada: p.situacaoInvestigada,
               ordemGlobal: p.ordemGlobal,
             },
@@ -144,16 +182,31 @@ async function seedQuestionario() {
     where: { fatorRisco: { dimensao: { bloco: { questionarioId: questionario.id } } } },
   });
 
+  const esperado = v.bloco1 + v.bloco2;
   console.log(
-    `Seed do questionário concluído: ${totalCriadas} perguntas processadas, ${totalNoBanco} no banco para "${questionario.nome}" (esperado: 42).`,
+    `Seed do questionário v${v.versao} concluído: ${totalCriadas} perguntas processadas, ` +
+      `${totalNoBanco} no banco (esperado: ${esperado}).`,
   );
-  if (totalNoBanco !== 42) {
-    throw new Error(`Inconsistência pós-seed: banco tem ${totalNoBanco} perguntas, esperado 42.`);
+  if (totalNoBanco !== esperado) {
+    throw new Error(
+      `Inconsistência pós-seed v${v.versao}: banco tem ${totalNoBanco} perguntas, esperado ${esperado}.`,
+    );
   }
 }
 
+/** Deixa exatamente uma versão ativa — a que pesquisas novas vão usar. */
+async function ativarVersao(v: VersaoQuestionario) {
+  await prisma.$transaction([
+    prisma.questionario.updateMany({ where: { id: { not: v.id } }, data: { ativo: false } }),
+    prisma.questionario.update({ where: { id: v.id }, data: { ativo: true } }),
+  ]);
+  console.log(`Questionário ativo para pesquisas novas: v${v.versao}.`);
+}
+
 async function main() {
-  await seedQuestionario();
+  await seedQuestionario(V1);
+  await seedQuestionario(V2);
+  await ativarVersao(V2);
 }
 
 main()

@@ -10,10 +10,12 @@ export function FormularioCodigo({
   workspaceSlug,
   pesquisaSlug,
   valorInicial,
+  mostrarTempoEstimado = false,
 }: {
   workspaceSlug: string;
   pesquisaSlug: string;
   valorInicial?: string;
+  mostrarTempoEstimado?: boolean;
 }) {
   // useMemo evita recriar a action a cada render — ver nota em
   // questionario.tsx sobre o bug que isso causa com useActionState.
@@ -34,7 +36,10 @@ export function FormularioCodigo({
   return (
     <main className="max-w-sm mx-auto mt-16 px-5">
       <h1 className="text-xl font-semibold text-zinc-900 mb-1">Acessar a pesquisa</h1>
-      <p className="text-sm text-zinc-500 mb-6">Informe o código do seu cartão de acesso.</p>
+      <p className="text-sm text-zinc-500 mb-6">
+        Informe o código do seu cartão de acesso.
+        {mostrarTempoEstimado && " São só cerca de 9 minutos para responder."}
+      </p>
       <form
         ref={formRef}
         action={formAction}

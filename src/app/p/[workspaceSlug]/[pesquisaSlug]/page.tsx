@@ -26,6 +26,11 @@ export default async function JornadaColaboradorPage({
   const pesquisa = await resolvePesquisaPublica(workspaceSlug, pesquisaSlug);
   if (!pesquisa) notFound();
 
+  // Instruções "9 minutos" / "últimos 6 meses" vieram com a revisão do
+  // questionário (v2, 35 perguntas). Pesquisas antigas continuam na v1,
+  // com 42 perguntas — para elas a estimativa de tempo não vale.
+  const instrucoesV2 = pesquisa.questionario.versao >= 2;
+
   const jar = await cookies();
   const codigoDigitado = jar.get("codigo_digitado")?.value;
 
@@ -42,6 +47,7 @@ export default async function JornadaColaboradorPage({
         workspaceSlug={workspaceSlug}
         pesquisaSlug={pesquisaSlug}
         valorInicial={codigoDigitado}
+        mostrarTempoEstimado={instrucoesV2}
       />
     );
   }
@@ -53,6 +59,7 @@ export default async function JornadaColaboradorPage({
         workspaceSlug={workspaceSlug}
         pesquisaSlug={pesquisaSlug}
         valorInicial={codigoDigitado}
+        mostrarTempoEstimado={instrucoesV2}
       />
     );
   }
@@ -65,6 +72,7 @@ export default async function JornadaColaboradorPage({
         workspaceSlug={workspaceSlug}
         pesquisaSlug={pesquisaSlug}
         valorInicial={codigoDigitado}
+        mostrarTempoEstimado={instrucoesV2}
       />
     );
   }
@@ -124,6 +132,7 @@ export default async function JornadaColaboradorPage({
       pagina={pagina}
       totalPaginas={paginas.length}
       respostasSalvas={respostasSalvas}
+      mostrarInstrucaoPeriodo={instrucoesV2}
     />
   );
 }

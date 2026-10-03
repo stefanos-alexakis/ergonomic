@@ -7,7 +7,8 @@ function paraDatetimeLocal(d: Date): string {
   return d.toISOString().slice(0, 16);
 }
 
-async function responderTodasAsPaginas(page: Page) {
+async function responderTodasAsPaginas(page: Page): Promise<{ viuExemplo: boolean }> {
+  let viuExemplo = false;
   // Responde a primeira opção em cada pergunta da página atual e avança.
   // Sem tela de revisão (a pedido do cliente, ver review.md): a última
   // página mostra "Concluir a pesquisa" em vez de "Próximo" — o helper
@@ -18,6 +19,7 @@ async function responderTodasAsPaginas(page: Page) {
     // clicável estilizado — clicar no rótulo é como uma pessoa de
     // verdade interage; clicar no input escondido diretamente esbarra
     // no rótulo por cima e nunca completa (achado no E2E desta fase).
+    if ((await page.getByText(/^Exemplo:/).count()) > 0) viuExemplo = true;
     const rotulosPrimeiraOpcao = page.locator('label:has(input[type="radio"][value="1"])');
     const total = await rotulosPrimeiraOpcao.count();
     for (let i = 0; i < total; i++) {
@@ -27,7 +29,7 @@ async function responderTodasAsPaginas(page: Page) {
     const botaoConcluir = page.getByRole("button", { name: "Concluir a pesquisa" });
     if (await botaoConcluir.isVisible()) {
       await botaoConcluir.click();
-      return;
+      return { viuExemplo };
     }
 
     const urlAntes = page.url();
@@ -135,9 +137,12 @@ test("jornada completa do colaborador: código → organização → questionár
   await page.getByRole("button", { name: "Continuar para o questionário" }).click();
 
   await expect(page.getByText(/Página 1 de/)).toBeVisible();
+  // Questionário v2 (35 perguntas): instrução do período só na 1ª página.
+  await expect(page.getByText("Responda pensando nos últimos 6 meses de trabalho nesta função.")).toBeVisible();
   // Sem tela de revisão (a pedido do cliente): responder a última página
   // já conclui direto, o helper clica em "Concluir a pesquisa" sozinho.
-  await responderTodasAsPaginas(page);
+  const { viuExemplo } = await responderTodasAsPaginas(page);
+  expect(viuExemplo).toBe(true); // perguntas da v2 com "Exemplo:" abaixo do texto
   await expect(page.getByRole("heading", { name: "Obrigado por participar!" })).toBeVisible();
 
   // O link "nu" (sem ?pagina=) SEMPRE volta a pedir o código — mesmo
@@ -147,6 +152,7 @@ test("jornada completa do colaborador: código → organização → questionár
   // de quem respondeu antes (bug real relatado pelo usuário).
   await page.goto(urlPublica);
   await expect(page.getByRole("heading", { name: "Acessar a pesquisa" })).toBeVisible();
+  await expect(page.getByText(/cerca de 9 minutos/)).toBeVisible();
 
   // Só ao digitar o código de novo é que o sistema confere que ele já
   // foi usado — idempotente, mostra "Obrigado" de novo, não reabre o

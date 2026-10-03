@@ -10,7 +10,7 @@ import {
 } from "@/lib/dashboard";
 
 describe("normalizarValor", () => {
-  it("mantém o valor quando maior = pior (as 42 perguntas atuais)", () => {
+  it("mantém o valor quando maior = pior (todas as perguntas atuais, v1 e v2)", () => {
     expect(normalizarValor(5, "MAIOR_PIOR")).toBe(5);
     expect(normalizarValor(1, "MAIOR_PIOR")).toBe(1);
   });

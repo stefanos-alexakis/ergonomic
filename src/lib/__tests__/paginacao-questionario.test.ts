@@ -10,7 +10,23 @@ function perguntas(n: number, prefixo: string) {
 }
 
 describe("montarPaginas (spec.md §6 — nunca mistura blocos na mesma página)", () => {
-  it("com os tamanhos reais (25 + 17) e página de 7, gera 7 páginas sem misturar bloco", () => {
+  it("questionário v2 (21 + 14) com página de 7 fecha em 5 páginas cheias, sem misturar bloco", () => {
+    const blocos: BlocoComPerguntas[] = [
+      { blocoId: "b1", blocoNome: "Bloco 1", perguntas: perguntas(21, "b1") },
+      { blocoId: "b2", blocoNome: "Bloco 2", perguntas: perguntas(14, "b2") },
+    ];
+    const paginas = montarPaginas(blocos, 7);
+
+    expect(paginas).toHaveLength(5); // 21/7=3 + 14/7=2
+    for (const p of paginas) {
+      expect(p.perguntas.every((q) => q.id.startsWith(p.blocoId))).toBe(true);
+      expect(p.perguntas).toHaveLength(7);
+    }
+    expect(paginas.map((p) => p.numeroPagina)).toEqual([1, 2, 3, 4, 5]);
+    expect(paginas.reduce((acc, p) => acc + p.perguntas.length, 0)).toBe(35);
+  });
+
+  it("com os tamanhos da v1 (25 + 17) e página de 7, gera 7 páginas sem misturar bloco", () => {
     const blocos: BlocoComPerguntas[] = [
       { blocoId: "b1", blocoNome: "Bloco 1", perguntas: perguntas(25, "b1") },
       { blocoId: "b2", blocoNome: "Bloco 2", perguntas: perguntas(17, "b2") },
