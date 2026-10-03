@@ -12,6 +12,7 @@ import {
 } from "@/lib/dashboard";
 import type { GrupoComSupressao } from "@/lib/agregacao";
 import { AppShell } from "@/components/shell/app-shell";
+import { NAV_GESTOR } from "@/components/shell/nav-gestor";
 import { BannerImpersonacao } from "@/components/shell/banner-impersonacao";
 import { PageHeader } from "@/components/ui/page-header";
 import { Table, Thead, Th, Tr, Td } from "@/components/ui/table";
@@ -21,7 +22,7 @@ import { Badge } from "@/components/ui/badge";
 
 export const dynamic = "force-dynamic";
 
-const NAV = [{ href: "/gestor/estrutura", label: "Setores e departamentos" }];
+const NAV = NAV_GESTOR;
 
 function TabelaGrupo({ titulo, grupos }: { titulo: string; grupos: GrupoComSupressao<ResumoGrupo>[] }) {
   if (grupos.length === 0) return null;

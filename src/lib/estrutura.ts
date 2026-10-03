@@ -120,7 +120,7 @@ export async function listarCatalogoOrganizacional(workspaceId: string) {
     db.setorOrg.findMany({
       where: { workspaceId },
       orderBy: { nome: "asc" },
-      include: { _count: { select: { respostas: true } } },
+      include: { _count: { select: { respostas: true, avaliacoesEixo2: true } } },
     }),
     db.departamento.findMany({
       where: { workspaceId },

@@ -51,20 +51,29 @@ describe("perguntas-v2.json (Eixo 1 revisado)", () => {
     }
   });
 
-  it("segue as dimensões do documento (10 dimensões, sem 4, 7 e 12)", () => {
+  it("usa as 13 dimensões da metodologia (mesmas do Eixo 2 e da planilha CID-F)", () => {
+    // O Eixo 2 e o agravamento do Eixo 3 são calculados POR FATOR — se o
+    // Eixo 1 agrupar diferente, os eixos não se cruzam.
     const dimensoes = [...new Set(perguntas.map((p) => p.dimensao))];
     expect(dimensoes).toEqual([
-      "1.Instrução de trabalho",
+      "1. Instrução de Trabalho",
       "2. Demandas de Trabalho",
       "3. Controle e Autonomia",
+      "4. Ritmo e Cadência",
       "5. Horários e Jornada",
-      "6. Segurança e Mudanças",
+      "6. Segurança no Emprego",
+      "7. Gestão de Mudanças",
       "8. Relações Interpessoais",
       "9. Liderança",
       "10. Equilíbrio Trabalho-Vida",
       "11. Violência no Trabalho",
+      "12. Tarefas com Exposição a Situações Extremas",
       "13. Trabalho Isolado ou Remoto",
     ]);
+    // um fator por dimensão
+    for (const d of dimensoes) {
+      expect(new Set(perguntas.filter((p) => p.dimensao === d).map((p) => p.fatorRisco)).size).toBe(1);
+    }
   });
 
   it("une reconhecimento e feedback numa única pergunta, como no documento", () => {

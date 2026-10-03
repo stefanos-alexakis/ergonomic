@@ -26,6 +26,7 @@ model Workspace {
   segmentos     Segmento[]
   funcoes       Funcao[]
   pesquisas     Pesquisa[]
+  avaliacoesEixo2 AvaliacaoEixo2[]
 
   @@index([slug])
 }
@@ -73,8 +74,9 @@ model Questionario {
   ativo     Boolean  @default(true)
   createdAt DateTime @default(now())
 
-  blocos    Bloco[]
-  pesquisas Pesquisa[]
+  blocos          Bloco[]
+  pesquisas       Pesquisa[]
+  avaliacoesEixo2 AvaliacaoEixo2[]
 }
 
 model Bloco {
@@ -135,6 +137,7 @@ model Pergunta {
 
   fatorRisco    FatorRisco     @relation(fields: [fatorRiscoId], references: [id], onDelete: Cascade)
   respostaItens RespostaItem[]
+  questaoEixo2  QuestaoEixo2?
 
   @@index([fatorRiscoId])
   @@index([ordemGlobal])
@@ -147,8 +150,10 @@ model SetorOrg {
   workspaceId String
   nome        String
 
-  workspace Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  respostas Resposta[]
+  workspace       Workspace             @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  respostas       Resposta[]
+  avaliacoesEixo2 AvaliacaoEixo2Setor[]
+  respostasEixo2  RespostaEixo2[]
 
   @@unique([workspaceId, nome])
   @@index([workspaceId])
@@ -283,4 +288,108 @@ model RespostaItem {
 
   @@unique([respostaId, perguntaId])
   @@index([perguntaId])
+}
+
+// ── Eixo 2 — medidas de controle, respondido pela empresa por setor ──────
+//
+// Cada questão do Eixo 2 é a contrapartida, do lado da empresa, de uma
+// pergunta do Eixo 1 (1:1) — herda dela dimensão e fator, que é a unidade
+// em que a metodologia calcula o fator de correção (0,80/0,90/1,00).
+
+enum CondicaoMedida {
+  EFICAZ           // medida existente e eficaz — 0,80
+  PRECISA_MELHORAR // existente, mas precisa melhorar — 0,90
+  INEXISTENTE      // medida inexistente — 1,00
+  NAO_SE_APLICA    // não exposto à situação — 0,80 (mesmo valor de EFICAZ)
+}
+
+enum StatusAvaliacao {
+  RASCUNHO
+  CONCLUIDA
+}
+
+model QuestaoEixo2 {
+  id              String  @id @default(cuid())
+  perguntaEixo1Id String  @unique
+  texto           String
+  // Texto colado (editável) quando o usuário habilita o plano de ação.
+  planoSugerido   String?
+  ordem           Int
+  // Peso no fator do Eixo 2 — configurável pelo admin, como no Eixo 1.
+  peso            Float   @default(1)
+
+  perguntaEixo1 Pergunta        @relation(fields: [perguntaEixo1Id], references: [id], onDelete: Cascade)
+  respostas     RespostaEixo2[]
+
+  @@index([ordem])
+}
+
+// Ciclo de avaliação da empresa — independente das pesquisas do Eixo 1
+// (decisão do usuário); o cruzamento é escolhido depois, no painel final.
+model AvaliacaoEixo2 {
+  id              String          @id @default(cuid())
+  workspaceId     String
+  // Versão do Eixo 1 cujo catálogo do Eixo 2 esta avaliação usa.
+  questionarioId  String
+  nome            String
+  status          StatusAvaliacao @default(RASCUNHO)
+  participantes   String?
+  responsavel     String?
+  observacaoFinal String?
+  createdAt       DateTime        @default(now())
+  concluidaEm     DateTime?
+
+  workspace    Workspace             @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  questionario Questionario          @relation(fields: [questionarioId], references: [id])
+  setores      AvaliacaoEixo2Setor[]
+  respostas    RespostaEixo2[]
+  praticas     PraticaAdicional[]
+
+  @@index([workspaceId])
+}
+
+model AvaliacaoEixo2Setor {
+  avaliacaoId String
+  setorId     String
+
+  avaliacao AvaliacaoEixo2 @relation(fields: [avaliacaoId], references: [id], onDelete: Cascade)
+  // Apagar um setor do cadastro tira ele (e suas respostas) da avaliação.
+  setor     SetorOrg       @relation(fields: [setorId], references: [id], onDelete: Cascade)
+
+  @@id([avaliacaoId, setorId])
+  @@index([setorId])
+}
+
+// Uma linha por setor, sempre. "Mesma resposta para todos os setores" é um
+// modo da tela que grava a mesma resposta em todos — não um campo aqui.
+model RespostaEixo2 {
+  id            String         @id @default(cuid())
+  avaliacaoId   String
+  questaoId     String
+  setorId       String
+  condicao      CondicaoMedida
+  justificativa String?
+  planoAcao     String?
+  updatedAt     DateTime       @updatedAt
+
+  avaliacao AvaliacaoEixo2 @relation(fields: [avaliacaoId], references: [id], onDelete: Cascade)
+  questao   QuestaoEixo2   @relation(fields: [questaoId], references: [id], onDelete: Cascade)
+  setor     SetorOrg       @relation(fields: [setorId], references: [id], onDelete: Cascade)
+
+  @@unique([avaliacaoId, questaoId, setorId])
+  @@index([setorId])
+}
+
+// "Práticas adicionais declaradas pela empresa" do instrumento do Eixo 2.
+model PraticaAdicional {
+  id          String  @id @default(cuid())
+  avaliacaoId String
+  descricao   String
+  frequencia  String?
+  evidencia   String?
+  ordem       Int
+
+  avaliacao AvaliacaoEixo2 @relation(fields: [avaliacaoId], references: [id], onDelete: Cascade)
+
+  @@index([avaliacaoId])
 }

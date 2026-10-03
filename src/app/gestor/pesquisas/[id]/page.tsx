@@ -4,6 +4,7 @@ import { getActor } from "@/lib/tenant";
 import { getWorkspaceDoGestor, resolvePesquisaDoWorkspace } from "@/lib/pesquisa";
 import { listarCodigos } from "@/lib/licenca";
 import { AppShell } from "@/components/shell/app-shell";
+import { NAV_GESTOR } from "@/components/shell/nav-gestor";
 import { BannerImpersonacao } from "@/components/shell/banner-impersonacao";
 import { PageHeader } from "@/components/ui/page-header";
 import { Table, Thead, Th, Tr, Td } from "@/components/ui/table";
@@ -12,7 +13,7 @@ import { GerarLicencasButton } from "./gerar-licencas-button";
 
 export const dynamic = "force-dynamic";
 
-const NAV = [{ href: "/gestor/estrutura", label: "Setores e departamentos" }];
+const NAV = NAV_GESTOR;
 
 export default async function PesquisaDetalhePage({
   params,

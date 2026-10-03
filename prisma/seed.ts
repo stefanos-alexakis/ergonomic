@@ -37,8 +37,9 @@ type VersaoQuestionario = {
  *     mesclagens reais das colunas A/B/C (ver review.md).
  * v2: revisão da cliente em EIXO_01_PERCEPCAO_COLABORADOR_REVISADO.docx
  *     (35 perguntas, set/2026), extraída respeitando as células mescladas
- *     do Word; dimensões seguem o documento ao pé da letra (decisão do
- *     usuário) e o grupo que ficou sem nome virou "6. Segurança e Mudanças".
+ *     do Word. Dimensões/fatores: as 13 da metodologia, com os nomes da
+ *     planilha Fatores × CID-F — as mesmas do Eixo 2, que é calculado por
+ *     fator (realinhado em out/2026; antes estava em 10 dimensões).
  */
 const V1: VersaoQuestionario = {
   id: "questionario-riscos-psicossociais-v1",
@@ -203,9 +204,56 @@ async function ativarVersao(v: VersaoQuestionario) {
   console.log(`Questionário ativo para pesquisas novas: v${v.versao}.`);
 }
 
+type QuestaoEixo2Seed = {
+  ordem: number;
+  perguntaColaborador: string;
+  texto: string;
+  planoSugerido: string | null;
+};
+
+/**
+ * Catálogo do Eixo 2 (EIXO_02_FINAL_PERGUNTAS_E_INTERVENCOES_ORIGINAIS.docx):
+ * uma pergunta à empresa para cada pergunta do Eixo 1 v2, ligada pela
+ * numeração. A ligação é o que dá à questão do Eixo 2 sua dimensão e fator.
+ */
+async function seedEixo2(v: VersaoQuestionario) {
+  const path = join(__dirname, "seed-data", "eixo2-v2.json");
+  const itens = JSON.parse(readFileSync(path, "utf-8")) as QuestaoEixo2Seed[];
+  const esperado = v.bloco1 + v.bloco2;
+  if (itens.length !== esperado) {
+    throw new Error(`Eixo 2: esperado ${esperado} questões, encontrado ${itens.length} em eixo2-v2.json.`);
+  }
+
+  const perguntas = await prisma.pergunta.findMany({
+    where: { fatorRisco: { dimensao: { bloco: { questionarioId: v.id } } } },
+    select: { id: true, ordemGlobal: true },
+  });
+  const porOrdem = new Map(perguntas.map((p) => [p.ordemGlobal, p.id]));
+
+  for (const item of itens) {
+    const perguntaEixo1Id = porOrdem.get(item.ordem);
+    if (!perguntaEixo1Id) {
+      throw new Error(`Eixo 2: questão ${item.ordem} sem pergunta correspondente no Eixo 1 v${v.versao}.`);
+    }
+    await prisma.questaoEixo2.upsert({
+      where: { perguntaEixo1Id },
+      // `peso` fora do update: configurado pelo admin, não volta a 1 a cada seed.
+      update: { texto: item.texto, planoSugerido: item.planoSugerido, ordem: item.ordem },
+      create: { perguntaEixo1Id, texto: item.texto, planoSugerido: item.planoSugerido, ordem: item.ordem },
+    });
+  }
+
+  const total = await prisma.questaoEixo2.count({
+    where: { perguntaEixo1: { fatorRisco: { dimensao: { bloco: { questionarioId: v.id } } } } },
+  });
+  console.log(`Seed do Eixo 2 (catálogo da v${v.versao}) concluído: ${total} questões (esperado: ${esperado}).`);
+  if (total !== esperado) throw new Error(`Inconsistência pós-seed do Eixo 2: ${total} questões.`);
+}
+
 async function main() {
   await seedQuestionario(V1);
   await seedQuestionario(V2);
+  await seedEixo2(V2);
   await ativarVersao(V2);
 }
 

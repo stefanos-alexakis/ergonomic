@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { atualizarPesosAction, type EstadoPesos } from "./actions";
+import { atualizarPesosAction, atualizarPesosEixo2Action, type EstadoPesos } from "./actions";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/ui/field";
@@ -10,8 +10,11 @@ type Pergunta = { id: string; texto: string; situacaoInvestigada: string; peso: 
 type Dimensao = { id: string; nome: string; perguntas: Pergunta[] };
 type Bloco = { id: string; nome: string; dimensoes: Dimensao[] };
 
-export function PesosForm({ blocos }: { blocos: Bloco[] }) {
-  const [estado, formAction, pendente] = useActionState<EstadoPesos, FormData>(atualizarPesosAction, undefined);
+export function PesosForm({ blocos, eixo = 1 }: { blocos: Bloco[]; eixo?: 1 | 2 }) {
+  const [estado, formAction, pendente] = useActionState<EstadoPesos, FormData>(
+    eixo === 2 ? atualizarPesosEixo2Action : atualizarPesosAction,
+    undefined,
+  );
 
   return (
     <form action={formAction} className="flex flex-col gap-8">

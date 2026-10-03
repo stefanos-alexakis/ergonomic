@@ -1,0 +1,212 @@
+[
+  {
+    "ordem": 1,
+    "perguntaColaborador": "FALTA clareza sobre qual é sua função e quais atividades deve realizar?",
+    "texto": "A empresa mantém descrição de cargo clara e atualizada, e os colaboradores têm acesso às informações sobre suas funções e atividades?",
+    "planoSugerido": "- Descrições de cargo de forma clara, atualizada, informada ao colaborador disponíveis para consulta sempre que necessário"
+  },
+  {
+    "ordem": 2,
+    "perguntaColaborador": "Você recebe ORDENS DIFERENTES DE MAIS DE UM SUPERIOR sobre a mesma tarefa?",
+    "texto": "Há definição clara de autoridade para evitar ordens divergentes de mais de um superior sobre a mesma tarefa?",
+    "planoSugerido": "- Fluxos de decisão e autoridade formalizados\n- Reuniões periódicas de alinhamento de expectativas"
+  },
+  {
+    "ordem": 3,
+    "perguntaColaborador": "FALTA treinamento ou orientação para você realizar bem o seu trabalho?",
+    "texto": "Os colaboradores recebem treinamento ou orientação suficiente para realizar corretamente suas atividades, incluindo integração e reciclagens quando necessárias?",
+    "planoSugerido": "- Treinamentos com registros\n- Integração\n- Manuais e/ou informativos\n- Reciclagens/atualização"
+  },
+  {
+    "ordem": 4,
+    "perguntaColaborador": "FALTA gente na sua equipe para dar conta do trabalho do dia a dia?",
+    "texto": "O dimensionamento da equipe é revisto quando a demanda aumenta ou quando há dificuldade recorrente para cumprir o trabalho dentro da jornada?",
+    "planoSugerido": "- Dimensionamento, revisar quadro/contratar"
+  },
+  {
+    "ordem": 5,
+    "perguntaColaborador": "As metas que você precisa cumprir são IMPOSSÍVEIS de alcançar, mesmo se esforçando?",
+    "texto": "As metas são definidas e revistas considerando a capacidade real da equipe e o tempo disponível para execução?",
+    "planoSugerido": "- Metas, recalibrar indicadores"
+  },
+  {
+    "ordem": 6,
+    "perguntaColaborador": "O TRABALHO É DIVIDIDO DE FORMA DESIGUAL entre você e seus colegas?",
+    "texto": "A distribuição do trabalho entre pessoas/cargos é acompanhada para identificar e corrigir concentrações desiguais de demanda?",
+    "planoSugerido": "- Distribuição, redesenhar fluxo."
+  },
+  {
+    "ordem": 7,
+    "perguntaColaborador": "A quantidade de trabalho que você recebe É MAIOR do que dá para entregar no seu horário?",
+    "texto": "Quando a quantidade de trabalho ultrapassa a capacidade de execução dentro da jornada, a empresa identifica a situação e ajusta prioridades, processos, prazos ou recursos?",
+    "planoSugerido": "- Redesenhar fluxo."
+  },
+  {
+    "ordem": 8,
+    "perguntaColaborador": "Seu trabalho é MONÓTONO, com a mesma atividade repetida por longos períodos e pouca variação? Exemplo: passar grande parte do expediente conferindo, separando, embalando, digitando ou acompanhando sempre a mesma atividade, do mesmo jeito.",
+    "texto": "Nos trabalhos com atividade repetida por longos períodos e pouca variação, existem medidas para reduzir a monotonia quando tecnicamente possível?",
+    "planoSugerido": "- Rodízio de tarefas/atividades"
+  },
+  {
+    "ordem": 9,
+    "perguntaColaborador": "FALTA revezamento ou variedade de tarefas no seu dia a dia de trabalho? Exemplo: você passa a maior parte do expediente fazendo uma única tarefa, sem alternar com outras atividades diferentes.",
+    "texto": "Quando a atividade permite, existe revezamento ou alternância planejada entre tarefas diferentes ao longo da jornada?",
+    "planoSugerido": "- Rodízio de tarefas/atividades"
+  },
+  {
+    "ordem": 10,
+    "perguntaColaborador": "Você fica parado(a), COM POUCO TRABALHO para fazer durante o expediente? Exemplo: há vários momentos de ociosidade, sem atividades para realizar.",
+    "texto": "A empresa identifica períodos frequentes de ociosidade ou subutilização e reorganiza atividades quando necessário?",
+    "planoSugerido": "- Rodízio de tarefas/atividades"
+  },
+  {
+    "ordem": 11,
+    "perguntaColaborador": "FALTA oportunidade para você dar sua opinião ou sugestão (se quiser) sobre o seu trabalho? Exemplo: possibilidades de melhoria, desperdícios...",
+    "texto": "Existem meios para o colaborador apresentar opiniões ou sugestões sobre o próprio trabalho e essas contribuições são consideradas quando aplicáveis?",
+    "planoSugerido": "- Incluir, formalmente, a participação, consulta ou comunicação prévia dos trabalhadores em decisões\n- Canais de sugestão efetivos"
+  },
+  {
+    "ordem": 12,
+    "perguntaColaborador": "Você precisa seguir uma ORDEM OU UM JEITO FIXO de fazer o trabalho, SEM PODER FAZER AJUSTES quando necessário? Exemplo: a empresa, a máquina ou o processo determina exatamente como e em que ordem fazer as tarefas, sem permitir que você adapte a forma de trabalhar.",
+    "texto": "Quando a atividade permite, o colaborador pode fazer ajustes na ordem ou na forma de executar o trabalho, respeitando os limites técnicos e de segurança?",
+    "planoSugerido": "- Ampliar autonomia do modo operatório de trabalho (sequência, ritmo, ordem das atividades) dentro de limites seguros"
+  },
+  {
+    "ordem": 13,
+    "perguntaColaborador": "O ritmo do seu trabalho É IMPOSTO PELA MÁQUINA OU LINHA DE PRODUÇÃO, impedindo você de parar quando precisa?",
+    "texto": "Quando o ritmo é determinado por máquina, linha ou processo contínuo, existem meios para que o trabalhador possa interromper ou regular o trabalho quando necessário?",
+    "planoSugerido": "- Revisão de ciclos produtivos com base em dados reais e proposta de modificações\n- Revisão de metas e indicadores com propostas de modificação ou mecanismos de regulação\n- Estudo e instituição de pausas obrigatórias mesmo em altas demandas de trabalho"
+  },
+  {
+    "ordem": 14,
+    "perguntaColaborador": "O trabalho é tão corrido que NÃO DÁ para fazer pausas para banheiro, refeição ou café?",
+    "texto": "Nos períodos de ritmo intenso, a organização do trabalho permite pausas para necessidades básicas, como banheiro, refeição ou café?",
+    "planoSugerido": "- Revisão de ciclos produtivos com base em dados reais e proposta de modificações\n- Revisão de metas e indicadores com propostas de modificação ou mecanismos de regulação\n- Estudo e instituição de pausas obrigatórias mesmo em altas demandas de trabalho"
+  },
+  {
+    "ordem": 15,
+    "perguntaColaborador": "SE EXISTIR REMUNERAÇÃO POR PRODUTIVIDADE, essa situação faz com que você trabalhe mais rápido ou evite pausas para produzir mais?",
+    "texto": "Se existir remuneração por produtividade, há medidas para evitar que esse sistema estimule aceleração excessiva do ritmo ou supressão de pausas?",
+    "planoSugerido": "- Revisão de ciclos produtivos com base em dados reais e proposta de modificações\n- Revisão de metas e indicadores com propostas de modificação ou mecanismos de regulação\n- Estudo e instituição de pausas obrigatórias mesmo em altas demandas de trabalho"
+  },
+  {
+    "ordem": 16,
+    "perguntaColaborador": "Você sente PRESSÃO OU COBRANÇA EXCESSIVA no trabalho por prazos e entregas?",
+    "texto": "A empresa controla a pressão por prazos e entregas, definindo prioridades e prazos compatíveis com a capacidade real de trabalho?",
+    "planoSugerido": "- Revisão de fluxos e prioridades para reduzir urgência crônica\n- Negociação de prazos com clientes/áreas internas considerando a capacidade real da equipe\n- Comunicação antecipada de prazos e entregas"
+  },
+  {
+    "ordem": 17,
+    "perguntaColaborador": "Você faz HORA EXTRA mais de 3 vezes por semana?",
+    "texto": "A empresa acompanha a frequência de horas extras e adota medidas quando elas se tornam recorrentes, especialmente quando ocorrem mais de três vezes por semana?",
+    "planoSugerido": "- Limitar horas extras habituais"
+  },
+  {
+    "ordem": 18,
+    "perguntaColaborador": "Sua escala de trabalho MUDA DE ÚLTIMA HORA, sem aviso com antecedência suficiente para você se organizar?",
+    "texto": "As escalas e alterações de horário são comunicadas com antecedência suficiente para que os colaboradores possam se organizar?",
+    "planoSugerido": "- Planejar escalas com antecedência"
+  },
+  {
+    "ordem": 19,
+    "perguntaColaborador": "Você sente que as PAUSAS durante o trabalho SÃO INSUFICIENTES para atender às suas necessidades?",
+    "texto": "A empresa verifica se as pausas praticadas durante a jornada são suficientes para as necessidades dos trabalhadores e para as características da atividade?",
+    "planoSugerido": "- Estudo e concessão de pausas (NR-17)"
+  },
+  {
+    "ordem": 20,
+    "perguntaColaborador": "Você sente INSEGURANÇA sobre a continuidade do seu emprego?",
+    "texto": "A empresa adota comunicação clara e respeitosa sobre situações que possam gerar insegurança quanto à continuidade do emprego, evitando rumores ou ameaças como forma de pressão?",
+    "planoSugerido": "- Treinamento de técnicas de liderança e comunicação\n- Delimitar o papel do líder formalmente deixando claro a cultura de liderança da empresa"
+  },
+  {
+    "ordem": 21,
+    "perguntaColaborador": "Acontecem MUDANÇAS no seu trabalho SEM EXPLICAÇÃO OU ORIENTAÇÃO suficiente?",
+    "texto": "Quando ocorrem mudanças que afetam o trabalho, os colaboradores recebem explicação e orientação suficientes antes ou durante a implantação?",
+    "planoSugerido": "- Envolver trabalhadores no planejamento de mudanças\n- Suporte prático na transição"
+  },
+  {
+    "ordem": 22,
+    "perguntaColaborador": "Existem CONFLITOS entre você e seus colegas de trabalho que dificultam a realização do trabalho?",
+    "texto": "Existem meios definidos para identificar, mediar e tratar conflitos interpessoais que estejam prejudicando o trabalho?",
+    "planoSugerido": "- Promover espaços de diálogo\n- Mediar conflitos de forma estruturada e/ou com especialista\n- Treinar lideranças para intermediar ou direcionar questões em situações de conflitos"
+  },
+  {
+    "ordem": 23,
+    "perguntaColaborador": "FALTA apoio dos colegas quando você precisa?",
+    "texto": "A organização estimula e acompanha práticas de cooperação e apoio entre colegas quando a execução do trabalho exige ajuda da equipe?",
+    "planoSugerido": "- Treinar colaboradores sobre trabalho em equipe, cultura, regras e expectativas da corporação e, comportamento corporativo"
+  },
+  {
+    "ordem": 24,
+    "perguntaColaborador": "Sua liderança toma decisões de forma AUTORITÁRIA OU INFLEXÍVEL? Exemplo: trata você de forma grosseira ou não permite que você explique dificuldades relacionadas ao trabalho.",
+    "texto": "As lideranças são orientadas e acompanhadas para evitar condutas autoritárias, inflexíveis ou grosseiras e para permitir que o colaborador apresente dificuldades relacionadas ao trabalho?",
+    "planoSugerido": "- Capacitar líderes e gestores em técnicas de liderança adequada e eficiente\n- Avaliação de clima periódica\n- Feedbacks estruturados e bidirecionais"
+  },
+  {
+    "ordem": 25,
+    "perguntaColaborador": "Você se sente VIGIADO(A) além do que o seu trabalho realmente exige? Exemplo: uso de câmeras, sistemas digitais ou outros meios de monitoramento de forma excessiva.",
+    "texto": "Quando existem câmeras, sistemas digitais ou outros meios de monitoramento, seu uso é limitado ao necessário para a atividade, segurança ou exigência regulatória e é comunicado aos colaboradores?",
+    "planoSugerido": "- Política clara de uso de ferramentas de monitoramento"
+  },
+  {
+    "ordem": 26,
+    "perguntaColaborador": "FALTA RETORNO da liderança sobre como está o seu desempenho no trabalho?",
+    "texto": "Existe rotina para que a liderança forneça retorno sobre o desempenho e reconheça contribuições dos colaboradores de forma clara e coerente?",
+    "planoSugerido": "- Revisar critérios de avaliação e torná-los transparentes\n- Reconhecimento além do financeiro\n- Equidade interna de remuneração\n- Capacitar supervisores para feedback individual e coletivo"
+  },
+  {
+    "ordem": 27,
+    "perguntaColaborador": "Quando surge um problema no trabalho, FALTA ajuda da liderança para resolvê-lo?",
+    "texto": "Quando surgem problemas de trabalho que o colaborador não consegue resolver sozinho, existe suporte acessível da liderança para orientação e solução?",
+    "planoSugerido": "- Revisar critérios de avaliação e torná-los transparentes\n- Reconhecimento além do financeiro\n- Equidade interna de remuneração\n- Capacitar supervisores para feedback individual coletivo"
+  },
+  {
+    "ordem": 28,
+    "perguntaColaborador": "Fora do expediente, você PRECISA responder mensagens ou resolver assuntos de trabalho?",
+    "texto": "A empresa evita exigir respostas a mensagens ou resolução de assuntos de trabalho fora do expediente, salvo situações previamente previstas pela função, escala ou regime de trabalho?",
+    "planoSugerido": "- Política de desconexão após o expediente\n- Respeitar horários de início e fim\n- Escala de descanso compensatório onde há plantão"
+  },
+  {
+    "ordem": 29,
+    "perguntaColaborador": "Nos últimos 6 meses, você sofreu ou presenciou AGRESSÃO VERBAL, FÍSICA, AMEAÇA OU VIOLÊNCIA DE GÊNERO por parte de clientes, fornecedores ou outras pessoas de fora da empresa?",
+    "texto": "Nos setores com possibilidade de agressão, ameaça ou violência por terceiros, existem medidas de prevenção, orientação para manejo da situação e suporte após ocorrências?",
+    "planoSugerido": "- Mapear postos com exposição a violência e adotar controles\n- Treinar para manejo de conflito\n- Suporte psicológico após incidentes"
+  },
+  {
+    "ordem": 30,
+    "perguntaColaborador": "Nos últimos 6 meses, você sofreu ou presenciou alguma situação de ASSÉDIO dentro da empresa? Exemplo: humilhação em público, xingamentos, ameaças, chacotas, constrangimentos ou outras situações semelhantes entre superiores ou colegas.",
+    "texto": "A empresa possui medidas formais de prevenção, orientação, denúncia, acolhimento e apuração de situações de assédio, e essas medidas são divulgadas aos colaboradores?",
+    "planoSugerido": null
+  },
+  {
+    "ordem": 31,
+    "perguntaColaborador": "Você trabalha ou atende PESSOAS EM SOFRIMENTO SEM receber apoio suficiente para lidar com essas situações? Exemplo: atuação em serviços de saúde, assistência social, instituições de acolhimento, sistema prisional ou situações de alta carga emocional.",
+    "texto": "Nas funções com contato habitual com pessoas em sofrimento, existe suporte organizacional para lidar com a carga emocional da atividade?",
+    "planoSugerido": "- Grupos de apoio e de briefing após eventos críticos\n- Suporte psicológico especializado periódico\n- Rodízio planejado quando viável"
+  },
+  {
+    "ordem": 32,
+    "perguntaColaborador": "Nos últimos 6 meses, você foi exposto(a) a SITUAÇÕES TRAUMÁTICAS no trabalho? Exemplo: morte, violência ou acidente grave.",
+    "texto": "Quando ocorre exposição a morte, violência ou acidente grave, existe procedimento de acolhimento e suporte após o evento?",
+    "planoSugerido": "- Grupos de apoio e de briefing após eventos críticos\n- Suporte psicológico especializado periódico\n- Rodízio planejado quando viável"
+  },
+  {
+    "ordem": 33,
+    "perguntaColaborador": "Seu trabalho exige que você permaneça, de forma FREQUENTE OU CONTÍNUA, em situações com possibilidade de ACIDENTE GRAVE OU DANO À SUA INTEGRIDADE FÍSICA? Exemplo: atividades em que existe risco relevante de queda, atropelamento, choque elétrico, acidente com máquinas ou outras ocorrências graves.",
+    "texto": "Nas atividades com possibilidade frequente ou contínua de acidente grave ou dano à integridade física, existem medidas organizacionais e suporte compatíveis com essa exposição?",
+    "planoSugerido": "- Grupos de apoio e de briefing após eventos críticos\n- Suporte psicológico especializado periódico\n- Rodízio planejado quando viável"
+  },
+  {
+    "ordem": 34,
+    "perguntaColaborador": "Você trabalha de forma CONSTANTE isolado(a) fisicamente da equipe ou em trabalho remoto, com pouco contato direto com outras pessoas da empresa?",
+    "texto": "Nas funções realizadas de forma constante ou predominante em isolamento físico ou remoto, a empresa mantém meios efetivos de comunicação, suporte e integração com a equipe?",
+    "planoSugerido": "- Rotina de contato regular\n- Suporte técnico e de segurança acessível\n- Incluir trabalhadores remotos em reuniões e decisões"
+  },
+  {
+    "ordem": 35,
+    "perguntaColaborador": "Quando você trabalha isolado(a) ou remotamente, FALTA contato regular e organizado com a empresa ou com a equipe?",
+    "texto": "Existe rotina regular e organizada de contato da empresa ou da equipe com trabalhadores que atuam isolados ou remotamente?",
+    "planoSugerido": "- Rotina de contato regular\n- Suporte técnico e de segurança acessível\n- Incluir trabalhadores remotos em reuniões e decisões"
+  }
+]

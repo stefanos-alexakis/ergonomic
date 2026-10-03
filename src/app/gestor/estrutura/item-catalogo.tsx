@@ -12,11 +12,13 @@ export function ItemCatalogo({
   id,
   nome,
   totalRespostas,
+  totalAvaliacoesEixo2 = 0,
 }: {
   tipo: TipoCatalogo;
   id: string;
   nome: string;
   totalRespostas: number;
+  totalAvaliacoesEixo2?: number;
 }) {
   const [modo, setModo] = useState<"ver" | "editar" | "confirmarExcluir">("ver");
   const [pendenteExcluir, startTransition] = useTransition();
@@ -62,6 +64,8 @@ export function ItemCatalogo({
             ` ${totalRespostas} resposta${totalRespostas > 1 ? "s" : ""} ${
               totalRespostas > 1 ? "ficarão" : "ficará"
             } sem esse ${tipo === "setor" ? "setor" : "departamento"}.`}
+          {totalAvaliacoesEixo2 > 0 &&
+            ` Ele sai de ${totalAvaliacoesEixo2} avaliaç${totalAvaliacoesEixo2 > 1 ? "ões" : "ão"} do Eixo 2, e as respostas dele lá são apagadas.`}
         </p>
         <div className="flex gap-2">
           <Button

@@ -2,6 +2,7 @@ import { getActor } from "@/lib/tenant";
 import { getWorkspaceDoGestor } from "@/lib/pesquisa";
 import { listarCatalogoOrganizacional } from "@/lib/estrutura";
 import { AppShell } from "@/components/shell/app-shell";
+import { NAV_GESTOR } from "@/components/shell/nav-gestor";
 import { BannerImpersonacao } from "@/components/shell/banner-impersonacao";
 import { PageHeader } from "@/components/ui/page-header";
 import { Card } from "@/components/ui/card";
@@ -11,7 +12,7 @@ import { ItemCatalogo } from "./item-catalogo";
 
 export const dynamic = "force-dynamic";
 
-const NAV = [{ href: "/gestor/estrutura", label: "Setores e departamentos" }];
+const NAV = NAV_GESTOR;
 
 const ROTULOS = {
   setor: "Setores",
@@ -60,7 +61,9 @@ export default async function EstruturaPage() {
               <ul className="mt-3 flex flex-col gap-1.5 border-t border-zinc-100 pt-3">
                 {itensPorTipo[tipo].map((item) => (
                   <li key={item.id}>
-                    <ItemCatalogo tipo={tipo} id={item.id} nome={item.nome} totalRespostas={item._count.respostas} />
+                    <ItemCatalogo tipo={tipo} id={item.id} nome={item.nome} totalRespostas={item._count.respostas}
+                      totalAvaliacoesEixo2={"avaliacoesEixo2" in item._count ? item._count.avaliacoesEixo2 : 0}
+                    />
                   </li>
                 ))}
               </ul>

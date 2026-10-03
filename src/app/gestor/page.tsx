@@ -3,6 +3,7 @@ import { getActor } from "@/lib/tenant";
 import { getWorkspaceDoGestor } from "@/lib/pesquisa";
 import { db } from "@/lib/db";
 import { AppShell } from "@/components/shell/app-shell";
+import { NAV_GESTOR } from "@/components/shell/nav-gestor";
 import { BannerImpersonacao } from "@/components/shell/banner-impersonacao";
 import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 
 export const dynamic = "force-dynamic";
 
-const NAV = [{ href: "/gestor/estrutura", label: "Setores e departamentos" }];
+const NAV = NAV_GESTOR;
 
 export default async function GestorHomePage() {
   const actor = await getActor();

@@ -2,7 +2,7 @@
   {
     "ordemGlobal": 1,
     "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
-    "dimensao": "1.Instrução de trabalho",
+    "dimensao": "1. Instrução de Trabalho",
     "fatorRisco": "Instruções de trabalho e/ou cargo mal definidos",
     "situacaoInvestigada": "Ausência/desatualização de descrição de cargo formalizado",
     "texto": "FALTA clareza sobre qual é sua função e quais atividades deve realizar?",
@@ -11,7 +11,7 @@
   {
     "ordemGlobal": 2,
     "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
-    "dimensao": "1.Instrução de trabalho",
+    "dimensao": "1. Instrução de Trabalho",
     "fatorRisco": "Instruções de trabalho e/ou cargo mal definidos",
     "situacaoInvestigada": "Exigências contraditórias de superiores distintos",
     "texto": "Você recebe ORDENS DIFERENTES DE MAIS DE UM SUPERIOR sobre a mesma tarefa?",
@@ -20,7 +20,7 @@
   {
     "ordemGlobal": 3,
     "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
-    "dimensao": "1.Instrução de trabalho",
+    "dimensao": "1. Instrução de Trabalho",
     "fatorRisco": "Instruções de trabalho e/ou cargo mal definidos",
     "situacaoInvestigada": "Insuficiência de treinamentos / instrução de trabalho",
     "texto": "FALTA treinamento ou orientação para você realizar bem o seu trabalho?",
@@ -110,8 +110,8 @@
   {
     "ordemGlobal": 13,
     "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
-    "dimensao": "5. Horários e Jornada",
-    "fatorRisco": "Jornada / Pausas / Regime de Trabalho inadequados",
+    "dimensao": "4. Ritmo e Cadência",
+    "fatorRisco": "Ritmo de Trabalho imposto e/ou intenso",
     "situacaoInvestigada": "Ritmo imposto por processo contínuo sem pausas",
     "texto": "O ritmo do seu trabalho É IMPOSTO PELA MÁQUINA OU LINHA DE PRODUÇÃO, impedindo você de parar quando precisa?",
     "exemplo": null
@@ -119,8 +119,8 @@
   {
     "ordemGlobal": 14,
     "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
-    "dimensao": "5. Horários e Jornada",
-    "fatorRisco": "Jornada / Pausas / Regime de Trabalho inadequados",
+    "dimensao": "4. Ritmo e Cadência",
+    "fatorRisco": "Ritmo de Trabalho imposto e/ou intenso",
     "situacaoInvestigada": "Ritmo intenso sem pausas adequadas",
     "texto": "O trabalho é tão corrido que NÃO DÁ para fazer pausas para banheiro, refeição ou café?",
     "exemplo": null
@@ -128,8 +128,8 @@
   {
     "ordemGlobal": 15,
     "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
-    "dimensao": "5. Horários e Jornada",
-    "fatorRisco": "Jornada / Pausas / Regime de Trabalho inadequados",
+    "dimensao": "4. Ritmo e Cadência",
+    "fatorRisco": "Ritmo de Trabalho imposto e/ou intenso",
     "situacaoInvestigada": "Remuneração por produção",
     "texto": "SE EXISTIR REMUNERAÇÃO POR PRODUTIVIDADE, essa situação faz com que você trabalhe mais rápido ou evite pausas para produzir mais?",
     "exemplo": null
@@ -137,8 +137,8 @@
   {
     "ordemGlobal": 16,
     "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
-    "dimensao": "5. Horários e Jornada",
-    "fatorRisco": "Jornada / Pausas / Regime de Trabalho inadequados",
+    "dimensao": "4. Ritmo e Cadência",
+    "fatorRisco": "Ritmo de Trabalho imposto e/ou intenso",
     "situacaoInvestigada": "Cobrança contínua por entregas",
     "texto": "Você sente PRESSÃO OU COBRANÇA EXCESSIVA no trabalho por prazos e entregas?",
     "exemplo": null
@@ -173,8 +173,8 @@
   {
     "ordemGlobal": 20,
     "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
-    "dimensao": "6. Segurança e Mudanças",
-    "fatorRisco": "Insegurança e gestão inadequada de mudanças",
+    "dimensao": "6. Segurança no Emprego",
+    "fatorRisco": "Insegurança quanto à estabilidade no emprego",
     "situacaoInvestigada": "Insegurança quanto à estabilidade no emprego",
     "texto": "Você sente INSEGURANÇA sobre a continuidade do seu emprego?",
     "exemplo": null
@@ -182,8 +182,8 @@
   {
     "ordemGlobal": 21,
     "bloco": "BLOCO 1 — ORGANIZAÇÃO DO TRABALHO",
-    "dimensao": "6. Segurança e Mudanças",
-    "fatorRisco": "Insegurança e gestão inadequada de mudanças",
+    "dimensao": "7. Gestão de Mudanças",
+    "fatorRisco": "Gestão inadequada nas mudanças organizacionais",
     "situacaoInvestigada": "Ausência de comunicação / orientação sobre mudanças",
     "texto": "Acontecem MUDANÇAS no seu trabalho SEM EXPLICAÇÃO OU ORIENTAÇÃO suficiente?",
     "exemplo": null
@@ -255,7 +255,7 @@
     "ordemGlobal": 29,
     "bloco": "BLOCO 2 — FATORES SOCIAIS NO TRABALHO",
     "dimensao": "11. Violência no Trabalho",
-    "fatorRisco": "Exposição a Violência e/ ou assédio",
+    "fatorRisco": "Exposição a Violência e/ou assédio",
     "situacaoInvestigada": "Agressão verbal/física, ameaças ou violência de gênero por terceiros",
     "texto": "Nos últimos 6 meses, você sofreu ou presenciou AGRESSÃO VERBAL, FÍSICA, AMEAÇA OU VIOLÊNCIA DE GÊNERO por parte de clientes, fornecedores ou outras pessoas de fora da empresa?",
     "exemplo": null
@@ -264,7 +264,7 @@
     "ordemGlobal": 30,
     "bloco": "BLOCO 2 — FATORES SOCIAIS NO TRABALHO",
     "dimensao": "11. Violência no Trabalho",
-    "fatorRisco": "Exposição a Violência e/ ou assédio",
+    "fatorRisco": "Exposição a Violência e/ou assédio",
     "situacaoInvestigada": "Assédio",
     "texto": "Nos últimos 6 meses, você sofreu ou presenciou alguma situação de ASSÉDIO dentro da empresa?",
     "exemplo": "humilhação em público, xingamentos, ameaças, chacotas, constrangimentos ou outras situações semelhantes entre superiores ou colegas."
@@ -272,8 +272,8 @@
   {
     "ordemGlobal": 31,
     "bloco": "BLOCO 2 — FATORES SOCIAIS NO TRABALHO",
-    "dimensao": "13. Trabalho Isolado ou Remoto",
-    "fatorRisco": "Trabalho isolado",
+    "dimensao": "12. Tarefas com Exposição a Situações Extremas",
+    "fatorRisco": "Exposição a Situações Extremas Inerentes à Função",
     "situacaoInvestigada": "Contato habitual com pessoas em sofrimento (saúde, social, educação)",
     "texto": "Você trabalha ou atende PESSOAS EM SOFRIMENTO SEM receber apoio suficiente para lidar com essas situações?",
     "exemplo": "atuação em serviços de saúde, assistência social, instituições de acolhimento, sistema prisional ou situações de alta carga emocional."
@@ -281,8 +281,8 @@
   {
     "ordemGlobal": 32,
     "bloco": "BLOCO 2 — FATORES SOCIAIS NO TRABALHO",
-    "dimensao": "13. Trabalho Isolado ou Remoto",
-    "fatorRisco": "Trabalho isolado",
+    "dimensao": "12. Tarefas com Exposição a Situações Extremas",
+    "fatorRisco": "Exposição a Situações Extremas Inerentes à Função",
     "situacaoInvestigada": "Exposição a eventos traumáticos (morte, violência, acidentes graves)",
     "texto": "Nos últimos 6 meses, você foi exposto(a) a SITUAÇÕES TRAUMÁTICAS no trabalho?",
     "exemplo": "morte, violência ou acidente grave."
@@ -290,8 +290,8 @@
   {
     "ordemGlobal": 33,
     "bloco": "BLOCO 2 — FATORES SOCIAIS NO TRABALHO",
-    "dimensao": "13. Trabalho Isolado ou Remoto",
-    "fatorRisco": "Trabalho isolado",
+    "dimensao": "12. Tarefas com Exposição a Situações Extremas",
+    "fatorRisco": "Exposição a Situações Extremas Inerentes à Função",
     "situacaoInvestigada": "Exposição frequente ou contínua a situações com possibilidade de acidente grave ou dano à integridade física",
     "texto": "Seu trabalho exige que você permaneça, de forma FREQUENTE OU CONTÍNUA, em situações com possibilidade de ACIDENTE GRAVE OU DANO À SUA INTEGRIDADE FÍSICA?",
     "exemplo": "atividades em que existe risco relevante de queda, atropelamento, choque elétrico, acidente com máquinas ou outras ocorrências graves."

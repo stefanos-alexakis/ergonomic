@@ -16,25 +16,26 @@ export type EstadoPesos = { erro?: string; sucesso?: boolean } | undefined;
  * `Next-Action` contra qualquer rota, inclusive as públicas — e os IDs das
  * perguntas aparecem no HTML da jornada do colaborador.
  */
-export async function atualizarPesosAction(_estadoAnterior: EstadoPesos, formData: FormData): Promise<EstadoPesos> {
-  const actor = await getActor();
-  if (!actor?.isPlatformAdmin) return { erro: "Sem permissão." };
-
+function lerPesos(formData: FormData): { id: string; peso: number }[] | { erro: string } {
   const atualizacoes: { id: string; peso: number }[] = [];
-
   for (const [chave, valor] of formData.entries()) {
     if (!chave.startsWith("peso_")) continue;
-    const perguntaId = chave.slice("peso_".length);
     const peso = Number.parseFloat(String(valor).replace(",", "."));
     if (!Number.isFinite(peso) || peso <= 0) {
       return { erro: "Todos os pesos precisam ser números maiores que zero." };
     }
-    atualizacoes.push({ id: perguntaId, peso });
+    atualizacoes.push({ id: chave.slice("peso_".length), peso });
   }
+  if (atualizacoes.length === 0) return { erro: "Nenhuma pergunta encontrada no formulário." };
+  return atualizacoes;
+}
 
-  if (atualizacoes.length === 0) {
-    return { erro: "Nenhuma pergunta encontrada no formulário." };
-  }
+export async function atualizarPesosAction(_estadoAnterior: EstadoPesos, formData: FormData): Promise<EstadoPesos> {
+  const actor = await getActor();
+  if (!actor?.isPlatformAdmin) return { erro: "Sem permissão." };
+
+  const atualizacoes = lerPesos(formData);
+  if ("erro" in atualizacoes) return atualizacoes;
 
   // Só perguntas do questionário ativo: versões anteriores mantêm os pesos
   // com que suas pesquisas foram calculadas (a tela promete isso). Um ID de
@@ -57,5 +58,36 @@ export async function atualizarPesosAction(_estadoAnterior: EstadoPesos, formDat
     throw err;
   }
 
+  return { sucesso: true };
+}
+
+/**
+ * Pesos das questões do Eixo 2 — mesmas regras do Eixo 1: só admin da
+ * plataforma, só o catálogo do questionário ativo (avaliações antigas
+ * mantêm os pesos com que foram calculadas).
+ */
+export async function atualizarPesosEixo2Action(_estadoAnterior: EstadoPesos, formData: FormData): Promise<EstadoPesos> {
+  const actor = await getActor();
+  if (!actor?.isPlatformAdmin) return { erro: "Sem permissão." };
+
+  const atualizacoes = lerPesos(formData);
+  if ("erro" in atualizacoes) return atualizacoes;
+
+  const doCatalogoAtivo = {
+    perguntaEixo1: { fatorRisco: { dimensao: { bloco: { questionario: { ativo: true } } } } },
+  };
+  try {
+    await db.$transaction(async (tx) => {
+      for (const a of atualizacoes) {
+        const r = await tx.questaoEixo2.updateMany({ where: { id: a.id, ...doCatalogoAtivo }, data: { peso: a.peso } });
+        if (r.count !== 1) throw new Error("QUESTAO_FORA_DO_CATALOGO_ATIVO");
+      }
+    });
+  } catch (err) {
+    if (err instanceof Error && err.message === "QUESTAO_FORA_DO_CATALOGO_ATIVO") {
+      return { erro: "Uma ou mais perguntas não pertencem ao questionário em uso. Recarregue a página." };
+    }
+    throw err;
+  }
   return { sucesso: true };
 }
