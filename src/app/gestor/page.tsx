@@ -8,7 +8,7 @@ import { BannerImpersonacao } from "@/components/shell/banner-impersonacao";
 import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
 import { Table, Thead, Th, Tr, Td } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import { BadgeStatusPesquisa } from "@/components/ui/badge-status-pesquisa";
 
 export const dynamic = "force-dynamic";
 
@@ -79,7 +79,7 @@ export default async function GestorHomePage() {
                   </Link>
                 </Td>
                 <Td>
-                  <Badge>{p.status}</Badge>
+                  <BadgeStatusPesquisa pesquisa={p} codigosGerados={p._count.codigos > 0} />
                 </Td>
                 <Td className="text-zinc-500">
                   {p.dataInicio.toLocaleDateString("pt-BR")} – {p.dataFim.toLocaleDateString("pt-BR")}

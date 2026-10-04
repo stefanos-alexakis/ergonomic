@@ -9,6 +9,7 @@ import { BannerImpersonacao } from "@/components/shell/banner-impersonacao";
 import { PageHeader } from "@/components/ui/page-header";
 import { Table, Thead, Th, Tr, Td } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { BadgeStatusPesquisa } from "@/components/ui/badge-status-pesquisa";
 import { GerarLicencasButton } from "./gerar-licencas-button";
 
 export const dynamic = "force-dynamic";
@@ -51,7 +52,7 @@ export default async function PesquisaDetalhePage({
           </>
         }
         title={pesquisa.nome}
-        actions={<Badge>{pesquisa.status}</Badge>}
+        actions={<BadgeStatusPesquisa pesquisa={pesquisa} codigosGerados={codigos.length > 0} />}
       />
 
       {codigos.length === 0 ? (
