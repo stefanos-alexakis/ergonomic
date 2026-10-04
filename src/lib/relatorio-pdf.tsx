@@ -59,10 +59,11 @@ export async function gerarRelatorioPdf(params: {
           <>
             <Text>
               Score Base (Eixo 1): {dashboard.scoreBase} / {dashboard.scoreBaseMaximo} pontos —{" "}
-              <Text style={{ color: COR_POR_TOM[calcularNivelRisco(dashboard.scoreBase!).tom], fontWeight: 700 }}>
-                {calcularNivelRisco(dashboard.scoreBase!).rotulo}
+              <Text style={{ color: COR_POR_TOM[calcularNivelRisco(dashboard.mediaGeral!).tom], fontWeight: 700 }}>
+                {calcularNivelRisco(dashboard.mediaGeral!).rotulo}
               </Text>{" "}
-              (quanto maior, melhor; piso de {SCORE_BASE_MINIMO} pontos, mesmo no cenário mais grave).
+              (quanto maior, melhor; piso de {SCORE_BASE_MINIMO} pontos). Mesma régua do Painel FRPRT: média até
+              3,00 (nota 450 ou mais) sem risco · até 4,00 (nota 275 ou mais) atenção · acima disso risco alto.
             </Text>
             <Text>Média geral de risco: {dashboard.mediaGeral?.toFixed(2)} (escala 1–5)</Text>
 
@@ -91,7 +92,7 @@ export async function gerarRelatorioPdf(params: {
                         <Text
                           style={
                             scoreGrupo !== null
-                              ? { ...styles.colValor, color: COR_POR_TOM[calcularNivelRisco(scoreGrupo).tom] }
+                              ? { ...styles.colValor, color: COR_POR_TOM[calcularNivelRisco(g.mediaGeral).tom] }
                               : styles.colValor
                           }
                         >

@@ -10,7 +10,20 @@
  * haver duas classificações discordando na mesma tela.
  */
 
-import { SCORE_BASE_MAXIMO, SCORE_BASE_MINIMO } from "@/lib/dashboard";
+// Eixo 1 (percepção) vale até 80% da pontuação final — os 20% restantes
+// ficam reservados para os multiplicadores dos Eixos 2 (políticas,
+// atenuante) e 3 (atestados, agravante), ainda não implementados
+// (decisão do usuário, ver review.md). Escala estilo Serasa: 1000 =
+// melhor cenário possível.
+export const SCORE_BASE_MAXIMO = 800;
+
+// Piso: mesmo no pior cenário possível (todo mundo respondeu "sempre" em
+// tudo), a nota base não zera — trava em 100. Sem piso, um agravante do
+// Eixo 3 aplicado sobre um score já em 0 não teria efeito nenhum (0 ×
+// qualquer coisa = 0, ou 0 − qualquer coisa continua ilegível como
+// "nota"), justo no cenário mais grave, onde o agravante mais precisa
+// aparecer (decisão do usuário).
+export const SCORE_BASE_MINIMO = 100;
 
 export function calcularRiscoFinal(eixo1: number, fatorEixo2: number, fatorEixo3: number): number {
   return eixo1 * fatorEixo2 * fatorEixo3;

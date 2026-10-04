@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { aplicarSupressaoGruposPequenos, type GrupoComSupressao } from "@/lib/agregacao";
+import { CONCLUSOES, SCORE_BASE_MAXIMO, SCORE_BASE_MINIMO, concluir } from "@/lib/score-final";
 
 /**
  * Toda a matemática de indicador mora aqui, num único lugar — nenhum
@@ -33,20 +34,7 @@ export function calcularMedia(itens: { valor: number; polaridade: Polaridade; pe
   return somaPonderada / somaPesos;
 }
 
-// Eixo 1 (percepção) vale até 80% da pontuação final — os 20% restantes
-// ficam reservados para os multiplicadores dos Eixos 2 (políticas,
-// atenuante) e 3 (atestados, agravante), ainda não implementados
-// (decisão do usuário, ver review.md). Escala estilo Serasa: 1000 =
-// melhor cenário possível.
-export const SCORE_BASE_MAXIMO = 800;
-
-// Piso: mesmo no pior cenário possível (todo mundo respondeu "sempre" em
-// tudo), a nota base não zera — trava em 100. Sem piso, um agravante do
-// Eixo 3 aplicado sobre um score já em 0 não teria efeito nenhum (0 ×
-// qualquer coisa = 0, ou 0 − qualquer coisa continua ilegível como
-// "nota"), justo no cenário mais grave, onde o agravante mais precisa
-// aparecer (decisão do usuário).
-export const SCORE_BASE_MINIMO = 100;
+export { SCORE_BASE_MAXIMO, SCORE_BASE_MINIMO } from "@/lib/score-final";
 
 /** média está sempre em 1–5 (1 = nunca/melhor, 5 = sempre/pior) após normalizarValor. */
 export function calcularScoreBase(mediaGeral: number): number {
@@ -55,15 +43,18 @@ export function calcularScoreBase(mediaGeral: number): number {
 }
 
 /**
- * Faixa de risco a partir do Score Base, pedida pelo cliente: abaixo de
- * 400 é risco alto, de 401 a 600 é moderado, acima de 600 é baixo (quanto
- * maior o score, melhor). 400 cai no corte "alto" — sem essa convenção o
- * valor exato ficaria indefinido entre as duas faixas descritas.
+ * Faixa de risco do Score Base — a MESMA régua do Painel FRPRT: os cortes
+ * da metodologia (3,00 / 4,00) aplicados à média 1–5, pela mesma função
+ * `concluir`. Antes o Score Base usava faixas próprias da nota (400/600) e
+ * a mesma nota podia ter rótulos diferentes nas duas telas. Recebe a média
+ * (não a nota) para o arredondamento da nota nunca mudar a faixa.
+ *   média ≤ 3,00 → nota ≥ 450 · Sem risco
+ *   média ≤ 4,00 → nota ≥ 275 · Atenção
+ *   acima        → nota < 275 · Risco alto
  */
-export function calcularNivelRisco(scoreBase: number): { rotulo: string; tom: "perigo" | "atencao" | "sucesso" } {
-  if (scoreBase <= 400) return { rotulo: "Risco alto", tom: "perigo" };
-  if (scoreBase <= 600) return { rotulo: "Risco moderado", tom: "atencao" };
-  return { rotulo: "Risco baixo", tom: "sucesso" };
+export function calcularNivelRisco(media: number): { rotulo: string; tom: "perigo" | "atencao" | "sucesso" } {
+  const c = CONCLUSOES[concluir(media)];
+  return { rotulo: c.curto, tom: c.tom };
 }
 
 export type ResumoGrupo = { nome: string; total: number; mediaGeral: number };

@@ -76,7 +76,7 @@ export default async function RespostasIndividuaisPage({
                   className="flex items-center gap-2 font-medium text-zinc-900 hover:underline"
                 >
                   {r.scoreBase}
-                  <Badge tom={calcularNivelRisco(r.scoreBase).tom}>{calcularNivelRisco(r.scoreBase).rotulo}</Badge>
+                  <Badge tom={calcularNivelRisco(r.media).tom}>{calcularNivelRisco(r.media).rotulo}</Badge>
                   →
                 </Link>
               </Td>

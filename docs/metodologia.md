@@ -35,8 +35,10 @@ Leitura do Eixo 1 isolado, numa escala em que maior é melhor:
 
 ```
 Score Base = 100 + 175 × (5 − média)      → 1 vale 800, 5 vale 100
-≤ 400 risco alto · 401–600 risco moderado · > 600 risco baixo
 ```
+
+A classificação usa **a mesma régua do Painel FRPRT** (função `concluir`, aplicada à média):
+até 3,00 sem risco (nota 450 ou mais) · até 4,00 atenção (nota 275 ou mais) · acima, risco alto.
 
 ## Eixo 2 — Medidas de controle
 
@@ -86,10 +88,9 @@ A comparação é feita em centésimos (3,00 calculado nunca "escorrega" para a 
   Eixo 2 = `E1 × F2 − E1`; Eixo 3 = `E1 × F2 × F3 − E1 × F2`.
 - "Principais fatores" = % de setores em que o fator ficou acima de 3,00 (desempate pela média).
 
-> **Atenção às duas escalas de nota.** O Score Base da pesquisa usa os cortes 400/600 pedidos para
-> o Eixo 1. O Painel FRPRT usa os cortes da metodologia (risco 3,00 e 4,00 = notas 450 e 275).
-> A mesma nota pode ter rótulos diferentes nas duas telas, por exemplo 420 é "moderado" no Score
-> Base e "atenção" no FRPRT.
+> **Uma régua só.** O Score Base (painel da pesquisa) e o Painel FRPRT classificam pelos mesmos
+> cortes e pela mesma função. A diferença entre as telas é só o que entra no número: o Score Base
+> usa apenas o Eixo 1; o Painel FRPRT aplica também os Eixos 2 e 3.
 
 ## Anonimato (regras que valem para todos os cálculos)
 

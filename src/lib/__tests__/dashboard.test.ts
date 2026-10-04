@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { concluir } from "@/lib/score-final";
 import {
   agruparEResumir,
   calcularMedia,
@@ -67,29 +68,35 @@ describe("calcularScoreBase — Eixo 1 vale até 80% da pontuação, com piso de
   });
 });
 
-describe("calcularNivelRisco — faixas pedidas pelo cliente: <400 alto, 401-600 moderado, >600 baixo", () => {
-  it("score bem abaixo de 400 é risco alto (perigo)", () => {
-    expect(calcularNivelRisco(100)).toEqual({ rotulo: "Risco alto", tom: "perigo" });
+describe("calcularNivelRisco — mesma régua do Painel FRPRT (cortes 3,00 / 4,00 na média)", () => {
+  it("média 1 (melhor cenário) é sem risco", () => {
+    expect(calcularNivelRisco(1)).toEqual({ rotulo: "Sem risco", tom: "sucesso" });
   });
 
-  it("400 exato cai no corte de risco alto", () => {
-    expect(calcularNivelRisco(400)).toEqual({ rotulo: "Risco alto", tom: "perigo" });
+  it("média 3,00 exata ainda é sem risco (nota 450)", () => {
+    expect(calcularNivelRisco(3)).toEqual({ rotulo: "Sem risco", tom: "sucesso" });
+    expect(calcularScoreBase(3)).toBe(450);
   });
 
-  it("401 já é risco moderado", () => {
-    expect(calcularNivelRisco(401)).toEqual({ rotulo: "Risco moderado", tom: "atencao" });
+  it("média 3,01 já é atenção", () => {
+    expect(calcularNivelRisco(3.01)).toEqual({ rotulo: "Atenção", tom: "atencao" });
   });
 
-  it("600 exato ainda é risco moderado", () => {
-    expect(calcularNivelRisco(600)).toEqual({ rotulo: "Risco moderado", tom: "atencao" });
+  it("média 4,00 exata ainda é atenção (nota 275)", () => {
+    expect(calcularNivelRisco(4)).toEqual({ rotulo: "Atenção", tom: "atencao" });
+    expect(calcularScoreBase(4)).toBe(275);
   });
 
-  it("601 já é risco baixo (sucesso)", () => {
-    expect(calcularNivelRisco(601)).toEqual({ rotulo: "Risco baixo", tom: "sucesso" });
+  it("média 4,01 já é risco alto", () => {
+    expect(calcularNivelRisco(4.01)).toEqual({ rotulo: "Risco alto", tom: "perigo" });
   });
 
-  it("score máximo (800) é risco baixo", () => {
-    expect(calcularNivelRisco(SCORE_BASE_MAXIMO)).toEqual({ rotulo: "Risco baixo", tom: "sucesso" });
+  it("concorda com a conclusão do Painel FRPRT em toda a escala", () => {
+    const tomPainel = { SEM_RISCO: "sucesso", CONTROLE: "atencao", RISCO_EXISTENTE: "perigo" } as const;
+    for (let centesimos = 100; centesimos <= 500; centesimos++) {
+      const media = centesimos / 100;
+      expect(calcularNivelRisco(media).tom).toBe(tomPainel[concluir(media)]);
+    }
   });
 });
 
