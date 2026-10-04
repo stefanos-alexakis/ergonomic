@@ -165,23 +165,35 @@ test("Eixo 3 publicado e Painel FRPRT com o cruzamento dos três eixos", async (
 
   // ── Painel FRPRT ───────────────────────────────────────────────────
   await page.getByRole("link", { name: "Painel FRPRT" }).click();
-  const resumo = page.locator("section", { hasText: "1. Painel resumido por setor" });
+
+  // Topo: resultado geral em destaque (média dos setores com score = só Produção).
+  const geral = page.getByRole("region", { name: "Resultado geral da empresa" });
+  await expect(geral.getByText("4,10", { exact: true })).toBeVisible();
+  await expect(geral.getByText("Risco existente", { exact: true })).toBeVisible();
+  await expect(geral).toContainText("Nota 257 de 800");
+  await expect(geral).toContainText("exige plano de ação e inclusão no PGR");
+  const cartoesSetores = page.getByRole("region", { name: "Pontuação dos setores" });
+  await expect(cartoesSetores).toContainText("Produção");
+  await expect(cartoesSetores).toContainText(/Amostra insuficiente/);
+
+  const resumo = page.getByRole("region", { name: "Painel resumido por setor" });
   const linhaResumo = resumo.locator("tr", { hasText: "Produção" });
   await expect(linhaResumo.getByText("60%")).toBeVisible(); // 6 de 10 colaboradores
   await expect(linhaResumo.getByText("4,10")).toBeVisible();
-  await expect(linhaResumo.getByText("257")).toBeVisible();
+  await expect(linhaResumo.getByText(/257/)).toBeVisible();
   await expect(resumo.locator("tr", { hasText: "Administrativo" }).getByText(/Amostra insuficiente/)).toBeVisible();
 
   // Empate em 100% dos setores: o fator mais grave (Horários, 4,95) vem primeiro.
-  const principais = page.locator("section", { hasText: "2. Principais fatores" });
-  await expect(principais.locator("span.text-zinc-700").first()).toHaveText("5. Horários e Jornada");
+  const achados = page.getByRole("region", { name: "Principais achados" });
+  await expect(achados).toContainText("5. Horários e Jornada é o fator mais crítico");
+  await expect(achados.locator("span.w-52").first()).toHaveText("Horários e Jornada");
 
-  const matriz = page.locator("section", { hasText: "3. Matriz de decisão" });
+  const matriz = page.getByRole("region", { name: "Matriz de decisão" });
   await expect(matriz.locator("tr", { hasText: "5. Horários e Jornada" }).getByText("4,95")).toBeVisible();
   await expect(matriz.locator("tr", { hasText: "10. Equilíbrio Trabalho-Vida" }).getByText("4,40")).toBeVisible();
   await expect(matriz.locator("tr", { hasText: "1. Instrução de Trabalho" }).getByText("4,00").first()).toBeVisible();
 
-  const pgr = page.locator("section", { hasText: "4. Riscos existentes" });
+  const pgr = page.getByRole("region", { name: "Riscos para o PGR" });
   await expect(pgr.locator("article")).toHaveCount(2);
   await expect(pgr.getByText("Produção · 5. Horários e Jornada")).toBeVisible();
   await expect(pgr.getByText(/Registrados no setor e relacionados ao trabalho: F51\.2/).first()).toBeVisible();

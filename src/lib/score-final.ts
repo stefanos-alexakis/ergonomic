@@ -31,16 +31,50 @@ export type Conclusao = "SEM_RISCO" | "CONTROLE" | "RISCO_EXISTENTE";
 
 export const CONCLUSOES: Record<
   Conclusao,
-  { rotulo: string; encaminhamento: string; tom: "sucesso" | "atencao" | "perigo" }
+  {
+    rotulo: string;
+    curto: string;
+    descricao: string;
+    encaminhamento: string;
+    tom: "sucesso" | "atencao" | "perigo";
+    /** Cores em hex — iguais no painel e no PDF. */
+    cor: string;
+    fundo: string;
+  }
 > = {
-  SEM_RISCO: { rotulo: "Sem risco indicado", encaminhamento: "Sem inclusão automática", tom: "sucesso" },
+  SEM_RISCO: {
+    rotulo: "Sem risco indicado",
+    curto: "Sem risco",
+    descricao: "Percepções e controles dentro do esperado — manter o monitoramento.",
+    encaminhamento: "Sem inclusão automática",
+    tom: "sucesso",
+    cor: "#047857",
+    fundo: "#D1FAE5",
+  },
   CONTROLE: {
     rotulo: "Percepção de perigos com controle existente",
+    curto: "Atenção",
+    descricao: "Perigos percebidos, com medidas de controle existentes — acompanhar e manter os controles.",
     encaminhamento: "Acompanhar e manter controle",
     tom: "atencao",
+    cor: "#B45309",
+    fundo: "#FEF3C7",
   },
-  RISCO_EXISTENTE: { rotulo: "Risco existente", encaminhamento: "Plano de ação + inclusão no PGR", tom: "perigo" },
+  RISCO_EXISTENTE: {
+    rotulo: "Risco existente",
+    curto: "Risco alto",
+    descricao: "Risco psicossocial confirmado — exige plano de ação e inclusão no PGR.",
+    encaminhamento: "Plano de ação + inclusão no PGR",
+    tom: "perigo",
+    cor: "#B91C1C",
+    fundo: "#FEE2E2",
+  },
 };
+
+/** Posição (0–100%) de um risco na régua de 1 a 5, para o marcador visual. */
+export function posicaoNaRegua(risco: number): number {
+  return Math.min(100, Math.max(0, ((risco - 1) / 4) * 100));
+}
 
 /** Até 3,00 sem risco; acima de 3,00 até 4,00 controle; acima de 4,00 risco existente. */
 export function concluir(risco: number): Conclusao {

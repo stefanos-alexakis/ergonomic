@@ -49,8 +49,24 @@ export type LinhaSetorPainel = {
   conclusao: Conclusao | null;
   fatoresEmRisco: number;
   temOcorrenciaRelacionada: boolean;
+  ocorrenciasRelacionadas: number;
+  fatoresAgravados: number;
   celulas: CelulaPainel[];
 };
+
+export type ResultadoGeral = {
+  final: number;
+  nota: number;
+  conclusao: Conclusao;
+  setoresAvaliados: number;
+  setoresEmRisco: number;
+  fatoresPgr: number;
+  participacao: number | null;
+  efeitoEixo2: number | null;
+  efeitoEixo3: number | null;
+};
+
+export type Achado = { tom: "perigo" | "atencao" | "sucesso" | "neutro"; texto: string };
 
 /** Opções dos seletores do topo + seleção efetiva (padrão: mais recente de cada). */
 export async function opcoesPainel(workspaceId: string, selecao: SelecaoPainel) {
@@ -240,6 +256,8 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
       conclusao: finalSetor !== null ? concluir(finalSetor) : null,
       fatoresEmRisco: celulas.filter((c) => c.conclusao === "RISCO_EXISTENTE").length,
       temOcorrenciaRelacionada: (e3?.relacionadas ?? 0) > 0,
+      ocorrenciasRelacionadas: e3?.relacionadas ?? 0,
+      fatoresAgravados: celulas.filter((c) => c.fatorEixo3 > 1).length,
       celulas,
     };
   });
@@ -312,11 +330,16 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
       }),
   );
 
+  const geral = calcularGeral(linhas);
+  const achados = gerarAchados({ linhas, geral, principais, temEixo2: Boolean(avaliacao), temEixo3: Boolean(levantamento) });
+
   return {
     opcoes,
     fatores,
     limite,
     linhas,
+    geral,
+    achados,
     principais: principais.map((p) => ({ ...p, tratativas: (sugeridosPorFator.get(p.fator.id) ?? []).slice(0, 3) })),
     pgr,
     avaliacaoIncompleta: Boolean(eixo2?.linhas.some((l) => !l.completo)),
@@ -324,3 +347,109 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
 }
 
 export type PainelFrprt = NonNullable<Awaited<ReturnType<typeof calcularPainelFrprt>>>;
+
+/**
+ * Resultado geral da empresa: média simples do risco final dos setores com
+ * score (cada setor pesa igual — fácil de explicar; o setor pequeno demais
+ * para o anonimato fica de fora, como no resto do painel).
+ */
+export function calcularGeral(linhas: LinhaSetorPainel[]): ResultadoGeral | null {
+  const comScore = linhas.filter((l) => l.final !== null);
+  if (comScore.length === 0) return null;
+  const media = (xs: (number | null)[]) => {
+    const v = xs.filter((x): x is number => x !== null);
+    return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null;
+  };
+  const final = media(comScore.map((l) => l.final))!;
+  const comHeadcount = linhas.filter((l) => l.colaboradores && l.colaboradores > 0);
+  const totalColab = comHeadcount.reduce((a, l) => a + (l.colaboradores ?? 0), 0);
+  return {
+    final,
+    nota: notaDoRisco(final),
+    conclusao: concluir(final),
+    setoresAvaliados: comScore.length,
+    setoresEmRisco: comScore.filter((l) => l.conclusao === "RISCO_EXISTENTE").length,
+    fatoresPgr: comScore.reduce((a, l) => a + l.fatoresEmRisco, 0),
+    participacao: totalColab > 0 ? comHeadcount.reduce((a, l) => a + l.respondentes, 0) / totalColab : null,
+    efeitoEixo2: media(comScore.map((l) => l.efeitoEixo2)),
+    efeitoEixo3: media(comScore.map((l) => l.efeitoEixo3)),
+  };
+}
+
+const virgula = (n: number, casas = 2) => n.toFixed(casas).replace(".", ",");
+
+/** Frases curtas com o que mais importa — mesmas no painel e no PDF. */
+export function gerarAchados(params: {
+  linhas: LinhaSetorPainel[];
+  geral: ResultadoGeral | null;
+  principais: { fator: { id: string; nome: string }; percentual: number; mediaFinal: number }[];
+  temEixo2: boolean;
+  temEixo3: boolean;
+}): Achado[] {
+  const { linhas, geral, principais, temEixo2, temEixo3 } = params;
+  const achados: Achado[] = [];
+  const comScore = linhas.filter((l) => l.final !== null);
+  if (!geral || comScore.length === 0) return achados;
+
+  const critico = [...comScore].sort((a, b) => b.final! - a.final!)[0]!;
+  achados.push({
+    tom: critico.conclusao === "RISCO_EXISTENTE" ? "perigo" : critico.conclusao === "CONTROLE" ? "atencao" : "sucesso",
+    texto:
+      comScore.length > 1
+        ? `${critico.nome} é o setor mais crítico (${virgula(critico.final!)})${critico.fatoresEmRisco ? `, com ${critico.fatoresEmRisco} fator(es) para o PGR` : ""}.`
+        : `${critico.nome}: risco final ${virgula(critico.final!)}${critico.fatoresEmRisco ? `, com ${critico.fatoresEmRisco} fator(es) para o PGR` : ""}.`,
+  });
+
+  const fatorCritico = principais[0] ?? null;
+  if (fatorCritico) {
+    achados.push({
+      tom: fatorCritico.mediaFinal > 4 ? "perigo" : "atencao",
+      texto: `${fatorCritico.fator.nome} é o fator mais crítico: acima de 3,00 em ${Math.round(fatorCritico.percentual * 100)}% dos setores (média ${virgula(fatorCritico.mediaFinal)}).`,
+    });
+  }
+
+  if (geral.fatoresPgr > 0) {
+    achados.push({
+      tom: "perigo",
+      texto: `${geral.fatoresPgr} combinação(ões) setor × fator acima de 4,00 vão para o PGR com plano de ação.`,
+    });
+  } else {
+    achados.push({ tom: "sucesso", texto: "Nenhum fator acima de 4,00 — nada entra automaticamente no PGR." });
+  }
+
+  if (temEixo2 && geral.efeitoEixo2 !== null) {
+    achados.push({
+      tom: geral.efeitoEixo2 <= -0.5 ? "sucesso" : geral.efeitoEixo2 < 0 ? "atencao" : "perigo",
+      texto:
+        geral.efeitoEixo2 < 0
+          ? `As medidas de controle da empresa (Eixo 2) reduziram o risco em ${virgula(Math.abs(geral.efeitoEixo2))} ponto(s) em média.`
+          : "As medidas de controle (Eixo 2) não atenuaram o risco — medidas inexistentes ou a melhorar.",
+    });
+  } else {
+    achados.push({ tom: "neutro", texto: "Eixo 2 não considerado: as medidas de controle ainda não foram avaliadas." });
+  }
+
+  if (temEixo3) {
+    const ocorr = comScore.reduce((a, l) => a + l.ocorrenciasRelacionadas, 0);
+    const setoresAgravados = comScore.filter((l) => l.fatoresAgravados > 0);
+    achados.push(
+      ocorr > 0
+        ? {
+            tom: "perigo",
+            texto: `${ocorr} atestado(s) CID-F relacionado(s) ao trabalho agravaram fatores em ${setoresAgravados.length} setor(es): ${setoresAgravados.map((l) => l.nome).join(", ")}.`,
+          }
+        : { tom: "sucesso", texto: "Nenhum atestado CID-F relacionado ao trabalho nos setores avaliados (Eixo 3)." },
+    );
+  } else {
+    achados.push({ tom: "neutro", texto: "Eixo 3 não considerado: nenhum levantamento de atestados publicado." });
+  }
+
+  const suprimidos = linhas.filter((l) => l.suprimido).length;
+  if (suprimidos > 0) {
+    achados.push({
+      tom: "neutro",
+      texto: `${suprimidos} setor(es) com poucas respostas ficaram fora do cálculo para proteger o anonimato.`,
+    });
+  }
+  return achados;
+}
