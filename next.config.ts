@@ -3,6 +3,13 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: "standalone",
   reactStrictMode: true,
+  experimental: {
+    serverActions: {
+      // Planilha do Eixo 3 (até 5 MB, validado no parser) e logo (até 2 MB).
+      // O padrão de 1 MB recusava esses envios antes de qualquer validação.
+      bodySizeLimit: "6mb",
+    },
+  },
   async headers() {
     return [
       {

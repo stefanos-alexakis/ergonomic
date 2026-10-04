@@ -63,6 +63,7 @@ export default async function EstruturaPage() {
                   <li key={item.id}>
                     <ItemCatalogo tipo={tipo} id={item.id} nome={item.nome} totalRespostas={item._count.respostas}
                       totalAvaliacoesEixo2={"avaliacoesEixo2" in item._count ? item._count.avaliacoesEixo2 : 0}
+                      numeroColaboradores={"numeroColaboradores" in item ? item.numeroColaboradores : null}
                     />
                   </li>
                 ))}

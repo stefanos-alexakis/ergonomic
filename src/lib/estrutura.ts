@@ -25,6 +25,23 @@ export async function adicionarItemCatalogo(
   }
 }
 
+/**
+ * Nº de colaboradores do setor (opcional) — base da % de participação do
+ * Eixo 1 e da taxa de ocorrências do Eixo 3. `updateMany` com workspaceId:
+ * id de outra empresa afeta 0 linhas.
+ */
+export async function definirColaboradoresSetor(
+  workspaceId: string,
+  setorId: string,
+  numero: number | null,
+): Promise<{ ok: true } | { ok: false; erro: string }> {
+  if (numero !== null && (!Number.isInteger(numero) || numero < 0 || numero > 1_000_000)) {
+    return { ok: false, erro: "Nº de colaboradores deve ser um número inteiro." };
+  }
+  const r = await db.setorOrg.updateMany({ where: { id: setorId, workspaceId }, data: { numeroColaboradores: numero } });
+  return r.count === 1 ? { ok: true } : { ok: false, erro: "Setor não encontrado." };
+}
+
 export type ResultadoRenomear = { ok: true } | { ok: false; erro: string };
 
 /**

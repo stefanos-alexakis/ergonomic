@@ -9,6 +9,7 @@ import {
   removerItemCatalogo,
   renomearItemCatalogo,
   type TipoCatalogo,
+  definirColaboradoresSetor,
 } from "@/lib/estrutura";
 
 export type EstadoEstrutura = { erro?: string; mensagem?: string } | undefined;
@@ -52,6 +53,12 @@ export async function renomearItemAction(
   const novoNome = String(formData.get("nome") ?? "");
   const resultado = await renomearItemCatalogo(workspace.id, tipo, id, novoNome);
   if (!resultado.ok) return { erro: resultado.erro };
+
+  if (tipo === "setor" && formData.has("numeroColaboradores")) {
+    const bruto = String(formData.get("numeroColaboradores") ?? "").trim();
+    const r = await definirColaboradoresSetor(workspace.id, id, bruto === "" ? null : Number(bruto));
+    if (!r.ok) return { erro: r.erro };
+  }
 
   revalidatePath("/gestor/estrutura");
   return { mensagem: "Renomeado." };

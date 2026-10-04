@@ -13,12 +13,14 @@ export function ItemCatalogo({
   nome,
   totalRespostas,
   totalAvaliacoesEixo2 = 0,
+  numeroColaboradores = null,
 }: {
   tipo: TipoCatalogo;
   id: string;
   nome: string;
   totalRespostas: number;
   totalAvaliacoesEixo2?: number;
+  numeroColaboradores?: number | null;
 }) {
   const [modo, setModo] = useState<"ver" | "editar" | "confirmarExcluir">("ver");
   const [pendenteExcluir, startTransition] = useTransition();
@@ -43,6 +45,18 @@ export function ItemCatalogo({
       <form action={formAction} className="flex flex-col gap-1">
         <div className="flex gap-2">
           <Input name="nome" defaultValue={nome} required minLength={1} className="flex-1" autoFocus />
+          {tipo === "setor" && (
+            <Input
+              name="numeroColaboradores"
+              type="number"
+              min={0}
+              step={1}
+              defaultValue={numeroColaboradores ?? ""}
+              placeholder="Nº colab."
+              aria-label="Nº de colaboradores do setor"
+              className="w-28"
+            />
+          )}
           <Button type="submit" variant="secondary" disabled={pendenteRenomear}>
             {pendenteRenomear ? "..." : "Salvar"}
           </Button>
@@ -92,7 +106,12 @@ export function ItemCatalogo({
 
   return (
     <div className="flex items-center justify-between gap-2 text-sm text-zinc-700">
-      <span>{nome}</span>
+      <span>
+        {nome}
+        {tipo === "setor" && numeroColaboradores !== null && (
+          <span className="text-zinc-400"> · {numeroColaboradores} colab.</span>
+        )}
+      </span>
       <span className="flex items-center gap-3 shrink-0">
         <button type="button" onClick={() => setModo("editar")} className="text-zinc-500 hover:text-zinc-900 cursor-pointer">
           editar

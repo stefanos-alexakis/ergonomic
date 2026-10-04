@@ -250,10 +250,59 @@ async function seedEixo2(v: VersaoQuestionario) {
   if (total !== esperado) throw new Error(`Inconsistência pós-seed do Eixo 2: ${total} questões.`);
 }
 
+type MatrizCidSeed = {
+  ordem: number;
+  situacao: string;
+  consequencias: string;
+  cids: string[];
+  naoEspecifico: boolean;
+  cidsDescricao: string;
+  observacaoTecnica: string;
+};
+
+/**
+ * Matriz Fatores × CID F (PLanilha-Eixo3-completa.xlsx, aba 2): uma linha
+ * por situação investigada, ligada à pergunta do Eixo 1 de mesma numeração.
+ * Decide quais fatores uma ocorrência CID-F relacionada ao trabalho agrava.
+ */
+async function seedMatrizCid(v: VersaoQuestionario) {
+  const path = join(__dirname, "seed-data", "matriz-cid-v2.json");
+  const itens = JSON.parse(readFileSync(path, "utf-8")) as MatrizCidSeed[];
+  const esperado = v.bloco1 + v.bloco2;
+  if (itens.length !== esperado) {
+    throw new Error(`Matriz CID: esperado ${esperado} situações, encontrado ${itens.length}.`);
+  }
+
+  const perguntas = await prisma.pergunta.findMany({
+    where: { fatorRisco: { dimensao: { bloco: { questionarioId: v.id } } } },
+    select: { id: true, ordemGlobal: true },
+  });
+  const porOrdem = new Map(perguntas.map((p) => [p.ordemGlobal, p.id]));
+
+  for (const item of itens) {
+    const perguntaEixo1Id = porOrdem.get(item.ordem);
+    if (!perguntaEixo1Id) throw new Error(`Matriz CID: situação ${item.ordem} sem pergunta no Eixo 1 v${v.versao}.`);
+    const dados = {
+      cids: item.cids,
+      naoEspecifico: item.naoEspecifico,
+      cidsDescricao: item.cidsDescricao,
+      consequencias: item.consequencias,
+      observacaoTecnica: item.observacaoTecnica,
+    };
+    await prisma.matrizCidSituacao.upsert({
+      where: { perguntaEixo1Id },
+      update: dados,
+      create: { perguntaEixo1Id, ...dados },
+    });
+  }
+  console.log(`Seed da matriz Fatores × CID F (v${v.versao}) concluído: ${itens.length} situações.`);
+}
+
 async function main() {
   await seedQuestionario(V1);
   await seedQuestionario(V2);
   await seedEixo2(V2);
+  await seedMatrizCid(V2);
   await ativarVersao(V2);
 }
 
