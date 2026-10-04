@@ -94,6 +94,16 @@ test("Eixo 2: confirma setores, responde para todos, abre exceção por setor, p
   await expect(linhaInstrucao.getByText("×0,87")).toHaveCount(1);
   await expect(linhaInstrucao.getByText("×0,80")).toHaveCount(2);
   await expect(page.getByText("- Revisar em 30 dias")).toBeVisible();
+
+  // Reabrir para corrigir e concluir já da 1ª etapa, sem percorrer as 13
+  // (sugestão do usuário depois de testar).
+  await page.getByRole("link", { name: "Ver respostas" }).click();
+  await page.getByRole("button", { name: "Reabrir para editar" }).click();
+  await expect(page).toHaveURL(/\/gestor\/eixo2\/[^/?]+$/);
+  await page.locator("article").nth(1).getByText("Existente, precisa melhorar").click();
+  await expect(page.locator("article").nth(1).getByText("Salvo")).toBeVisible();
+  await page.getByRole("button", { name: "Concluir avaliação" }).first().click();
+  await expect(page.getByRole("heading", { name: "Resultado das medidas de controle" })).toBeVisible();
 });
 
 test("Eixo 2: gestor de outra empresa não abre avaliação alheia", async ({ page }) => {

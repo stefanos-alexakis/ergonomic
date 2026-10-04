@@ -116,6 +116,21 @@ export async function salvarFechamentoAction(
   return { mensagem: "Salvo." };
 }
 
+/**
+ * Concluir direto de qualquer etapa (sugestão do usuário: ao reabrir uma
+ * avaliação para corrigir uma resposta, não faz sentido percorrer as 13
+ * etapas até o fim). Os dados de fechamento já gravados são mantidos; a
+ * regra de "tudo respondido" continua valendo em concluirAvaliacao.
+ */
+export async function concluirAvaliacaoAction(avaliacaoId: string): Promise<EstadoEixo2> {
+  const workspace = await empresaDoGestor();
+  if (!workspace) return { erro: "Sem permissão." };
+  const r = await concluirAvaliacao(avaliacaoId, workspace.id);
+  if (!r.ok) return { erro: r.erro };
+  revalidatePath("/gestor/eixo2");
+  redirect(`/gestor/eixo2/${avaliacaoId}/resultado`);
+}
+
 export async function reabrirAvaliacaoAction(avaliacaoId: string): Promise<void> {
   const workspace = await empresaDoGestor();
   if (!workspace) return;

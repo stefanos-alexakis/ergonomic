@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { contextoAvaliacao } from "../contexto";
 import { reabrirAvaliacaoAction } from "../actions";
 import { QuestaoCard } from "./questao-card";
+import { BotaoConcluir } from "./botao-concluir";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +30,9 @@ export default async function PreenchimentoEixo2Page({
   const dimensao = dimensoes[etapa - 1]!;
   const concluida = avaliacao.status === "CONCLUIDA";
   const percentual = progresso.total === 0 ? 0 : Math.round((progresso.completas / progresso.total) * 100);
+  // Tudo respondido (ex.: avaliação reaberta para corrigir uma resposta):
+  // dá para concluir de qualquer etapa, sem percorrer as 13 até o fim.
+  const podeConcluir = !concluida && progresso.total > 0 && progresso.completas === progresso.total;
 
   const completa = (dimId: string) =>
     dimensoes
@@ -50,6 +54,7 @@ export default async function PreenchimentoEixo2Page({
                 <Button variant="ghost">Setores ({setores.length})</Button>
               </Link>
             )}
+            {podeConcluir && <BotaoConcluir avaliacaoId={avaliacao.id} />}
           </>
         }
       />
@@ -70,7 +75,10 @@ export default async function PreenchimentoEixo2Page({
           <span className="text-zinc-600">
             {progresso.completas} de {progresso.total} perguntas respondidas em todos os setores
           </span>
-          <span className="text-xs text-zinc-400">{percentual}%</span>
+          <span className="text-xs text-zinc-400">
+            {!concluida && "Salvo automaticamente · "}
+            {percentual}%
+          </span>
         </div>
         <div className="h-1 w-full bg-[var(--ws-secondary,#f4f4f5)] rounded-full overflow-hidden">
           <div className="h-full bg-[var(--ws-accent,#18181b)] rounded-full" style={{ width: `${percentual}%` }} />
@@ -128,17 +136,20 @@ export default async function PreenchimentoEixo2Page({
         ) : (
           <span />
         )}
-        {etapa < dimensoes.length ? (
-          <Link href={`/gestor/eixo2/${avaliacao.id}?etapa=${etapa + 1}`}>
-            <Button>Próxima dimensão →</Button>
-          </Link>
-        ) : (
-          !concluida && (
-            <Link href={`/gestor/eixo2/${avaliacao.id}/concluir`}>
-              <Button>Revisar e concluir →</Button>
+        <div className="flex items-start gap-2">
+          {podeConcluir && etapa < dimensoes.length && <BotaoConcluir avaliacaoId={avaliacao.id} />}
+          {etapa < dimensoes.length ? (
+            <Link href={`/gestor/eixo2/${avaliacao.id}?etapa=${etapa + 1}`}>
+              <Button variant={podeConcluir ? "secondary" : "primary"}>Próxima dimensão →</Button>
             </Link>
-          )
-        )}
+          ) : (
+            !concluida && (
+              <Link href={`/gestor/eixo2/${avaliacao.id}/concluir`}>
+                <Button>Revisar e concluir →</Button>
+              </Link>
+            )
+          )}
+        </div>
       </div>
     </ShellGestor>
   );
