@@ -1,0 +1,200 @@
+<title>Como funciona o Score FRPRT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+  /* Layout: uma lauda (folha A4) centrada; fórmula → eixos → régua com exemplos → tabela de exemplos */
+  :root {
+    --papel: #ffffff;
+    --fundo: #eef1f4;
+    --tinta: #1b2733;
+    --suave: #5b6876;
+    --linha: #d9dfe5;
+    --marinho: #183b56;
+    --e1: #cfe2f3; --e1-tinta: #1f4e79;
+    --e2: #cdeadf; --e2-tinta: #1d6248;
+    --e3: #fde3c8; --e3-tinta: #8a3d0c;
+    --ok: #047857; --ok-fundo: #d1fae5; --ok-faixa: #6ee7b7;
+    --at: #b45309; --at-fundo: #fef3c7; --at-faixa: #fcd34d;
+    --ri: #b91c1c; --ri-fundo: #fee2e2; --ri-faixa: #f87171;
+    --f-titulo: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    --f-texto: "Source Sans 3", "Segoe UI", Arial, sans-serif;
+    --f-num: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --papel: #17202a; --fundo: #0f151c; --tinta: #e6ebf0; --suave: #9eabb8; --linha: #2c3a48; --marinho: #8cc0e8;
+      --e1: #1d3a55; --e1-tinta: #b9d7f2; --e2: #183f33; --e2-tinta: #a6e3c8; --e3: #4a2a12; --e3-tinta: #f7c79a;
+      --ok: #34d399; --ok-fundo: #0f3b2e; --at: #fbbf24; --at-fundo: #3d2e0b; --ri: #f87171; --ri-fundo: #451a1a;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --papel: #17202a; --fundo: #0f151c; --tinta: #e6ebf0; --suave: #9eabb8; --linha: #2c3a48; --marinho: #8cc0e8;
+    --e1: #1d3a55; --e1-tinta: #b9d7f2; --e2: #183f33; --e2-tinta: #a6e3c8; --e3: #4a2a12; --e3-tinta: #f7c79a;
+    --ok: #34d399; --ok-fundo: #0f3b2e; --at: #fbbf24; --at-fundo: #3d2e0b; --ri: #f87171; --ri-fundo: #451a1a;
+    color-scheme: dark;
+  }
+
+  body { background: var(--fundo); color: var(--tinta); font-family: var(--f-texto); font-size: 14px; line-height: 1.45; padding-inline: 16px; padding-block: 24px; }
+  .folha { max-width: 820px; margin: 0 auto; background: var(--papel); border: 1px solid var(--linha); padding: 36px 44px; display: flex; flex-direction: column; gap: 18px; }
+  h1, h2 { font-family: var(--f-titulo); color: var(--marinho); margin: 0; text-wrap: balance; }
+  h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.01em; }
+  h2 { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; }
+  p { margin: 0; }
+  .sub { color: var(--suave); max-width: 68ch; margin-top: 4px; }
+  .num { font-family: var(--f-num); font-variant-numeric: tabular-nums; }
+  header { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; border-bottom: 2px solid var(--marinho); padding-bottom: 12px; }
+  header .tag { font-family: var(--f-num); font-size: 11px; color: var(--suave); text-transform: uppercase; letter-spacing: 0.08em; }
+
+  /* Fórmula */
+  .formula { display: flex; align-items: stretch; gap: 8px; flex-wrap: wrap; }
+  .termo { flex: 1 1 150px; min-width: 0; border-radius: 6px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
+  .termo b { font-family: var(--f-titulo); font-size: 13px; }
+  .termo .num { font-size: 15px; }
+  .termo small { font-size: 12px; opacity: .9; }
+  .op { align-self: center; font-family: var(--f-num); font-size: 20px; color: var(--suave); }
+  .t1 { background: var(--e1); color: var(--e1-tinta); }
+  .t2 { background: var(--e2); color: var(--e2-tinta); }
+  .t3 { background: var(--e3); color: var(--e3-tinta); }
+  .tf { background: var(--marinho); color: var(--papel); }
+
+  /* Eixos */
+  .eixos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  .eixo { border-top: 4px solid; padding-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+  .eixo h3 { margin: 0; font-family: var(--f-titulo); font-size: 14px; }
+  .eixo p { font-size: 13px; }
+  .eixo ul { margin: 2px 0 0; padding-left: 16px; font-size: 13px; }
+  .eixo li { margin: 1px 0; }
+  .x1 { border-color: var(--e1-tinta); } .x1 h3 { color: var(--e1-tinta); }
+  .x2 { border-color: var(--e2-tinta); } .x2 h3 { color: var(--e2-tinta); }
+  .x3 { border-color: var(--e3-tinta); } .x3 h3 { color: var(--e3-tinta); }
+
+  /* Régua */
+  .regua { position: relative; padding-top: 30px; }
+  .faixa { display: flex; height: 14px; border-radius: 7px; overflow: hidden; }
+  .faixa span:nth-child(1) { width: 50%; background: var(--ok-faixa); }
+  .faixa span:nth-child(2) { width: 25%; background: var(--at-faixa); }
+  .faixa span:nth-child(3) { width: 25%; background: var(--ri-faixa); }
+  .marca { position: absolute; top: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; font-family: var(--f-num); font-size: 11px; font-weight: 600; }
+  .marca i { width: 2px; height: 22px; background: var(--tinta); margin-top: 2px; }
+  .marca b { background: var(--tinta); color: var(--papel); border-radius: 50%; width: 16px; height: 16px; display: grid; place-items: center; font-size: 10px; }
+  .eixo-x { position: relative; height: 34px; font-family: var(--f-num); font-size: 11px; color: var(--suave); }
+  .eixo-x span { position: absolute; transform: translateX(-50%); text-align: center; line-height: 1.3; top: 4px; white-space: nowrap; }
+  .eixo-x span:first-child { transform: none; text-align: left; }
+  .eixo-x span:last-child { transform: translateX(-100%); text-align: right; }
+  .zonas { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin-top: 4px; }
+  .zona { border-radius: 6px; padding: 8px 10px; font-size: 12.5px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .zona b { font-family: var(--f-titulo); font-size: 13px; }
+  .z1 { background: var(--ok-fundo); } .z1 b { color: var(--ok); }
+  .z2 { background: var(--at-fundo); } .z2 b { color: var(--at); }
+  .z3 { background: var(--ri-fundo); } .z3 b { color: var(--ri); }
+
+  /* Exemplos */
+  .tabela { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--suave); font-weight: 600; padding: 4px 6px; border-bottom: 1px solid var(--linha); }
+  td { padding: 6px; border-bottom: 1px solid var(--linha); vertical-align: top; }
+  td.num, th.num { text-align: right; white-space: nowrap; }
+  .pilula { display: inline-block; border-radius: 4px; padding: 1px 7px; font-weight: 700; font-family: var(--f-num); }
+  .p1 { background: var(--ok-fundo); color: var(--ok); }
+  .p2 { background: var(--at-fundo); color: var(--at); }
+  .p3 { background: var(--ri-fundo); color: var(--ri); }
+  .letra { font-family: var(--f-num); font-weight: 600; }
+  .rodape { font-size: 12px; color: var(--suave); border-top: 1px solid var(--linha); padding-top: 10px; }
+
+  @media (max-width: 640px) {
+    .folha { padding: 22px 18px; }
+    .eixos { grid-template-columns: 1fr; }
+    .zonas { grid-template-columns: 1fr; }
+    .op { display: none; }
+  }
+  @media print {
+    @page { size: A4; margin: 12mm; }
+    body { background: #fff; padding: 0; }
+    .folha { border: 0; padding: 0; max-width: none; }
+  }
+</style>
+
+<article class="folha">
+  <header>
+    <div>
+      <h1>Como funciona o Score FRPRT</h1>
+      <p class="sub">O score mede o risco psicossocial de cada setor, fator por fator (13 fatores da NR-1), juntando três fontes de informação.</p>
+    </div>
+    <span class="tag">Guia rápido · NR-1 / PGR</span>
+  </header>
+
+  <section aria-label="Fórmula" class="formula">
+    <div class="termo t1"><b>Eixo 1 · Percepção</b><span class="num">nota 1 a 5</span><small>o que os colaboradores sentem</small></div>
+    <span class="op">×</span>
+    <div class="termo t2"><b>Eixo 2 · Controles</b><span class="num">×0,80 a ×1,00</span><small>o que a empresa já faz</small></div>
+    <span class="op">×</span>
+    <div class="termo t3"><b>Eixo 3 · Atestados</b><span class="num">×1,00 ou ×1,10</span><small>o que já aconteceu</small></div>
+    <span class="op">=</span>
+    <div class="termo tf"><b>Risco final</b><span class="num">1 a 5</span><small>quanto maior, pior</small></div>
+  </section>
+
+  <section class="eixos" aria-label="Os três eixos">
+    <div class="eixo x1">
+      <h3>Eixo 1 — Percepção dos colaboradores</h3>
+      <p>Questionário anônimo com 35 perguntas. Para cada setor e fator sai uma média de <span class="num">1</span> (melhor) a <span class="num">5</span> (pior).</p>
+      <ul><li>Setor com menos de 5 respostas não recebe nota, para proteger o anonimato.</li></ul>
+    </div>
+    <div class="eixo x2">
+      <h3>Eixo 2 — Medidas de controle</h3>
+      <p>A empresa informa, por setor, se já existe controle para cada situação. O controle reduz o risco:</p>
+      <ul>
+        <li>Eficaz ou não se aplica: <span class="num">×0,80</span></li>
+        <li>Precisa melhorar: <span class="num">×0,90</span></li>
+        <li>Inexistente: <span class="num">×1,00</span></li>
+      </ul>
+    </div>
+    <div class="eixo x3">
+      <h3>Eixo 3 — Atestados CID-F</h3>
+      <p>O RH/DP publica os atestados do período, sem identificar ninguém. Se houve ao menos um atestado <strong>relacionado ao trabalho</strong>, com CID compatível com o fator, o risco sobe <span class="num">×1,10</span>.</p>
+      <ul><li>A quantidade não muda o peso. Casos inconclusivos não agravam.</li></ul>
+    </div>
+  </section>
+
+  <section aria-labelledby="t-regua" style="display:flex;flex-direction:column;gap:6px">
+    <h2 id="t-regua">Como ler o resultado</h2>
+    <div class="regua" role="img" aria-label="Régua de 1 a 5: até 3 sem risco, de 3 a 4 atenção, acima de 4 risco existente. Exemplos A em 2,56, B em 3,69 e C em 4,07.">
+      <!-- posição = (risco − 1) ÷ 4 -->
+      <div class="marca" style="left:39%"><b>A</b><i></i></div>
+      <div class="marca" style="left:67.25%"><b>B</b><i></i></div>
+      <div class="marca" style="left:76.75%"><b>C</b><i></i></div>
+      <div class="faixa"><span></span><span></span><span></span></div>
+      <div class="eixo-x">
+        <span style="left:0">risco 1<br>nota 800</span>
+        <span style="left:50%">3,00<br>450</span>
+        <span style="left:75%">4,00<br>275</span>
+        <span style="left:100%">5<br>100</span>
+      </div>
+    </div>
+    <div class="zonas">
+      <div class="zona z1"><b>Até 3,00 · Sem risco</b><span>Percepções e controles dentro do esperado. Manter o monitoramento.</span></div>
+      <div class="zona z2"><b>3,01 a 4,00 · Atenção</b><span>Perigo percebido, com controle existente. Acompanhar e manter os controles.</span></div>
+      <div class="zona z3"><b>Acima de 4,00 · Risco</b><span>Risco existente. Plano de ação e inclusão no PGR.</span></div>
+    </div>
+    <p class="sub" style="max-width:none">A <strong>nota</strong> é a mesma informação numa escala em que maior é melhor: <span class="num">nota = 100 + 175 × (5 − risco)</span>. Risco 1 vale 800; risco 5 vale 100. Com controles eficazes a nota pode passar de 800.</p>
+  </section>
+
+  <section aria-labelledby="t-ex" style="display:flex;flex-direction:column;gap:6px">
+    <h2 id="t-ex">Exemplos</h2>
+    <div class="tabela">
+      <table>
+        <thead>
+          <tr><th></th><th>Setor · fator</th><th class="num">Eixo 1</th><th class="num">Eixo 2</th><th class="num">Eixo 3</th><th class="num">Risco final</th><th class="num">Nota</th><th>Leitura</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="letra">A</td><td>Administrativo · Liderança</td><td class="num">3,20</td><td class="num">×0,80</td><td class="num">×1,00</td><td class="num"><span class="pilula p1">2,56</span></td><td class="num">527</td><td>Controle eficaz trouxe o fator para a faixa verde.</td></tr>
+          <tr><td class="letra">B</td><td>Produção · Demandas</td><td class="num">4,10</td><td class="num">×0,90</td><td class="num">×1,00</td><td class="num"><span class="pilula p2">3,69</span></td><td class="num">329</td><td>Percepção alta, mas há controle (a melhorar). Acompanhar.</td></tr>
+          <tr><td class="letra">C</td><td>Produção · Horários e jornada</td><td class="num">3,70</td><td class="num">×1,00</td><td class="num">×1,10</td><td class="num"><span class="pilula p3">4,07</span></td><td class="num">263</td><td>Sem controle e com atestado F51.2 ligado ao trabalho. Sem o atestado ficaria em 3,70; vai para o PGR.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <p class="rodape">O risco de cada setor é a média dos seus 13 fatores, e o resultado geral da empresa é a média dos setores avaliados. Um CID não comprova, sozinho, nexo causal: o Eixo 3 funciona como indicador coletivo do setor, nunca como prova individual.</p>
+</article>
