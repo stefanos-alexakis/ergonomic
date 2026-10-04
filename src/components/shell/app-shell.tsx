@@ -1,11 +1,19 @@
 import type { CSSProperties, ReactNode } from "react";
+import { contrasteEntre } from "@/lib/validation";
 import { Topbar } from "./topbar";
+import type { ItemNav } from "./nav-gestor";
+
+/** Texto legível sobre a cor primária: branco ou quase-preto, o que contrastar mais. */
+function textoSobre(hex: string): string {
+  return contrasteEntre(hex, "#ffffff") >= contrasteEntre(hex, "#18181b") ? "#ffffff" : "#18181b";
+}
 
 export function AppShell({
   contexto,
   homeHref,
   userLabel,
   nav,
+  logoUrl,
   accentColor,
   secondaryColor,
   banner,
@@ -17,7 +25,9 @@ export function AppShell({
   // subpágina (usuário reparou que não existia — antes não tinha volta).
   homeHref: string;
   userLabel?: string;
-  nav: { href: string; label: string }[];
+  nav: ItemNav[];
+  // Logo da empresa (workspace.logoUrl) — aparece no canto da barra superior.
+  logoUrl?: string | null;
   // Cores cadastradas da empresa do gestor logado (workspace.corPrimaria/
   // corSecundaria). Admin não passa isso — gerencia várias empresas, sem
   // cor única.
@@ -34,13 +44,14 @@ export function AppShell({
       ? ({
           "--ws-line": accentColor ?? undefined,
           "--ws-accent": accentColor ?? undefined,
+          "--ws-on-accent": accentColor ? textoSobre(accentColor) : undefined,
           "--ws-secondary": secondaryColor ?? undefined,
         } as CSSProperties)
       : undefined;
 
   return (
     <div className="min-h-screen bg-white" style={temaEmpresa}>
-      <Topbar contexto={contexto} homeHref={homeHref} userLabel={userLabel} nav={nav} />
+      <Topbar contexto={contexto} homeHref={homeHref} userLabel={userLabel} nav={nav} logoUrl={logoUrl} />
       {banner}
       <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
     </div>
