@@ -7,7 +7,7 @@ type Variant = "primary" | "secondary" | "ghost" | "danger";
 // a empresa tem cor cadastrada); o fallback #18181b é o mesmo hex de
 // zinc-900, então sem cor cadastrada o botão fica idêntico ao visual atual.
 const VARIANTS: Record<Variant, string> = {
-  primary: "bg-[var(--ws-accent,#18181b)] text-white border border-[var(--ws-accent,#18181b)] hover:opacity-90",
+  primary: "bg-[var(--ws-accent,#18181b)] text-[var(--ws-on-accent,#ffffff)] border border-[var(--ws-accent,#18181b)] hover:opacity-90",
   secondary: "bg-white text-zinc-900 border border-zinc-300 hover:bg-zinc-50",
   ghost: "bg-transparent text-zinc-600 border border-transparent hover:bg-zinc-100",
   danger: "bg-white text-red-600 border border-zinc-300 hover:bg-red-50 hover:border-red-200",

@@ -18,11 +18,12 @@ export default async function NovaPesquisaPage() {
 
   return (
     <AppShell
-      contexto="Nova pesquisa"
+      contexto={workspace.nome}
       homeHref="/gestor"
       nav={NAV}
       accentColor={workspace.corPrimaria}
       secondaryColor={workspace.corSecundaria}
+      logoUrl={workspace.logoUrl}
       banner={actor.isPlatformAdmin ? <BannerImpersonacao workspaceNome={workspace.nome} /> : undefined}
     >
       <div className="max-w-md">

@@ -112,6 +112,7 @@ export default async function DashboardPage({
       nav={NAV}
       accentColor={workspace.corPrimaria}
       secondaryColor={workspace.corSecundaria}
+      logoUrl={workspace.logoUrl}
       banner={actor.isPlatformAdmin ? <BannerImpersonacao workspaceNome={workspace.nome} /> : undefined}
     >
       <PageHeader eyebrow={pesquisa.nome} title="Painel" />

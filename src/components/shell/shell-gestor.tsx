@@ -24,6 +24,7 @@ export function ShellGestor({
       nav={NAV_GESTOR}
       accentColor={workspace.corPrimaria}
       secondaryColor={workspace.corSecundaria}
+      logoUrl={workspace.logoUrl}
       banner={isPlatformAdmin ? <BannerImpersonacao workspaceNome={workspace.nome} /> : undefined}
     >
       {children}
