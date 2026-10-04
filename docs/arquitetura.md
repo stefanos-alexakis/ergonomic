@@ -93,8 +93,6 @@ por `workspaceId`.
 
 ## Pontos em aberto
 
-- O campo `status` da pesquisa (rascunho/agendada/aberta/encerrada) não é atualizado
-  automaticamente. O acesso do colaborador é controlado pelas datas de início e fim.
 - SMTP e tarefas agendadas estão previstos (`.env.example`, dependências) mas não são usados.
 - Plano de segurança corporativa (2FA por e-mail, sessão de 48 h, trilha de auditoria) foi
   planejado e ainda não implementado.

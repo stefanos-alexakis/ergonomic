@@ -57,6 +57,9 @@ Na página da pesquisa:
    e entregar.
 3. Durante a vigência, acompanhe a participação em **Ver painel**.
 
+O **status** da pesquisa é atualizado sozinho: *Rascunho* (licenças ainda não geradas), *Agendada*
+(antes do início), *Aberta* (dentro do período) e *Encerrada* (depois do encerramento).
+
 Regras de acesso do colaborador:
 - Antes do início, o código não funciona.
 - Depois do encerramento, quem não começou não entra; quem já começou tem 60 minutos de tolerância

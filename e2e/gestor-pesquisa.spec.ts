@@ -50,12 +50,21 @@ test("gestor cria pesquisa e importa estrutura organizacional por planilha", asy
   await page.getByRole("link", { name: "+ Nova pesquisa" }).click();
   await page.getByLabel("Nome da pesquisa").fill("Pesquisa E2E 2026");
   await page.getByLabel("Quantidade de licenças").fill("50");
-  await page.getByLabel("Início").fill("2026-03-01T09:00");
-  await page.getByLabel("Encerramento").fill("2026-03-15T18:00");
+  // Datas no futuro: sem códigos gerados e antes do encerramento, o status
+  // calculado é "Rascunho" (o status sai das datas, não de uma coluna fixa).
+  await page.getByLabel("Início").fill("2099-03-01T09:00");
+  await page.getByLabel("Encerramento").fill("2099-03-15T18:00");
   await page.getByRole("button", { name: "Criar pesquisa" }).click();
   await expect(page).toHaveURL(/\/gestor$/);
-  await expect(page.getByText("Pesquisa E2E 2026")).toBeVisible();
-  await expect(page.getByText("RASCUNHO")).toBeVisible();
+  const linhaPesquisa = page.locator("tr", { hasText: "Pesquisa E2E 2026" });
+  await expect(linhaPesquisa).toBeVisible();
+  await expect(linhaPesquisa.getByText("Rascunho", { exact: true })).toBeVisible();
+
+  // Gerar as licenças muda o status para "Agendada" (início ainda no futuro).
+  await linhaPesquisa.getByRole("link", { name: "Pesquisa E2E 2026" }).click();
+  await page.getByRole("button", { name: "Gerar licenças e códigos de acesso" }).click();
+  await expect(page.getByText("Agendada", { exact: true })).toBeVisible();
+  await page.getByRole("link", { name: "Pesquisas" }).click();
 
   // 3b. Tentar criar outra pesquisa com o MESMO nome tem que ser recusado —
   // o nome vira o slug da URL pública, então duas pesquisas com o mesmo
