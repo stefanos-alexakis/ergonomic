@@ -1,0 +1,462 @@
+[
+  {
+    "ordem": 1,
+    "situacao": "Ausência/desatualização de descrição de cargo formalizada",
+    "consequencias": "Insegurança, ansiedade, estresse ocupacional e dificuldade de adaptação às exigências do trabalho.",
+    "cids": [
+      "F41",
+      "F43"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação",
+    "observacaoTecnica": "Possível; depende da exposição e de seus efeitos."
+  },
+  {
+    "ordem": 2,
+    "situacao": "Exigências contraditórias de superiores distintos",
+    "consequencias": "Insegurança, ansiedade, estresse ocupacional e dificuldade de adaptação às exigências do trabalho.",
+    "cids": [
+      "F41",
+      "F43"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação",
+    "observacaoTecnica": "Possível; depende da exposição e de seus efeitos."
+  },
+  {
+    "ordem": 3,
+    "situacao": "Insuficiência de treinamentos / instrução de trabalho",
+    "consequencias": "Insegurança, ansiedade, estresse ocupacional e dificuldade de adaptação às exigências do trabalho.",
+    "cids": [
+      "F41",
+      "F43"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação",
+    "observacaoTecnica": "Possível; depende da exposição e de seus efeitos."
+  },
+  {
+    "ordem": 4,
+    "situacao": "Dimensionamento / equipe insuficiente",
+    "consequencias": "Sobrecarga ou subcarga mental, fadiga, ansiedade, sofrimento emocional e sintomas depressivos.",
+    "cids": [
+      "F32",
+      "F41",
+      "F43",
+      "F48.0"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F32 — Episódios depressivos; F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação; F48.0 — Neurose de fadiga",
+    "observacaoTecnica": "Possível; a presença do fator não determina isoladamente um CID F."
+  },
+  {
+    "ordem": 5,
+    "situacao": "Metas acima da capacidade real",
+    "consequencias": "Sobrecarga ou subcarga mental, fadiga, ansiedade, sofrimento emocional e sintomas depressivos.",
+    "cids": [
+      "F32",
+      "F41",
+      "F43",
+      "F48.0"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F32 — Episódios depressivos; F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação; F48.0 — Neurose de fadiga",
+    "observacaoTecnica": "Possível; a presença do fator não determina isoladamente um CID F."
+  },
+  {
+    "ordem": 6,
+    "situacao": "Distribuição de demandas desigual entre cargos",
+    "consequencias": "Sobrecarga ou subcarga mental, fadiga, ansiedade, sofrimento emocional e sintomas depressivos.",
+    "cids": [
+      "F32",
+      "F41",
+      "F43",
+      "F48.0"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F32 — Episódios depressivos; F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação; F48.0 — Neurose de fadiga",
+    "observacaoTecnica": "Possível; a presença do fator não determina isoladamente um CID F."
+  },
+  {
+    "ordem": 7,
+    "situacao": "Excesso de demandas de trabalho (acima da possibilidade de horas para entrega dia/semana/mês)",
+    "consequencias": "Sobrecarga ou subcarga mental, fadiga, ansiedade, sofrimento emocional e sintomas depressivos.",
+    "cids": [
+      "F32",
+      "F41",
+      "F43",
+      "F48.0"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F32 — Episódios depressivos; F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação; F48.0 — Neurose de fadiga",
+    "observacaoTecnica": "Possível; a presença do fator não determina isoladamente um CID F."
+  },
+  {
+    "ordem": 8,
+    "situacao": "Trabalho monótono: repetitividade, estereotipia, padrão sonoro",
+    "consequencias": "Sobrecarga ou subcarga mental, fadiga, ansiedade, sofrimento emocional e sintomas depressivos.",
+    "cids": [
+      "F32",
+      "F41",
+      "F43",
+      "F48.0"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F32 — Episódios depressivos; F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação; F48.0 — Neurose de fadiga",
+    "observacaoTecnica": "Possível; a presença do fator não determina isoladamente um CID F."
+  },
+  {
+    "ordem": 9,
+    "situacao": "Ausência de rotação/alternância de tarefas",
+    "consequencias": "Sobrecarga ou subcarga mental, fadiga, ansiedade, sofrimento emocional e sintomas depressivos.",
+    "cids": [
+      "F32",
+      "F41",
+      "F43",
+      "F48.0"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F32 — Episódios depressivos; F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação; F48.0 — Neurose de fadiga",
+    "observacaoTecnica": "Possível; a presença do fator não determina isoladamente um CID F."
+  },
+  {
+    "ordem": 10,
+    "situacao": "Baixas demandas de trabalho / subutilização",
+    "consequencias": "Sobrecarga ou subcarga mental, fadiga, ansiedade, sofrimento emocional e sintomas depressivos.",
+    "cids": [
+      "F32",
+      "F41",
+      "F43",
+      "F48.0"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F32 — Episódios depressivos; F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação; F48.0 — Neurose de fadiga",
+    "observacaoTecnica": "Possível; a presença do fator não determina isoladamente um CID F."
+  },
+  {
+    "ordem": 11,
+    "situacao": "Baixa autonomia no trabalho",
+    "consequencias": "Ansiedade, tensão, sofrimento emocional e dificuldade de adaptação diante de baixo controle sobre o trabalho.",
+    "cids": [
+      "F41",
+      "F43"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação",
+    "observacaoTecnica": "Possível; depende da intensidade, duração e contexto."
+  },
+  {
+    "ordem": 12,
+    "situacao": "Sequência de execução e/ou modo operatório imposto",
+    "consequencias": "Ansiedade, tensão, sofrimento emocional e dificuldade de adaptação diante de baixo controle sobre o trabalho.",
+    "cids": [
+      "F41",
+      "F43"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação",
+    "observacaoTecnica": "Possível; depende da intensidade, duração e contexto."
+  },
+  {
+    "ordem": 13,
+    "situacao": "Ritmo imposto por processo contínuo sem pausas",
+    "consequencias": "Fadiga, ansiedade, tensão, sofrimento emocional e dificuldade de recuperação.",
+    "cids": [
+      "F41",
+      "F43",
+      "F48.0"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação; F48.0 — Neurose de fadiga",
+    "observacaoTecnica": "Possível; ritmo/cadência não determinam isoladamente diagnóstico."
+  },
+  {
+    "ordem": 14,
+    "situacao": "Ritmo intenso sem pausas suficientes",
+    "consequencias": "Fadiga, ansiedade, tensão, sofrimento emocional e dificuldade de recuperação.",
+    "cids": [
+      "F41",
+      "F43",
+      "F48.0"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação; F48.0 — Neurose de fadiga",
+    "observacaoTecnica": "Possível; ritmo/cadência não determinam isoladamente diagnóstico."
+  },
+  {
+    "ordem": 15,
+    "situacao": "Remuneração por produção",
+    "consequencias": "Fadiga, ansiedade, tensão, sofrimento emocional e dificuldade de recuperação.",
+    "cids": [
+      "F41",
+      "F43",
+      "F48.0"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação; F48.0 — Neurose de fadiga",
+    "observacaoTecnica": "Possível; ritmo/cadência não determinam isoladamente diagnóstico."
+  },
+  {
+    "ordem": 16,
+    "situacao": "Cobrança contínua por entregas",
+    "consequencias": "Fadiga, ansiedade, tensão, sofrimento emocional e dificuldade de recuperação.",
+    "cids": [
+      "F41",
+      "F43",
+      "F48.0"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação; F48.0 — Neurose de fadiga",
+    "observacaoTecnica": "Possível; ritmo/cadência não determinam isoladamente diagnóstico."
+  },
+  {
+    "ordem": 17,
+    "situacao": "Horas extras frequentes, acima de 3 x semana, além do contratual/legal",
+    "consequencias": "Fadiga, dificuldade de recuperação, ansiedade e alterações do sono, conforme organização da jornada.",
+    "cids": [
+      "F41",
+      "F43",
+      "F48.0",
+      "F51.2"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação; F48.0 — Neurose de fadiga; F51.2 — Transtornos não orgânicos do ciclo vigília-sono",
+    "observacaoTecnica": "Possível; F51.2 requer investigação clínica e compatibilidade com alteração do ciclo vigília-sono."
+  },
+  {
+    "ordem": 18,
+    "situacao": "Imprevisibilidade de escala",
+    "consequencias": "Fadiga, dificuldade de recuperação, ansiedade e alterações do sono, conforme organização da jornada.",
+    "cids": [
+      "F41",
+      "F43",
+      "F48.0",
+      "F51.2"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação; F48.0 — Neurose de fadiga; F51.2 — Transtornos não orgânicos do ciclo vigília-sono",
+    "observacaoTecnica": "Possível; F51.2 requer investigação clínica e compatibilidade com alteração do ciclo vigília-sono."
+  },
+  {
+    "ordem": 19,
+    "situacao": "Pausas insuficientes durante a jornada",
+    "consequencias": "Fadiga, dificuldade de recuperação, ansiedade e alterações do sono, conforme organização da jornada.",
+    "cids": [
+      "F41",
+      "F43",
+      "F48.0",
+      "F51.2"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação; F48.0 — Neurose de fadiga; F51.2 — Transtornos não orgânicos do ciclo vigília-sono",
+    "observacaoTecnica": "Possível; F51.2 requer investigação clínica e compatibilidade com alteração do ciclo vigília-sono."
+  },
+  {
+    "ordem": 20,
+    "situacao": "Insegurança quanto à estabilidade no emprego",
+    "consequencias": "Insegurança, ansiedade, sofrimento emocional, sintomas depressivos e dificuldade de adaptação.",
+    "cids": [
+      "F32",
+      "F41",
+      "F43"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F32 — Episódios depressivos; F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação",
+    "observacaoTecnica": "Possível."
+  },
+  {
+    "ordem": 21,
+    "situacao": "Ausência de comunicação / orientação sobre mudanças",
+    "consequencias": "Ansiedade, insegurança e dificuldade de adaptação diante de mudanças organizacionais mal comunicadas.",
+    "cids": [
+      "F41",
+      "F43"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação",
+    "observacaoTecnica": "Possível; F43 é especialmente pertinente quando há resposta clínica a estressor identificável."
+  },
+  {
+    "ordem": 22,
+    "situacao": "Conflitos interpessoais",
+    "consequencias": "Ansiedade, sofrimento emocional, sintomas depressivos e dificuldade de adaptação.",
+    "cids": [
+      "F32",
+      "F41",
+      "F43"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F32 — Episódios depressivos; F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação",
+    "observacaoTecnica": "Possível."
+  },
+  {
+    "ordem": 23,
+    "situacao": "Falta de apoio entre colegas",
+    "consequencias": "Ansiedade, sofrimento emocional, sintomas depressivos e dificuldade de adaptação.",
+    "cids": [
+      "F32",
+      "F41",
+      "F43"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F32 — Episódios depressivos; F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação",
+    "observacaoTecnica": "Possível."
+  },
+  {
+    "ordem": 24,
+    "situacao": "Autoritarismo",
+    "consequencias": "Ansiedade, sofrimento emocional, sintomas depressivos e dificuldade de adaptação.",
+    "cids": [
+      "F32",
+      "F41",
+      "F43",
+      "F48.8"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F32 — Episódios depressivos; F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação; F48.8 — Outros transtornos neuróticos especificados",
+    "observacaoTecnica": "Possível; a relação depende da exposição, duração e contexto organizacional."
+  },
+  {
+    "ordem": 25,
+    "situacao": "Monitoramento/vigilância digital além do exigido pela natureza regulatória",
+    "consequencias": "Ansiedade, sofrimento emocional, sintomas depressivos e dificuldade de adaptação.",
+    "cids": [
+      "F32",
+      "F41",
+      "F43",
+      "F48.8"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F32 — Episódios depressivos; F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação; F48.8 — Outros transtornos neuróticos especificados",
+    "observacaoTecnica": "Possível; a relação depende da exposição, duração e contexto organizacional."
+  },
+  {
+    "ordem": 26,
+    "situacao": "Falta de reconhecimento / falta de feedback construtivo",
+    "consequencias": "Ansiedade, sofrimento emocional, sintomas depressivos e dificuldade de adaptação.",
+    "cids": [
+      "F32",
+      "F41",
+      "F43",
+      "F48.8"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F32 — Episódios depressivos; F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação; F48.8 — Outros transtornos neuróticos especificados",
+    "observacaoTecnica": "Possível; a relação depende da exposição, duração e contexto organizacional."
+  },
+  {
+    "ordem": 27,
+    "situacao": "Ausência de suporte para resolução de problemas",
+    "consequencias": "Ansiedade, sofrimento emocional, sintomas depressivos e dificuldade de adaptação.",
+    "cids": [
+      "F32",
+      "F41",
+      "F43",
+      "F48.8"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F32 — Episódios depressivos; F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação; F48.8 — Outros transtornos neuróticos especificados",
+    "observacaoTecnica": "Possível; a relação depende da exposição, duração e contexto organizacional."
+  },
+  {
+    "ordem": 28,
+    "situacao": "Contato fora do horário além do previsto contratualmente",
+    "consequencias": "Dificuldade de recuperação, ansiedade, sintomas depressivos e alterações do sono.",
+    "cids": [
+      "F32",
+      "F41",
+      "F43",
+      "F51.2"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F32 — Episódios depressivos; F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação; F51.2 — Transtornos não orgânicos do ciclo vigília-sono",
+    "observacaoTecnica": "Possível."
+  },
+  {
+    "ordem": 29,
+    "situacao": "Agressão verbal/física, ameaças ou violência de gênero por terceiros",
+    "consequencias": "Ansiedade, reação ao estresse e sofrimento emocional; quando houver exposição a evento traumático, possibilidade de TEPT.",
+    "cids": [
+      "F41",
+      "F43",
+      "F43.1"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação; F43.1 — Transtorno de estresse pós-traumático",
+    "observacaoTecnica": "Possível; F43.1 somente quando houver evento traumático compatível e avaliação clínica."
+  },
+  {
+    "ordem": 30,
+    "situacao": "Assédio",
+    "consequencias": "Ansiedade, sintomas depressivos, reação ao estresse e sofrimento emocional.",
+    "cids": [
+      "F32",
+      "F41",
+      "F43"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F32 — Episódios depressivos; F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação",
+    "observacaoTecnica": "Possível; a relação com o trabalho deve ser investigada caso a caso."
+  },
+  {
+    "ordem": 31,
+    "situacao": "Contato habitual com pessoas em sofrimento (saúde, social, educação)",
+    "consequencias": "Sobrecarga emocional, ansiedade, reação ao estresse e sintomas depressivos.",
+    "cids": [
+      "F32",
+      "F41",
+      "F43"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F32 — Episódios depressivos; F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação",
+    "observacaoTecnica": "Possível; a intensidade e a frequência da exposição são determinantes."
+  },
+  {
+    "ordem": 32,
+    "situacao": "Exposição a eventos traumáticos (morte, violência, acidentes graves)",
+    "consequencias": "Ansiedade, reação ao estresse e sofrimento emocional; quando houver exposição a evento traumático, possibilidade de TEPT.",
+    "cids": [
+      "F41",
+      "F43",
+      "F43.1"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação; F43.1 — Transtorno de estresse pós-traumático",
+    "observacaoTecnica": "Possível; F43.1 somente quando houver evento traumático compatível e avaliação clínica."
+  },
+  {
+    "ordem": 33,
+    "situacao": "Exposição frequente ou contínua a situações com possibilidade de acidente grave ou dano à integridade física",
+    "consequencias": "Não há CID F específico decorrente apenas da presença de possibilidade de acidente grave; podem ocorrer ansiedade, reação ao estresse ou outros agravos quando houver repercussão psicológica.",
+    "cids": [],
+    "naoEspecifico": true,
+    "cidsDescricao": "F41 / F43 podem ser observados apenas quando houver quadro clínico compatível; F43.1 requer evento traumático compatível.",
+    "observacaoTecnica": "Não presumir agravo mental apenas pela existência do perigo. Investigar repercussões psicológicas e eventuais eventos traumáticos."
+  },
+  {
+    "ordem": 34,
+    "situacao": "Trabalho realizado de forma constante ou predominante em isolamento físico ou remoto",
+    "consequencias": "Isolamento social no trabalho, insegurança, ansiedade e possível sofrimento emocional/depressivo.",
+    "cids": [
+      "F32",
+      "F41",
+      "F43"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F32 — Episódios depressivos; F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação",
+    "observacaoTecnica": "Possível e contextual; depende da intensidade, duração e contexto."
+  },
+  {
+    "ordem": 35,
+    "situacao": "Ausência de rotina formal de contato com trabalhadores isolados/remotos",
+    "consequencias": "Isolamento social no trabalho, insegurança, ansiedade e possível sofrimento emocional/depressivo.",
+    "cids": [
+      "F32",
+      "F41",
+      "F43"
+    ],
+    "naoEspecifico": false,
+    "cidsDescricao": "F32 — Episódios depressivos; F41 — Outros transtornos ansiosos; F43 — Reações ao estresse grave e transtornos de adaptação",
+    "observacaoTecnica": "Possível e contextual; depende da intensidade, duração e contexto."
+  }
+]
