@@ -7,7 +7,6 @@ import {
   calcularDashboard,
   calcularScoreBase,
   calcularNivelRisco,
-  SCORE_BASE_MINIMO,
   type ResumoGrupo,
 } from "@/lib/dashboard";
 import type { GrupoComSupressao } from "@/lib/agregacao";
@@ -53,8 +52,8 @@ function TabelaGrupo({ titulo, grupos }: { titulo: string; grupos: GrupoComSupre
                   <Td className="font-medium">
                     <span className="flex items-center gap-2">
                       {calcularScoreBase(g.mediaGeral)}
-                      <Badge tom={calcularNivelRisco(calcularScoreBase(g.mediaGeral)).tom}>
-                        {calcularNivelRisco(calcularScoreBase(g.mediaGeral)).rotulo}
+                      <Badge tom={calcularNivelRisco(g.mediaGeral).tom}>
+                        {calcularNivelRisco(g.mediaGeral).rotulo}
                       </Badge>
                     </span>
                   </Td>
@@ -178,14 +177,18 @@ export default async function DashboardPage({
             <>
               <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-5 py-4 mb-6 flex items-baseline gap-3">
                 <span className="text-3xl font-bold text-zinc-900">{dashboard.scoreBase}</span>
-                <Badge tom={calcularNivelRisco(dashboard.scoreBase!).tom}>
-                  {calcularNivelRisco(dashboard.scoreBase!).rotulo}
+                <Badge tom={calcularNivelRisco(dashboard.mediaGeral!).tom}>
+                  {calcularNivelRisco(dashboard.mediaGeral!).rotulo}
                 </Badge>
                 <span className="text-sm text-zinc-500">
                   / {dashboard.scoreBaseMaximo} pontos — Score Base (Eixo 1: percepção dos colaboradores). Quanto
-                  maior, melhor. Mesmo no cenário mais grave a nota não zera (piso de {SCORE_BASE_MINIMO} pontos) —
-                  isso mantém espaço para os Eixos 2 e 3 (ainda não implementados) ajustarem o resultado nos{" "}
-                  {1000 - dashboard.scoreBaseMaximo} pontos restantes.
+                  maior, melhor. Mesma régua do Painel FRPRT: média até 3,00 (nota 450 ou mais) sem risco · até
+                  4,00 (nota 275 ou mais) atenção · acima disso risco alto. O resultado final, com os Eixos 2 e 3,
+                  está no{" "}
+                  <Link href="/gestor/painel" className="underline hover:no-underline">
+                    Painel FRPRT
+                  </Link>
+                  .
                 </span>
               </div>
 
