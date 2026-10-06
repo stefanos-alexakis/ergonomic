@@ -39,6 +39,16 @@ justificativa técnica. É parte da metodologia: vale para todas as empresas, en
 Painel FRPRT e aparece no relatório como critério documentado. Deve refletir a validação do
 profissional de SST responsável. Só o administrador da plataforma pode alterar.
 
+### 1.7 Prazos padrão
+**Prazos padrão** — prazos sugeridos para cada prioridade da FMEA (plano de ação e medidas em dias,
+reavaliação em meses, até 24 meses como pede a NR-1). Valem para todas as empresas: aparecem no
+Painel FRPRT quando o fator ainda não tem ação e preenchem os prazos iniciais das ações geradas no
+Plano de ação. Só o administrador da plataforma pode alterar.
+
+### Consultoria
+A consultoria trabalha na empresa pelo **Acessar como gestor** e edita o Plano de ação com o próprio
+usuário. O histórico de cada ação registra o nome com a marca "(consultoria)".
+
 ---
 
 ## 2. Gestor da empresa
@@ -129,7 +139,45 @@ O que aparece, nesta ordem:
    possíveis, CIDs compatíveis, observação técnica e plano de ação.
 
 **Baixar relatório (PDF)** gera o mesmo conteúdo para anexar ao PGR. Como ler os números: veja o
-[Guia rápido do Score](score-frprt.html).
+[Guia rápido do Score](score-frprt.html). Onde o fator já tem ação no Plano de ação, o painel e o
+PDF mostram os prazos da ação; senão, a sugestão da FMEA.
+
+### 2.7 Plano de ação (5W2H e PDCA)
+Um plano contínuo da empresa, que atravessa os ciclos de pesquisa e avaliação.
+
+**De onde vêm as ações**
+- **Gerar a partir do Eixo 2** — cada plano de ação escrito no Eixo 2 vira uma ação. Planos iguais
+  em vários setores (por exemplo, "responder para todos") viram **uma** ação com vários setores.
+  Gerar de novo não duplica nem apaga o que foi editado, e ações canceladas não voltam. A ação já
+  nasce com a prioridade da FMEA e prazos sugeridos.
+- **Fatores que vão para o PGR sem ação** — lista em vermelho no topo, com **Criar ação** já
+  preenchida com setor, fator e uma tratativa sugerida.
+- **+ Nova ação** — ação manual.
+
+**5W2H** (todos editáveis, inclusive os prazos): o quê, por quê, onde (setores), quem (responsável e
+cargo), quando (início, prazo de conclusão e data de reavaliação), como e quanto custa (R$, com
+observação).
+
+**PDCA**
+1. **P · Planejar** — completar o 5W2H. Para iniciar a execução são obrigatórios responsável, prazo
+   e setor.
+2. **D · Executar** — registrar andamento (%) e anotações.
+3. **C · Verificar** — na data de reavaliação, a ficha mostra o índice do fator no setor **antes**
+   (quando a ação nasceu) e **agora** (Painel FRPRT mais recente). Registrar a eficácia: eficaz,
+   parcialmente eficaz ou ineficaz.
+4. **A · Agir** — eficaz: a ação é concluída (padronizar a medida, que deve entrar como "existente e
+   eficaz" no próximo Eixo 2). Parcial ou ineficaz: a ação é concluída e abre-se uma **ação
+   corretiva** ligada a ela, recomeçando o ciclo.
+
+A **situação** é calculada: atrasada (prazo vencido com a ação aberta), vence em até 30 dias, no
+prazo, sem prazo, concluída ou cancelada. Na verificação, vale a data de reavaliação.
+
+**Telas e exportação**: resumo (abertas, atrasadas, a vencer, concluídas, eficazes, custo), filtros
+(setor, fator, fase, situação, prioridade, busca), lista ou **quadro PDCA**, ficha com **histórico**
+de quem alterou o quê, e exportação em **Excel** e **PDF** com os mesmos filtros.
+
+Se duas pessoas editarem a mesma ação ao mesmo tempo, a segunda recebe o aviso para recarregar a
+página — nada é sobrescrito sem ver.
 
 ---
 

@@ -3,6 +3,7 @@ import { calcularMedia } from "@/lib/dashboard";
 import { calcularResultado } from "@/lib/avaliacao-eixo2";
 import { calcularEixo3Setor } from "@/lib/eixo3";
 import { carregarMatriz } from "@/lib/levantamento-eixo3";
+import { carregarRegrasPrazo } from "@/lib/prazos";
 import { calcularRiscoFinal, concluir, type Conclusao } from "@/lib/score-final";
 import { MEDIA_EXPOSTO, calcularFmea, calcularPrazos, compararFmea, type Prazos, type ResultadoFmea } from "@/lib/fmea";
 
@@ -40,6 +41,9 @@ export type CelulaPainel = {
   fmea: ResultadoFmea | null;
 };
 
+/** Ação do Plano de ação que cobre um setor × fator (prazos reais da empresa). */
+export type AcaoVinculada = { id: string; numero: number; prazo: Date | null; reavaliarEm: Date | null; fase: string };
+
 export type ItemFmea = {
   setorId: string;
   setor: string;
@@ -48,6 +52,8 @@ export type ItemFmea = {
   fmea: ResultadoFmea;
   prazos: Prazos;
   planos: string[];
+  /** Ações ativas do Plano de ação para este setor × fator — quando há, valem os prazos delas. */
+  acoes: AcaoVinculada[];
 };
 
 export type LinhaSetorPainel = {
@@ -221,6 +227,7 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
   // Fator sem severidade cadastrada usa 3 (meio da escala) e a tela avisa.
   const SEVERIDADE_PADRAO = 3;
   const emitidoEm = new Date();
+  const regrasPrazo = await carregarRegrasPrazo();
 
   // ── Setores: quem aparece em qualquer um dos três eixos ───────────────
   const ids = new Set<string>([...eixo1PorSetor.keys(), ...eixo2PorSetor.keys(), ...ocorrenciasPorSetor.keys()]);
@@ -360,6 +367,17 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
       })
     : [];
 
+  // Plano de ação: ações ativas (não canceladas) por setor × fator.
+  const acoesPlano = await db.acaoPlano.findMany({
+    where: { workspaceId, fase: { not: "CANCELADA" }, dimensaoId: { not: null } },
+    select: { id: true, numero: true, prazo: true, reavaliarEm: true, fase: true, dimensaoId: true, setores: { select: { setorId: true } } },
+    orderBy: { prazo: "asc" },
+  });
+  const acoesDe = (setorId: string, fatorId: string): AcaoVinculada[] =>
+    acoesPlano
+      .filter((a) => a.dimensaoId === fatorId && a.setores.some((s) => s.setorId === setorId))
+      .map(({ id, numero, prazo, reavaliarEm, fase }) => ({ id, numero, prazo, reavaliarEm, fase }));
+
   const planosDe = (setorId: string, fatorId: string) => [
     ...new Set(
       planosRegistrados
@@ -378,8 +396,9 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
             fator: fatores.find((f) => f.id === c.fatorId)!,
             celula: c,
             fmea: c.fmea!,
-            prazos: calcularPrazos(c.fmea!.prioridade, emitidoEm),
+            prazos: calcularPrazos(c.fmea!.prioridade, emitidoEm, regrasPrazo),
             planos: planosDe(l.setorId, c.fatorId),
+            acoes: acoesDe(l.setorId, c.fatorId),
           })),
       )
       .sort((a, b) => compararFmea(a.fmea, b.fmea) || b.celula.final! - a.celula.final!);
@@ -406,8 +425,9 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
           apoio: apoioPorFator.get(c.fatorId) ?? { consequencias: [], observacoes: [], cids: [] },
           planos: [...new Set(registrados)],
           planosSugeridos: sugeridosPorFator.get(c.fatorId) ?? [],
-          prazos: c.fmea ? calcularPrazos(c.fmea.prioridade, emitidoEm) : null,
+          prazos: c.fmea ? calcularPrazos(c.fmea.prioridade, emitidoEm, regrasPrazo) : null,
           ordem: ordemFmea.get(`${l.setorId}|${c.fatorId}`) ?? Number.MAX_SAFE_INTEGER,
+          acoes: acoesDe(l.setorId, c.fatorId),
         };
       }),
   ).sort((a, b) => a.ordem - b.ordem);
@@ -426,6 +446,7 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
     pgr,
     fmea: {
       emitidoEm,
+      regrasPrazo,
       pgr: fmeaPgr,
       acompanhamento: fmeaAcompanhamento,
       contagemSO,

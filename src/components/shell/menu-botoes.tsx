@@ -23,7 +23,7 @@ export function MenuBotoes({ itens, raiz }: { itens: ItemNav[]; raiz: string }) 
       ?.scrollIntoView({ block: "nearest", inline: "center" });
   }, [pathname]);
   return (
-    <nav ref={navRef} aria-label="Menu principal" className="flex gap-2 overflow-x-auto py-2.5 -mx-1 px-1">
+    <nav ref={navRef} aria-label="Menu principal" className="flex gap-2 overflow-x-auto lg:flex-wrap lg:overflow-visible py-2.5 -mx-1 px-1">
       {itens.map((item) => {
         const ativo = itemAtivo(item, pathname, raiz);
         return (

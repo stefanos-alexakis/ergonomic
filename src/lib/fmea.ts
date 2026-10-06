@@ -159,15 +159,28 @@ const somarMeses = (d: Date, meses: number) => {
   return r;
 };
 
-/** Prazos contados da emissão do relatório (decisão do usuário). */
-export const REGRA_PRAZOS: Record<Prioridade, { planoDias: number | null; implantacaoDias: number | null; reavaliacaoMeses: number; texto: string }> = {
-  ALTA: { planoDias: 30, implantacaoDias: 90, reavaliacaoMeses: 6, texto: "plano em 30 dias · medidas em 90 dias · reavaliar em 6 meses" },
-  MEDIA: { planoDias: 90, implantacaoDias: 180, reavaliacaoMeses: 12, texto: "plano em 90 dias · medidas em 180 dias · reavaliar em 12 meses" },
-  BAIXA: { planoDias: null, implantacaoDias: null, reavaliacaoMeses: 24, texto: "manter e monitorar os controles · reavaliar no próximo ciclo do PGR (24 meses)" },
+export type RegraPrazo = { planoDias: number | null; implantacaoDias: number | null; reavaliacaoMeses: number };
+export type RegrasPrazo = Record<Prioridade, RegraPrazo>;
+
+/**
+ * Prazos padrão por prioridade, contados da emissão (decisão do usuário).
+ * Proposta inicial — o admin ajusta em /admin/prazos (tabela
+ * PrazoPrioridade); cada ação do Plano de ação tem os próprios prazos.
+ */
+export const PRAZOS_PADRAO: RegrasPrazo = {
+  ALTA: { planoDias: 30, implantacaoDias: 90, reavaliacaoMeses: 6 },
+  MEDIA: { planoDias: 90, implantacaoDias: 180, reavaliacaoMeses: 12 },
+  BAIXA: { planoDias: null, implantacaoDias: null, reavaliacaoMeses: 24 },
 };
 
-export function calcularPrazos(prioridade: Prioridade, emissao: Date): Prazos {
-  const r = REGRA_PRAZOS[prioridade];
+export function textoRegraPrazo(r: RegraPrazo): string {
+  const reavaliar = `reavaliar em ${r.reavaliacaoMeses} ${r.reavaliacaoMeses === 1 ? "mês" : "meses"}`;
+  if (r.planoDias === null) return `manter e monitorar os controles · ${reavaliar}`;
+  return `plano em ${r.planoDias} dias${r.implantacaoDias !== null ? ` · medidas em ${r.implantacaoDias} dias` : ""} · ${reavaliar}`;
+}
+
+export function calcularPrazos(prioridade: Prioridade, emissao: Date, regras: RegrasPrazo = PRAZOS_PADRAO): Prazos {
+  const r = regras[prioridade];
   return {
     plano: r.planoDias !== null ? somarDias(emissao, r.planoDias) : null,
     implantacao: r.implantacaoDias !== null ? somarDias(emissao, r.implantacaoDias) : null,

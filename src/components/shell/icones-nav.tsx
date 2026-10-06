@@ -34,6 +34,15 @@ const CAMINHOS: Record<NonNullable<ItemNav["icone"]>, ReactNode> = {
   empresas: <path d="M4 21V5l8-2v18M12 9h8v12M4 21h16M7 8h2M7 12h2M7 16h2M15 13h2M15 17h2" />,
   // alerta (severidade)
   severidade: <path d="M12 3 2 20h20L12 3zM12 10v4M12 17h0" />,
+  // lista de tarefas com check
+  plano: <path d="M9 6h11M9 12h11M9 18h11M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2" />,
+  // relógio com seta (prazos)
+  prazos: (
+    <>
+      <circle cx="12" cy="13" r="8" />
+      <path d="M12 9v4l3 2M9 2h6" />
+    </>
+  ),
   // balança
   pesos: <path d="M12 4v16M6 20h12M5 8h14M5 8l-2 6a3 3 0 0 0 4 0L5 8zM19 8l-2 6a3 3 0 0 0 4 0l-2-6z" />,
 };
