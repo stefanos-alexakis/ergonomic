@@ -1,0 +1,67 @@
+[
+  {
+    "fator": 1,
+    "severidade": 2,
+    "justificativa": "Ambiguidade de papel: tensão e ansiedade, associação moderada com depressão (r ≈ 0,28; meta-análise de Schmidt et al.). Dano em geral reversível."
+  },
+  {
+    "fator": 2,
+    "severidade": 3,
+    "justificativa": "Demandas excessivas: burnout, ansiedade e exaustão (F48.0). Agravam os demais fatores quando o controle é baixo."
+  },
+  {
+    "fator": 3,
+    "severidade": 3,
+    "justificativa": "Baixo controle sobre o trabalho está associado a depressão clínica (meta-análise de Madsen et al., Psychological Medicine, 2017)."
+  },
+  {
+    "fator": 4,
+    "severidade": 3,
+    "justificativa": "Ritmo intenso e cadência imposta: fadiga, esgotamento e aumento de erros e acidentes."
+  },
+  {
+    "fator": 5,
+    "severidade": 4,
+    "justificativa": "Jornadas de 55 h ou mais por semana: +35% de risco de AVC e +17% de morte por doença isquêmica do coração (OMS/OIT, 2021). Também distúrbios do sono (F51.2) e fadiga."
+  },
+  {
+    "fator": 6,
+    "severidade": 3,
+    "justificativa": "Insegurança no emprego eleva sintomas depressivos (OR 1,29 em coortes prospectivas; Kim & von dem Knesebeck, 2016)."
+  },
+  {
+    "fator": 7,
+    "severidade": 2,
+    "justificativa": "Sofrimento transitório durante reestruturações; tende a reverter quando a mudança é comunicada e acompanhada."
+  },
+  {
+    "fator": 8,
+    "severidade": 3,
+    "justificativa": "Conflito e falta de apoio social: ansiedade e depressão; pode evoluir para assédio (ver fator 11)."
+  },
+  {
+    "fator": 9,
+    "severidade": 3,
+    "justificativa": "Pouco apoio da chefia intensifica o efeito das demandas sobre o sofrimento psíquico (F48.8)."
+  },
+  {
+    "fator": 10,
+    "severidade": 3,
+    "justificativa": "Conflito trabalho-família prediz depressão, burnout e insônia (meta-análise longitudinal com 112 mil participantes, PLOS Medicine)."
+  },
+  {
+    "fator": 11,
+    "severidade": 5,
+    "justificativa": "Assédio e agressão levam a TEPT e depressão: trauma ocupacional triplica o risco de TEPT (RR 3,18) e 57% das vítimas de assédio ficam acima do limiar de TEPT (Nielsen et al., 2015). Pode haver lesão física."
+  },
+  {
+    "fator": 12,
+    "severidade": 5,
+    "justificativa": "Eventos traumáticos (acidente grave, morte, ameaça à vida) levam a TEPT (F43.1) e incapacidade duradoura."
+  },
+  {
+    "fator": 13,
+    "severidade": 3,
+    "justificativa": "Isolamento social e, no trabalho isolado de campo, ausência de socorro imediato em emergências."
+  }
+]

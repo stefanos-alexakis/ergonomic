@@ -4,6 +4,7 @@ import { calcularResultado } from "@/lib/avaliacao-eixo2";
 import { calcularEixo3Setor } from "@/lib/eixo3";
 import { carregarMatriz } from "@/lib/levantamento-eixo3";
 import { calcularRiscoFinal, concluir, type Conclusao } from "@/lib/score-final";
+import { MEDIA_EXPOSTO, calcularFmea, calcularPrazos, compararFmea, type Prazos, type ResultadoFmea } from "@/lib/fmea";
 
 /**
  * Painel FRPRT — cruza, por setor × fator de risco:
@@ -31,6 +32,22 @@ export type CelulaPainel = {
   ajustado: number | null;
   final: number | null;
   conclusao: Conclusao | null;
+  /** Respondentes do setor com média ≥ 4 no fator ÷ respondentes (null quando suprimido). */
+  parcelaExpostos: number | null;
+  /** Maior afastamento (dias) entre os atestados relacionados e compatíveis. */
+  maiorAfastamento: number;
+  /** Classificação FMEA — só para células com índice final. */
+  fmea: ResultadoFmea | null;
+};
+
+export type ItemFmea = {
+  setorId: string;
+  setor: string;
+  fator: { id: string; nome: string };
+  celula: CelulaPainel;
+  fmea: ResultadoFmea;
+  prazos: Prazos;
+  planos: string[];
 };
 
 export type LinhaSetorPainel = {
@@ -148,20 +165,29 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
       })
     : [];
 
-  const eixo1PorSetor = new Map<string, { n: number; porFator: Map<string, number | null> }>();
+  const eixo1PorSetor = new Map<
+    string,
+    { n: number; porFator: Map<string, number | null>; expostosPorFator: Map<string, number | null> }
+  >();
   const agrupadas = new Map<string, typeof respostas>();
   for (const r of respostas) agrupadas.set(r.setorId!, [...(agrupadas.get(r.setorId!) ?? []), r]);
   for (const [setorId, lista] of agrupadas) {
     const porFator = new Map<string, number | null>();
+    const expostosPorFator = new Map<string, number | null>();
+    const itensDoFator = (r: (typeof lista)[number], fatorId: string) =>
+      r.itens
+        .filter((i) => i.pergunta.fatorRisco.dimensaoId === fatorId)
+        .map((i) => ({ valor: i.valor, polaridade: i.pergunta.polaridade, peso: i.pergunta.peso }));
     for (const f of fatores) {
-      const itens = lista.flatMap((r) =>
-        r.itens
-          .filter((i) => i.pergunta.fatorRisco.dimensaoId === f.id)
-          .map((i) => ({ valor: i.valor, polaridade: i.pergunta.polaridade, peso: i.pergunta.peso })),
-      );
-      porFator.set(f.id, calcularMedia(itens));
+      porFator.set(f.id, calcularMedia(lista.flatMap((r) => itensDoFator(r, f.id))));
+      // FMEA: quantos respondentes, individualmente, estão expostos ao fator.
+      const mediasIndividuais = lista
+        .map((r) => calcularMedia(itensDoFator(r, f.id)))
+        .filter((m): m is number => m !== null);
+      const expostos = mediasIndividuais.filter((m) => Math.round(m * 100) >= MEDIA_EXPOSTO * 100).length;
+      expostosPorFator.set(f.id, mediasIndividuais.length ? expostos / mediasIndividuais.length : null);
     }
-    eixo1PorSetor.set(setorId, { n: lista.length, porFator });
+    eixo1PorSetor.set(setorId, { n: lista.length, porFator, expostosPorFator });
   }
 
   // ── Eixo 2 ───────────────────────────────────────────────────────────
@@ -185,6 +211,16 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
     : [];
   const ocorrenciasPorSetor = new Map<string, typeof ocorrencias>();
   for (const o of ocorrencias) ocorrenciasPorSetor.set(o.setorId!, [...(ocorrenciasPorSetor.get(o.setorId!) ?? []), o]);
+
+  // ── FMEA: severidade-base de cada fator (tabela do admin) ────────────
+  const severidades = await db.severidadeFator.findMany({
+    where: { dimensaoId: { in: fatores.map((f) => f.id) } },
+    select: { dimensaoId: true, severidade: true, justificativa: true },
+  });
+  const severidadePorFator = new Map(severidades.map((x) => [x.dimensaoId, x]));
+  // Fator sem severidade cadastrada usa 3 (meio da escala) e a tela avisa.
+  const SEVERIDADE_PADRAO = 3;
+  const emitidoEm = new Date();
 
   // ── Setores: quem aparece em qualquer um dos três eixos ───────────────
   const ids = new Set<string>([...eixo1PorSetor.keys(), ...eixo2PorSetor.keys(), ...ocorrenciasPorSetor.keys()]);
@@ -212,6 +248,19 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
       const cidsEixo3 = e3?.cidsPorFator.get(f.id) ?? [];
       const ajustado = eixo1 !== null ? eixo1 * fatorEixo2 : null;
       const final = eixo1 !== null ? calcularRiscoFinal(eixo1, fatorEixo2, fatorEixo3) : null;
+      const parcelaExpostos = suprimido ? null : (e1?.expostosPorFator.get(f.id) ?? null);
+      const maiorAfastamento = e3?.maiorAfastamentoPorFator.get(f.id) ?? 0;
+      const fmea =
+        eixo1 !== null && final !== null
+          ? calcularFmea({
+              severidadeBase: severidadePorFator.get(f.id)?.severidade ?? SEVERIDADE_PADRAO,
+              mediaEixo1: eixo1,
+              fatorEixo2: f2,
+              atestadoRelacionado: fatorEixo3 > 1,
+              maiorAfastamentoDias: maiorAfastamento,
+              parcelaExpostos,
+            })
+          : null;
       return {
         fatorId: f.id,
         eixo1,
@@ -229,6 +278,9 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
         ajustado,
         final,
         conclusao: final !== null ? concluir(final) : null,
+        parcelaExpostos,
+        maiorAfastamento,
+        fmea,
       };
     });
 
@@ -308,6 +360,37 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
       })
     : [];
 
+  const planosDe = (setorId: string, fatorId: string) => [
+    ...new Set(
+      planosRegistrados
+        .filter((p) => p.setorId === setorId && p.questao.perguntaEixo1.fatorRisco.dimensaoId === fatorId)
+        .map((p) => p.planoAcao!),
+    ),
+  ];
+  const itensFmea = (conclusao: Conclusao): ItemFmea[] =>
+    linhas
+      .flatMap((l) =>
+        l.celulas
+          .filter((c) => c.conclusao === conclusao && c.fmea)
+          .map((c) => ({
+            setorId: l.setorId,
+            setor: l.nome,
+            fator: fatores.find((f) => f.id === c.fatorId)!,
+            celula: c,
+            fmea: c.fmea!,
+            prazos: calcularPrazos(c.fmea!.prioridade, emitidoEm),
+            planos: planosDe(l.setorId, c.fatorId),
+          })),
+      )
+      .sort((a, b) => compararFmea(a.fmea, b.fmea) || b.celula.final! - a.celula.final!);
+  const fmeaPgr = itensFmea("RISCO_EXISTENTE");
+  const fmeaAcompanhamento = itensFmea("CONTROLE");
+  // Contagem por célula da matriz S × O (as duas listas), para o mapa de calor.
+  const contagemSO = Array.from({ length: 5 }, () => Array<number>(5).fill(0));
+  for (const i of [...fmeaPgr, ...fmeaAcompanhamento]) contagemSO[i.fmea.s - 1]![i.fmea.o - 1]!++;
+
+  // PGR na ordem da FMEA (prioridade, depois RPN).
+  const ordemFmea = new Map(fmeaPgr.map((i, idx) => [`${i.setorId}|${i.fator.id}`, idx]));
   const pgr = linhas.flatMap((l) =>
     l.celulas
       .filter((c) => c.conclusao === "RISCO_EXISTENTE")
@@ -323,9 +406,11 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
           apoio: apoioPorFator.get(c.fatorId) ?? { consequencias: [], observacoes: [], cids: [] },
           planos: [...new Set(registrados)],
           planosSugeridos: sugeridosPorFator.get(c.fatorId) ?? [],
+          prazos: c.fmea ? calcularPrazos(c.fmea.prioridade, emitidoEm) : null,
+          ordem: ordemFmea.get(`${l.setorId}|${c.fatorId}`) ?? Number.MAX_SAFE_INTEGER,
         };
       }),
-  );
+  ).sort((a, b) => a.ordem - b.ordem);
 
   const geral = calcularGeral(linhas);
   const achados = gerarAchados({ linhas, geral, principais, temEixo2: Boolean(avaliacao), temEixo3: Boolean(levantamento) });
@@ -339,6 +424,18 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
     achados,
     principais: principais.map((p) => ({ ...p, tratativas: (sugeridosPorFator.get(p.fator.id) ?? []).slice(0, 3) })),
     pgr,
+    fmea: {
+      emitidoEm,
+      pgr: fmeaPgr,
+      acompanhamento: fmeaAcompanhamento,
+      contagemSO,
+      severidades: fatores.map((f) => ({
+        fator: f,
+        severidade: severidadePorFator.get(f.id)?.severidade ?? null,
+        justificativa: severidadePorFator.get(f.id)?.justificativa ?? null,
+      })),
+      severidadeIncompleta: fatores.some((f) => !severidadePorFator.has(f.id)),
+    },
     avaliacaoIncompleta: Boolean(eixo2?.linhas.some((l) => !l.completo)),
   };
 }

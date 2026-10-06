@@ -144,3 +144,22 @@ describe("calcularEixo3Setor", () => {
     expect([...r.fatorPorFator.values()].every((f) => f === 1)).toBe(true);
   });
 });
+
+describe("calcularEixo3Setor — maior afastamento por fator (agravante da FMEA)", () => {
+  it("considera só ocorrências relacionadas ao trabalho e compatíveis", () => {
+    const matriz = montarMatrizPorFator([
+      { fatorId: "jornada", cids: ["F51.2"], naoEspecifico: false },
+      { fatorId: "violencia", cids: ["F43.1"], naoEspecifico: false },
+    ]);
+    const r = calcularEixo3Setor(
+      [
+        { cid: "F51.2", relacao: "SIM", diasAfastados: 20 },
+        { cid: "F51.2", relacao: "SIM", diasAfastados: 4 },
+        { cid: "F43.1", relacao: "NAO", diasAfastados: 90 },
+      ],
+      matriz,
+    );
+    expect(r.maiorAfastamentoPorFator.get("jornada")).toBe(20);
+    expect(r.maiorAfastamentoPorFator.has("violencia")).toBe(false);
+  });
+});

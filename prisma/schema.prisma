@@ -20,13 +20,13 @@ model Workspace {
   deletedAt     DateTime?
   createdAt     DateTime  @default(now())
 
-  memberships   Membership[]
-  setores       SetorOrg[]
-  departamentos Departamento[]
-  segmentos     Segmento[]
-  funcoes       Funcao[]
-  pesquisas     Pesquisa[]
-  avaliacoesEixo2 AvaliacaoEixo2[]
+  memberships        Membership[]
+  setores            SetorOrg[]
+  departamentos      Departamento[]
+  segmentos          Segmento[]
+  funcoes            Funcao[]
+  pesquisas          Pesquisa[]
+  avaliacoesEixo2    AvaliacaoEixo2[]
   levantamentosEixo3 LevantamentoEixo3[]
 
   @@index([slug])
@@ -98,10 +98,26 @@ model Dimensao {
   nome    String
   ordem   Int
 
-  bloco        Bloco        @relation(fields: [blocoId], references: [id], onDelete: Cascade)
+  bloco        Bloco            @relation(fields: [blocoId], references: [id], onDelete: Cascade)
   fatoresRisco FatorRisco[]
+  severidade   SeveridadeFator?
 
   @@index([blocoId])
+}
+
+// ── FMEA — severidade-base de cada fator (metodologia, única p/ todas as
+// empresas). Nota 1–5 pela gravidade do dano típico, com a justificativa
+// técnica; editável só pelo admin da plataforma. Os agravantes (atestado
+// relacionado, afastamento > 15 dias, % de expostos) são calculados em
+// src/lib/fmea.ts a partir dos três eixos — não ficam gravados.
+model SeveridadeFator {
+  dimensaoId      String   @id
+  severidade      Int
+  justificativa   String
+  atualizadoEm    DateTime @updatedAt
+  atualizadoPorId String?
+
+  dimensao Dimensao @relation(fields: [dimensaoId], references: [id], onDelete: Cascade)
 }
 
 model FatorRisco {
@@ -136,7 +152,7 @@ model Pergunta {
   // pesquisa — ver review.md sobre a decisão do usuário).
   peso                Float      @default(1)
 
-  fatorRisco    FatorRisco     @relation(fields: [fatorRiscoId], references: [id], onDelete: Cascade)
+  fatorRisco    FatorRisco         @relation(fields: [fatorRiscoId], references: [id], onDelete: Cascade)
   respostaItens RespostaItem[]
   questaoEixo2  QuestaoEixo2?
   matrizCid     MatrizCidSituacao?
@@ -148,17 +164,17 @@ model Pergunta {
 // ── Estrutura organizacional (por empresa) ──────────────────────────────
 
 model SetorOrg {
-  id          String @id @default(cuid())
-  workspaceId String
-  nome        String
+  id                  String @id @default(cuid())
+  workspaceId         String
+  nome                String
   // Quantas pessoas trabalham no setor — opcional; habilita "% de
   // participação" (Eixo 1) e taxa de ocorrências (Eixo 3) no painel final.
   numeroColaboradores Int?
 
-  workspace       Workspace             @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  respostas       Resposta[]
-  avaliacoesEixo2 AvaliacaoEixo2Setor[]
-  respostasEixo2  RespostaEixo2[]
+  workspace        Workspace             @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  respostas        Resposta[]
+  avaliacoesEixo2  AvaliacaoEixo2Setor[]
+  respostasEixo2   RespostaEixo2[]
   ocorrenciasEixo3 OcorrenciaEixo3[]
 
   @@unique([workspaceId, nome])
@@ -303,10 +319,10 @@ model RespostaItem {
 // em que a metodologia calcula o fator de correção (0,80/0,90/1,00).
 
 enum CondicaoMedida {
-  EFICAZ           // medida existente e eficaz — 0,80
+  EFICAZ // medida existente e eficaz — 0,80
   PRECISA_MELHORAR // existente, mas precisa melhorar — 0,90
-  INEXISTENTE      // medida inexistente — 1,00
-  NAO_SE_APLICA    // não exposto à situação — 0,80 (mesmo valor de EFICAZ)
+  INEXISTENTE // medida inexistente — 1,00
+  NAO_SE_APLICA // não exposto à situação — 0,80 (mesmo valor de EFICAZ)
 }
 
 enum StatusAvaliacao {
@@ -436,22 +452,22 @@ enum RelacaoTrabalho {
 // Uma publicação da planilha de ocorrências, com a identificação do
 // levantamento e a declaração de veracidade do responsável (RH/DP).
 model LevantamentoEixo3 {
-  id                 String             @id @default(cuid())
-  workspaceId        String
-  nome               String
-  periodoInicio      DateTime
-  periodoFim         DateTime
-  responsavel        String?
-  cargoResponsavel   String?
-  status             StatusLevantamento @default(RASCUNHO)
+  id                  String             @id @default(cuid())
+  workspaceId         String
+  nome                String
+  periodoInicio       DateTime
+  periodoFim          DateTime
+  responsavel         String?
+  cargoResponsavel    String?
+  status              StatusLevantamento @default(RASCUNHO)
   // Só nome e hash do arquivo (auditoria) — o arquivo em si não é guardado:
   // dado de saúde não fica em disco público.
-  arquivoNome        String?
-  arquivoHash        String?
-  declaracaoAceitaEm DateTime?
+  arquivoNome         String?
+  arquivoHash         String?
+  declaracaoAceitaEm  DateTime?
   declaracaoAceitaPor String?
-  createdAt          DateTime           @default(now())
-  publicadoEm        DateTime?
+  createdAt           DateTime           @default(now())
+  publicadoEm         DateTime?
 
   workspace   Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   ocorrencias OcorrenciaEixo3[]
