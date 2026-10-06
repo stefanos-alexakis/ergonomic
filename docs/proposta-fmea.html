@@ -1,0 +1,248 @@
+<title>Matriz FMEA dos Fatores Psicossociais</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+  /* Layout: documento de proposta em folha única rolável; seções numeradas seguem a ordem real do cálculo (S → O → D → prioridade → prazos) */
+  :root {
+    --papel: #ffffff;
+    --fundo: #eef1f4;
+    --tinta: #1b2733;
+    --suave: #5b6876;
+    --linha: #d9dfe5;
+    --marinho: #183b56;
+    --alta: #b91c1c; --alta-fundo: #fee2e2;
+    --media: #b45309; --media-fundo: #fef3c7;
+    --baixa: #047857; --baixa-fundo: #d1fae5;
+    --s5: #7f1d1d; --s4: #b91c1c; --s3: #c2410c; --s2: #a16207; --s1: #4d7c0f;
+    --f-titulo: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    --f-texto: "Source Sans 3", "Segoe UI", Arial, sans-serif;
+    --f-num: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --papel: #17202a; --fundo: #0f151c; --tinta: #e6ebf0; --suave: #9eabb8; --linha: #2c3a48; --marinho: #8cc0e8;
+      --alta: #f87171; --alta-fundo: #451a1a; --media: #fbbf24; --media-fundo: #3d2e0b; --baixa: #34d399; --baixa-fundo: #0f3b2e;
+      --s5: #fca5a5; --s4: #f87171; --s3: #fb923c; --s2: #facc15; --s1: #a3e635;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --papel: #17202a; --fundo: #0f151c; --tinta: #e6ebf0; --suave: #9eabb8; --linha: #2c3a48; --marinho: #8cc0e8;
+    --alta: #f87171; --alta-fundo: #451a1a; --media: #fbbf24; --media-fundo: #3d2e0b; --baixa: #34d399; --baixa-fundo: #0f3b2e;
+    --s5: #fca5a5; --s4: #f87171; --s3: #fb923c; --s2: #facc15; --s1: #a3e635;
+    color-scheme: dark;
+  }
+
+  body { background: var(--fundo); color: var(--tinta); font-family: var(--f-texto); font-size: 15px; line-height: 1.5; padding-inline: 16px; padding-block: 24px; }
+  .folha { max-width: 880px; margin: 0 auto; background: var(--papel); border: 1px solid var(--linha); padding: 40px 48px; display: flex; flex-direction: column; gap: 28px; }
+  h1, h2, h3 { font-family: var(--f-titulo); color: var(--marinho); margin: 0; text-wrap: balance; }
+  h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.01em; }
+  h2 { font-size: 18px; font-weight: 800; display: flex; align-items: baseline; gap: 10px; }
+  h2 .n { font-family: var(--f-num); font-size: 13px; color: var(--suave); }
+  h3 { font-size: 14px; font-weight: 700; }
+  p { margin: 0; max-width: 72ch; }
+  section { display: flex; flex-direction: column; gap: 12px; }
+  .sub { color: var(--suave); }
+  .num { font-family: var(--f-num); font-variant-numeric: tabular-nums; }
+  header { display: flex; flex-direction: column; gap: 8px; border-bottom: 2px solid var(--marinho); padding-bottom: 16px; }
+  header .tag { font-family: var(--f-num); font-size: 11px; color: var(--suave); text-transform: uppercase; letter-spacing: 0.08em; }
+  .resumo { border-left: 4px solid var(--marinho); padding: 10px 14px; background: color-mix(in srgb, var(--marinho) 6%, var(--papel)); }
+  .resumo ul { margin: 6px 0 0; padding-left: 18px; }
+
+  .tabela { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--suave); font-weight: 600; padding: 6px 8px; border-bottom: 1px solid var(--linha); vertical-align: bottom; }
+  td { padding: 8px; border-bottom: 1px solid var(--linha); vertical-align: top; }
+  td.c, th.c { text-align: center; }
+  .nota { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 6px; font-family: var(--f-num); font-weight: 600; color: #fff; }
+  .n5 { background: var(--s5); } .n4 { background: var(--s4); } .n3 { background: var(--s3); } .n2 { background: var(--s2); } .n1 { background: var(--s1); }
+  :root[data-theme="dark"] .nota { color: #111; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .nota { color: #111; } }
+  .fonte { font-size: 12.5px; color: var(--suave); }
+
+  .regras { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .regra { border: 1px solid var(--linha); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .regra b { font-family: var(--f-num); font-size: 18px; color: var(--alta); }
+
+  /* Matriz S × O */
+  .matriz { display: grid; grid-template-columns: 70px repeat(5, minmax(0, 1fr)); gap: 4px; max-width: 560px; font-family: var(--f-num); font-size: 13px; }
+  .matriz .cab { color: var(--suave); text-align: center; align-self: end; padding-bottom: 2px; }
+  .matriz .lin { color: var(--suave); display: flex; align-items: center; }
+  .cel { border-radius: 6px; text-align: center; padding: 10px 0; font-weight: 600; }
+  .A { background: var(--alta-fundo); color: var(--alta); }
+  .M { background: var(--media-fundo); color: var(--media); }
+  .B { background: var(--baixa-fundo); color: var(--baixa); }
+  .pil { display: inline-block; border-radius: 4px; padding: 1px 8px; font-weight: 700; font-size: 13px; }
+
+  .prazos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .prazo { border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .prazo h3 { color: inherit; }
+  .prazo ul { margin: 0; padding-left: 18px; font-size: 14px; }
+
+  .listas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .lista { border: 1px solid var(--linha); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .perguntas li { margin-bottom: 6px; }
+  .rodape { font-size: 12.5px; color: var(--suave); border-top: 1px solid var(--linha); padding-top: 12px; display: flex; flex-direction: column; gap: 4px; }
+  .rodape a { color: var(--suave); }
+
+  @media (max-width: 680px) {
+    .folha { padding: 24px 18px; }
+    .regras, .prazos, .listas { grid-template-columns: 1fr; }
+    .matriz { grid-template-columns: 52px repeat(5, minmax(0, 1fr)); }
+  }
+  @media print {
+    @page { size: A4; margin: 14mm; }
+    body { background: #fff; padding: 0; }
+    .folha { border: 0; padding: 0; max-width: none; }
+  }
+</style>
+
+<article class="folha">
+  <header>
+    <span class="tag">Proposta técnica · NR-1 / PGR · para validação da consultoria</span>
+    <h1>Matriz FMEA dos Fatores Psicossociais</h1>
+    <p class="sub">Como priorizar, no PGR, os fatores apontados pelo Score FRPRT, usando Severidade, Ocorrência e Detecção (FMEA), com critérios documentados como pede a NR-1 (item 1.5.4.4.2).</p>
+  </header>
+
+  <div class="resumo">
+    <strong>Em resumo</strong>
+    <ul>
+      <li>O <strong>Score</strong> continua decidindo quais fatores entram na análise. A <strong>FMEA</strong> diz a ordem e o prazo de cada ação.</li>
+      <li><strong>O</strong> vem do Eixo 1, <strong>D</strong> do Eixo 2, e <strong>S</strong> da gravidade do fator, agravada pelo Eixo 3 e pelo número de expostos.</li>
+      <li>A prioridade final (<strong>Alta, Média, Baixa</strong>) segue o padrão atual da FMEA (AIAG-VDA 2019), em que a severidade pesa mais. O RPN (S × O × D) aparece como apoio.</li>
+      <li>Duas listas separadas: fatores com índice de <strong>3,01 a 4,00</strong> e fatores <strong>acima de 4,00</strong>.</li>
+    </ul>
+  </div>
+
+  <section aria-labelledby="t1">
+    <h2 id="t1"><span class="n">1</span> Severidade-base de cada fator</h2>
+    <p>Escala de 1 a 5 pela gravidade do dano típico à saúde: <strong>1</strong> desconforto passageiro · <strong>2</strong> sofrimento leve e reversível · <strong>3</strong> adoecimento psíquico com possível afastamento curto · <strong>4</strong> adoecimento com afastamento prolongado ou dano cardiovascular · <strong>5</strong> dano grave, potencialmente permanente ou com risco à vida.</p>
+    <div class="tabela">
+      <table>
+        <thead><tr><th>Fator</th><th class="c">S-base</th><th>Dano típico e evidência</th></tr></thead>
+        <tbody>
+          <tr><td>11. Violência no trabalho</td><td class="c"><span class="nota n5">5</span></td><td>Assédio e agressão levam a TEPT e depressão. Exposição a trauma ocupacional triplica o risco de TEPT (RR 3,18). Em média, 57% das vítimas de assédio passam do limiar de TEPT. Pode haver lesão física.</td></tr>
+          <tr><td>12. Situações extremas</td><td class="c"><span class="nota n5">5</span></td><td>Eventos traumáticos (acidente grave, morte, ameaça à vida) levam a TEPT (F43.1) e incapacidade duradoura.</td></tr>
+          <tr><td>5. Horários e jornada</td><td class="c"><span class="nota n4">4</span></td><td>Jornada de 55 h ou mais por semana: +35% de risco de AVC e +17% de morte por doença isquêmica do coração (OMS/OIT, 2021). Também distúrbios do sono (F51.2) e fadiga.</td></tr>
+          <tr><td>2. Demandas de trabalho</td><td class="c"><span class="nota n3">3</span></td><td>Burnout, ansiedade e exaustão (F48.0). Agrava os demais fatores quando o controle é baixo.</td></tr>
+          <tr><td>3. Controle e autonomia</td><td class="c"><span class="nota n3">3</span></td><td>Baixo controle está associado a depressão clínica (meta-análise de Madsen et al., 2017).</td></tr>
+          <tr><td>4. Ritmo e cadência</td><td class="c"><span class="nota n3">3</span></td><td>Fadiga, esgotamento e aumento de erros e acidentes.</td></tr>
+          <tr><td>6. Segurança no emprego</td><td class="c"><span class="nota n3">3</span></td><td>Insegurança no emprego eleva sintomas depressivos (OR 1,29, coortes prospectivas).</td></tr>
+          <tr><td>8. Relações interpessoais</td><td class="c"><span class="nota n3">3</span></td><td>Conflito e falta de apoio social: ansiedade e depressão. Pode evoluir para assédio (ver fator 11).</td></tr>
+          <tr><td>9. Liderança</td><td class="c"><span class="nota n3">3</span></td><td>Pouco apoio da chefia intensifica o efeito das demandas sobre o sofrimento psíquico (F48.8).</td></tr>
+          <tr><td>10. Equilíbrio trabalho-vida</td><td class="c"><span class="nota n3">3</span></td><td>Conflito trabalho-família prediz depressão, burnout e insônia (meta-análise longitudinal com 112 mil participantes).</td></tr>
+          <tr><td>13. Trabalho isolado ou remoto</td><td class="c"><span class="nota n3">3</span></td><td>Isolamento social. No trabalho isolado de campo, falta de socorro imediato em emergências.</td></tr>
+          <tr><td>1. Instrução de trabalho</td><td class="c"><span class="nota n2">2</span></td><td>Ambiguidade de papel: tensão e ansiedade, associação moderada com depressão (r ≈ 0,28). Dano em geral reversível.</td></tr>
+          <tr><td>7. Gestão de mudanças</td><td class="c"><span class="nota n2">2</span></td><td>Sofrimento transitório durante reestruturações. Tende a reverter quando a mudança é comunicada e acompanhada.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="fonte">Esta é uma sugestão inicial. A tabela final deve ser validada e assinada pelo profissional de SST responsável e ficará configurável na plataforma.</p>
+  </section>
+
+  <section aria-labelledby="t2">
+    <h2 id="t2"><span class="n">2</span> Agravantes da severidade</h2>
+    <p>Cada agravante soma <strong>+1</strong> à severidade-base do fator no setor. O máximo é 5.</p>
+    <div class="regras">
+      <div class="regra"><b>+1</b><h3>Atestado relacionado ao trabalho</h3><p>Ao menos uma ocorrência CID-F com relação ao trabalho = <strong>Sim</strong>, compatível com o fator, no setor. Sem relação com o trabalho, ou inconclusiva, <strong>não conta</strong>.</p></div>
+      <div class="regra"><b>+1</b><h3>Afastamento acima de 15 dias</h3><p>Uma dessas ocorrências (relacionada e compatível) com <strong>mais de 15 dias</strong> de afastamento, limite em que o caso passa ao INSS.</p></div>
+      <div class="regra"><b>+1</b><h3>Muitos expostos</h3><p><strong>50% ou mais</strong> dos respondentes do setor com média individual <strong>4 ou mais</strong> no fator ("frequentemente" ou "sempre"). Só em setores com 5 ou mais respostas, para manter o anonimato.</p></div>
+    </div>
+    <p class="sub">O número de expostos usa as respostas da pesquisa, como a NR-1 pede ("número de trabalhadores possivelmente afetados"). Quando o setor tiver o nº de colaboradores cadastrado, o relatório também mostra a estimativa de pessoas expostas.</p>
+  </section>
+
+  <section aria-labelledby="t3">
+    <h2 id="t3"><span class="n">3</span> Ocorrência (O) e Detecção (D)</h2>
+    <div class="tabela">
+      <table>
+        <thead><tr><th>Nota</th><th>O · Ocorrência: média do Eixo 1 no fator</th><th>D · Detecção e controle: fator do Eixo 2</th></tr></thead>
+        <tbody>
+          <tr><td><span class="nota n1">1</span></td><td class="num">até 1,80</td><td><span class="num">×0,80</span> · controles eficazes</td></tr>
+          <tr><td><span class="nota n2">2</span></td><td class="num">1,81 a 2,60</td><td><span class="num">×0,81 a ×0,85</span></td></tr>
+          <tr><td><span class="nota n3">3</span></td><td class="num">2,61 a 3,40</td><td><span class="num">×0,86 a ×0,90</span> · precisam melhorar</td></tr>
+          <tr><td><span class="nota n4">4</span></td><td class="num">3,41 a 4,20</td><td><span class="num">×0,91 a ×0,95</span></td></tr>
+          <tr><td><span class="nota n5">5</span></td><td class="num">acima de 4,20</td><td><span class="num">×0,96 a ×1,00</span> · controles inexistentes, ou setor sem avaliação do Eixo 2</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="t4">
+    <h2 id="t4"><span class="n">4</span> Prioridade de Ação</h2>
+    <p>Primeiro a matriz Severidade × Ocorrência dá o nível base. Depois a Detecção ajusta:</p>
+    <div class="matriz" role="img" aria-label="Matriz de severidade por ocorrência. Severidade 5: média com ocorrência 1, alta de 2 a 5. Severidade 4: baixa com 1, média com 2 e 3, alta com 4 e 5. Severidade 3: baixa com 1 e 2, média com 3 e 4, alta com 5. Severidade 2: baixa de 1 a 3, média com 4 e 5. Severidade 1: baixa de 1 a 4, média com 5.">
+      <span></span><span class="cab">O 1</span><span class="cab">O 2</span><span class="cab">O 3</span><span class="cab">O 4</span><span class="cab">O 5</span>
+      <span class="lin">S 5</span><span class="cel M">Média</span><span class="cel A">Alta</span><span class="cel A">Alta</span><span class="cel A">Alta</span><span class="cel A">Alta</span>
+      <span class="lin">S 4</span><span class="cel B">Baixa</span><span class="cel M">Média</span><span class="cel M">Média</span><span class="cel A">Alta</span><span class="cel A">Alta</span>
+      <span class="lin">S 3</span><span class="cel B">Baixa</span><span class="cel B">Baixa</span><span class="cel M">Média</span><span class="cel M">Média</span><span class="cel A">Alta</span>
+      <span class="lin">S 2</span><span class="cel B">Baixa</span><span class="cel B">Baixa</span><span class="cel B">Baixa</span><span class="cel M">Média</span><span class="cel M">Média</span>
+      <span class="lin">S 1</span><span class="cel B">Baixa</span><span class="cel B">Baixa</span><span class="cel B">Baixa</span><span class="cel B">Baixa</span><span class="cel M">Média</span>
+    </div>
+    <ul>
+      <li><strong>D 4 ou 5</strong> (controle fraco ou inexistente): <strong>sobe um nível</strong>.</li>
+      <li><strong>D 1</strong> (controle eficaz): <strong>desce um nível</strong>. Com severidade 5, nunca fica abaixo de Média.</li>
+      <li><strong>D 2 ou 3</strong>: mantém o nível.</li>
+      <li>O <strong>RPN = S × O × D</strong> (de 1 a 125) aparece ao lado e serve para desempatar a ordem dentro de cada prioridade.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="t5">
+    <h2 id="t5"><span class="n">5</span> Prazos sugeridos</h2>
+    <div class="prazos">
+      <div class="prazo A"><h3>Alta</h3><ul><li>Plano de ação em até <strong>30 dias</strong></li><li>Medidas implantadas em até <strong>90 dias</strong></li><li>Reavaliar em <strong>6 meses</strong></li></ul></div>
+      <div class="prazo M"><h3>Média</h3><ul><li>Plano de ação em até <strong>90 dias</strong></li><li>Medidas implantadas em até <strong>180 dias</strong></li><li>Reavaliar em <strong>12 meses</strong></li></ul></div>
+      <div class="prazo B"><h3>Baixa</h3><ul><li>Manter e monitorar os controles</li><li>Reavaliar no próximo ciclo do PGR (até <strong>24 meses</strong>)</li></ul></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="t6">
+    <h2 id="t6"><span class="n">6</span> Duas listas no relatório</h2>
+    <div class="listas">
+      <div class="lista"><h3>Índice de 3,01 a 4,00</h3><p>Perigos percebidos com controle existente. Ficam no inventário como fatores em acompanhamento, com prioridade FMEA para orientar melhorias.</p></div>
+      <div class="lista"><h3>Índice acima de 4,00</h3><p>Fatores com plano de ação obrigatório no PGR. A prioridade FMEA define a ordem e os prazos.</p></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="t7">
+    <h2 id="t7"><span class="n">7</span> Exemplos</h2>
+    <div class="tabela">
+      <table>
+        <thead><tr><th>Setor · fator</th><th>Índice</th><th class="c">S</th><th class="c">O</th><th class="c">D</th><th class="c">RPN</th><th>Prioridade</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Produção · 5. Horários e jornada<br><span class="fonte">S: base 4 +1 atestado F51.2 relacionado +1 expostos (100%) = 5 (limite)</span></td>
+            <td class="num">4,95</td><td class="c"><span class="nota n5">5</span></td><td class="c"><span class="nota n5">5</span></td><td class="c"><span class="nota n3">3</span></td><td class="c num">75</td>
+            <td><span class="pil A">Alta</span></td>
+          </tr>
+          <tr>
+            <td>Produção · 10. Equilíbrio trabalho-vida<br><span class="fonte">S: base 3 +1 atestado +1 expostos = 5 · controle eficaz (D 1) desce um nível</span></td>
+            <td class="num">4,40</td><td class="c"><span class="nota n5">5</span></td><td class="c"><span class="nota n5">5</span></td><td class="c"><span class="nota n1">1</span></td><td class="c num">25</td>
+            <td><span class="pil M">Média</span></td>
+          </tr>
+          <tr>
+            <td>Produção · 2. Demandas de trabalho<br><span class="fonte">S: base 3 +1 expostos = 4 · controle eficaz desce um nível</span></td>
+            <td class="num">4,00</td><td class="c"><span class="nota n4">4</span></td><td class="c"><span class="nota n5">5</span></td><td class="c"><span class="nota n1">1</span></td><td class="c num">20</td>
+            <td><span class="pil M">Média</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="fonte">Valores do setor de teste usado na validação da plataforma.</p>
+  </section>
+
+  <section aria-labelledby="t8">
+    <h2 id="t8"><span class="n">8</span> Para a consultoria validar</h2>
+    <ol class="perguntas">
+      <li>A <strong>severidade-base</strong> de cada fator (seção 1). Principalmente: Horários e jornada em 4, e Instrução de trabalho e Gestão de mudanças em 2.</li>
+      <li>O <strong>corte de expostos</strong>: 50% dos respondentes com média 4 ou mais.</li>
+      <li>A <strong>matriz de prioridade</strong> e o ajuste pela detecção.</li>
+      <li>Os <strong>prazos</strong> de cada prioridade.</li>
+    </ol>
+  </section>
+
+  <div class="rodape">
+    <span>Fontes: OMS/OIT, jornadas longas e doença cardiovascular (2021) · Verkuil et al., assédio e saúde mental, meta-análise (2015) · Nielsen et al., assédio e TEPT, meta-análise (2015) · Madsen et al., job strain e depressão clínica, <i>Psychological Medicine</i> (2017) · Kim &amp; von dem Knesebeck, insegurança no emprego e depressão (2016) · meta-análise de conflito trabalho-família e saúde mental, <i>PLOS Medicine</i> · Schmidt et al., ambiguidade de papel e depressão · AIAG-VDA, Manual FMEA (2019) · NR-1, item 1.5.4.4.2.</span>
+    <span>A FMEA prioriza; não substitui a avaliação clínica nem estabelece nexo causal individual.</span>
+  </div>
+</article>
