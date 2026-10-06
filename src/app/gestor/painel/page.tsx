@@ -19,7 +19,7 @@ import {
   Tratativas,
   periodoCurto,
 } from "./componentes";
-import { CriteriosFmea, MapaSO, PilulaPrioridade, TabelaFmea, TextoPrazos } from "./fmea";
+import { CriteriosFmea, MapaSO, PilulaPrioridade, PrazosOuAcoes, TabelaFmea } from "./fmea";
 
 export const dynamic = "force-dynamic";
 
@@ -281,7 +281,7 @@ export default async function PainelFrprtPage({
         </h3>
         <TabelaFmea itens={fmea.acompanhamento} vazio="Nenhum fator entre 3,01 e 4,00." />
 
-        <CriteriosFmea severidades={fmea.severidades} />
+        <CriteriosFmea severidades={fmea.severidades} regrasPrazo={fmea.regrasPrazo} />
       </section>
 
       {/* 4 — matriz de decisão */}
@@ -366,7 +366,7 @@ export default async function PainelFrprtPage({
                 {r.celula.fmea && r.prazos && (
                   <p className="text-xs text-zinc-600 mb-2">
                     FMEA: S {r.celula.fmea.s} · O {r.celula.fmea.o} · D {r.celula.fmea.d} · RPN {r.celula.fmea.rpn} —{" "}
-                    <TextoPrazos prazos={r.prazos} />
+                    <PrazosOuAcoes prazos={r.prazos} acoes={r.acoes} />
                   </p>
                 )}
                 <p className="text-xs text-zinc-500 mb-3">Fator de risco PGR: {r.fator.fatorRisco}</p>

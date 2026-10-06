@@ -1,10 +1,13 @@
-import type { ItemFmea } from "@/lib/painel-frprt";
+import Link from "next/link";
+import type { AcaoVinculada, ItemFmea } from "@/lib/painel-frprt";
+import { FASES, formatarDia, type Fase } from "@/lib/plano-acao-util";
 import {
   FAIXAS_D,
   FAIXAS_O,
   MATRIZ_S_O,
   PRIORIDADES,
-  REGRA_PRAZOS,
+  textoRegraPrazo,
+  type RegrasPrazo,
   ROTULO_AGRAVANTE,
   type Prazos,
   type Prioridade,
@@ -24,6 +27,33 @@ export function PilulaPrioridade({ prioridade }: { prioridade: Prioridade }) {
   return (
     <span className="inline-block rounded-md px-2 py-0.5 text-xs font-bold whitespace-nowrap" style={{ background: p.fundo, color: p.cor }}>
       {p.rotulo}
+    </span>
+  );
+}
+
+/** Quando há ação no Plano de ação, valem os prazos dela; senão, a sugestão da FMEA. */
+export function PrazosOuAcoes({ prazos, acoes }: { prazos: Prazos; acoes: AcaoVinculada[] }) {
+  if (acoes.length === 0) {
+    return (
+      <span className="flex flex-col gap-0.5">
+        <TextoPrazos prazos={prazos} />
+        <span className="text-[11px] text-zinc-400">sugerido pela FMEA · sem ação no plano</span>
+      </span>
+    );
+  }
+  return (
+    <span className="flex flex-col gap-1 text-xs">
+      {acoes.map((a) => (
+        <Link key={a.id} href={`/gestor/plano/${a.id}`} className="text-zinc-700 hover:underline">
+          <strong>Ação #{a.numero}</strong> · {FASES[a.fase as Fase]?.rotulo ?? a.fase}
+          <br />
+          {a.fase === "VERIFICAR" || a.fase === "CONCLUIDA" ? (
+            <>Reavaliar em <strong className="tabular-nums">{formatarDia(a.reavaliarEm)}</strong></>
+          ) : (
+            <>Prazo <strong className="tabular-nums">{formatarDia(a.prazo)}</strong></>
+          )}
+        </Link>
+      ))}
     </span>
   );
 }
@@ -111,7 +141,7 @@ export function TabelaFmea({ itens, vazio }: { itens: ItemFmea[]; vazio: string 
             <th className="px-3 py-2 text-center font-medium" title="Ocorrência (Eixo 1)">O</th>
             <th className="px-3 py-2 text-center font-medium" title="Detecção / controle (Eixo 2)">D</th>
             <th className="px-3 py-2 text-center font-medium">RPN</th>
-            <th className="px-3 py-2 text-left font-medium">Prazos</th>
+            <th className="px-3 py-2 text-left font-medium">Prazos / plano de ação</th>
           </tr>
         </thead>
         <tbody>
@@ -147,7 +177,7 @@ export function TabelaFmea({ itens, vazio }: { itens: ItemFmea[]; vazio: string 
                 </td>
                 <td className="px-3 py-3 text-center tabular-nums font-semibold text-zinc-800">{i.fmea.rpn}</td>
                 <td className="px-3 py-3 min-w-44">
-                  <TextoPrazos prazos={i.prazos} />
+                  <PrazosOuAcoes prazos={i.prazos} acoes={i.acoes} />
                 </td>
               </tr>
             );
@@ -161,8 +191,10 @@ export function TabelaFmea({ itens, vazio }: { itens: ItemFmea[]; vazio: string 
 /** Critérios documentados (NR-1 1.5.4.4.2): tabela de severidade, faixas, matriz e prazos. */
 export function CriteriosFmea({
   severidades,
+  regrasPrazo,
 }: {
   severidades: { fator: { id: string; nome: string }; severidade: number | null; justificativa: string | null }[];
+  regrasPrazo: RegrasPrazo;
 }) {
   return (
     <details className="rounded-lg border border-zinc-200 mt-6">
@@ -217,9 +249,9 @@ export function CriteriosFmea({
             abaixo de Média). RPN = S × O × D desempata. Prazos contados da emissão do relatório:
           </p>
           <ul className="flex flex-col gap-1">
-            {(Object.keys(REGRA_PRAZOS) as Prioridade[]).map((p) => (
+            {(Object.keys(regrasPrazo) as Prioridade[]).map((p) => (
               <li key={p} className="flex items-center gap-2">
-                <PilulaPrioridade prioridade={p} /> {REGRA_PRAZOS[p].texto}
+                <PilulaPrioridade prioridade={p} /> {textoRegraPrazo(regrasPrazo[p])}
               </li>
             ))}
           </ul>

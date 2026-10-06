@@ -28,6 +28,7 @@ model Workspace {
   pesquisas          Pesquisa[]
   avaliacoesEixo2    AvaliacaoEixo2[]
   levantamentosEixo3 LevantamentoEixo3[]
+  acoesPlano         AcaoPlano[]
 
   @@index([slug])
 }
@@ -101,6 +102,7 @@ model Dimensao {
   bloco        Bloco            @relation(fields: [blocoId], references: [id], onDelete: Cascade)
   fatoresRisco FatorRisco[]
   severidade   SeveridadeFator?
+  acoesPlano   AcaoPlano[]
 
   @@index([blocoId])
 }
@@ -176,6 +178,7 @@ model SetorOrg {
   avaliacoesEixo2  AvaliacaoEixo2Setor[]
   respostasEixo2   RespostaEixo2[]
   ocorrenciasEixo3 OcorrenciaEixo3[]
+  acoesPlano       AcaoPlanoSetor[]
 
   @@unique([workspaceId, nome])
   @@index([workspaceId])
@@ -342,6 +345,7 @@ model QuestaoEixo2 {
 
   perguntaEixo1 Pergunta        @relation(fields: [perguntaEixo1Id], references: [id], onDelete: Cascade)
   respostas     RespostaEixo2[]
+  acoesPlano    AcaoPlano[]
 
   @@index([ordem])
 }
@@ -366,6 +370,7 @@ model AvaliacaoEixo2 {
   setores      AvaliacaoEixo2Setor[]
   respostas    RespostaEixo2[]
   praticas     PraticaAdicional[]
+  acoesPlano   AcaoPlano[]
 
   @@index([workspaceId])
 }
@@ -497,4 +502,108 @@ model OcorrenciaEixo3 {
 
   @@index([levantamentoId])
   @@index([setorId])
+}
+
+// ── Plano de ação (5W2H + PDCA) ──────────────────────────────────────────
+// Um plano contínuo por empresa: as ações atravessam os ciclos (pesquisa,
+// Eixo 2, Eixo 3) e a verificação compara o índice antes × depois.
+// Ações nascem dos planos escritos no Eixo 2 (agrupadas por questão + texto,
+// uma ação para vários setores) ou são criadas à mão.
+
+enum FasePdca {
+  PLANEJAR
+  EXECUTAR
+  VERIFICAR
+  CONCLUIDA
+  CANCELADA
+}
+
+enum EficaciaAcao {
+  EFICAZ
+  PARCIAL
+  INEFICAZ
+}
+
+model AcaoPlano {
+  id                String        @id @default(cuid())
+  workspaceId       String
+  numero            Int
+  // 5W2H
+  oque              String
+  porque            String?
+  como              String?
+  responsavel       String?
+  cargoResponsavel  String?
+  inicio            DateTime?     @db.Date
+  prazo             DateTime?     @db.Date
+  custoCentavos     Int?
+  custoObservacao   String?
+  // Fator (dimensão) e questão do Eixo 2 de origem — "por quê" automático
+  dimensaoId        String?
+  questaoEixo2Id    String?
+  textoOrigem       String?
+  origemAvaliacaoId String?
+  prioridade        String?
+  // PDCA
+  fase              FasePdca      @default(PLANEJAR)
+  percentual        Int           @default(0)
+  reavaliarEm       DateTime?     @db.Date
+  eficacia          EficaciaAcao?
+  verificacao       String?
+  verificadaEm      DateTime?
+  acaoOrigemId      String?
+  criadoEm          DateTime      @default(now())
+  atualizadoEm      DateTime      @updatedAt
+  criadoPorId       String?
+
+  workspace       Workspace            @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  dimensao        Dimensao?            @relation(fields: [dimensaoId], references: [id], onDelete: SetNull)
+  questaoEixo2    QuestaoEixo2?        @relation(fields: [questaoEixo2Id], references: [id], onDelete: SetNull)
+  origemAvaliacao AvaliacaoEixo2?      @relation(fields: [origemAvaliacaoId], references: [id], onDelete: SetNull)
+  acaoOrigem      AcaoPlano?           @relation("Corretiva", fields: [acaoOrigemId], references: [id], onDelete: SetNull)
+  corretivas      AcaoPlano[]          @relation("Corretiva")
+  setores         AcaoPlanoSetor[]
+  historico       AcaoPlanoHistorico[]
+
+  @@unique([workspaceId, numero])
+  @@index([workspaceId])
+  @@index([workspaceId, questaoEixo2Id])
+}
+
+model AcaoPlanoSetor {
+  acaoId     String
+  setorId    String
+  // Índice final do fator no setor quando a ação foi criada (antes × depois)
+  indiceBase Float?
+
+  acao  AcaoPlano @relation(fields: [acaoId], references: [id], onDelete: Cascade)
+  setor SetorOrg  @relation(fields: [setorId], references: [id], onDelete: Cascade)
+
+  @@id([acaoId, setorId])
+  @@index([setorId])
+}
+
+model AcaoPlanoHistorico {
+  id        String   @id @default(cuid())
+  acaoId    String
+  userId    String?
+  autor     String
+  tipo      String
+  descricao String
+  criadoEm  DateTime @default(now())
+
+  acao AcaoPlano @relation(fields: [acaoId], references: [id], onDelete: Cascade)
+
+  @@index([acaoId])
+}
+
+// Prazos padrão por prioridade FMEA (metodologia, ajustável pelo admin).
+// Sem linha cadastrada, valem os padrões de src/lib/fmea.ts.
+model PrazoPrioridade {
+  prioridade       String   @id
+  planoDias        Int?
+  implantacaoDias  Int?
+  reavaliacaoMeses Int
+  atualizadoEm     DateTime @updatedAt
+  atualizadoPorId  String?
 }

@@ -7,7 +7,7 @@ import {
   FAIXAS_O,
   MATRIZ_S_O,
   PRIORIDADES,
-  REGRA_PRAZOS,
+  textoRegraPrazo,
   ROTULO_AGRAVANTE,
   type Prazos,
   type Prioridade,
@@ -157,6 +157,20 @@ function NotaFmea({ v }: { v: number }) {
   );
 }
 
+function textoPrazosOuAcoes(pz: Prazos, acoes: ItemFmea["acoes"]): string {
+  if (acoes.length === 0) return `${textoPrazos(pz)} (sugerido pela FMEA)`;
+  return acoes
+    .map((a) =>
+      a.fase === "VERIFICAR" || a.fase === "CONCLUIDA"
+        ? `Ação #${a.numero}: reavaliar em ${a.reavaliarEm ? formatarDiaPdf(a.reavaliarEm) : "—"}`
+        : `Ação #${a.numero}: prazo ${a.prazo ? formatarDiaPdf(a.prazo) : "—"}`,
+    )
+    .join(" · ");
+}
+
+/** Coluna @db.Date chega como meia-noite UTC — formata sem deslocar pelo fuso. */
+const formatarDiaPdf = (d: Date) => d.toISOString().slice(0, 10).split("-").reverse().join("/");
+
 function textoPrazos(pz: Prazos): string {
   return pz.plano
     ? `Plano até ${dataLocal(pz.plano)} · medidas até ${dataLocal(pz.implantacao!)} · reavaliar em ${dataLocal(pz.reavaliacao)}`
@@ -176,7 +190,7 @@ function TabelaFmeaPdf({ itens, vazio }: { itens: ItemFmea[]; vazio: string }) {
         <Text style={{ width: col.n, textAlign: "center" }}>O</Text>
         <Text style={{ width: col.n, textAlign: "center" }}>D</Text>
         <Text style={{ width: col.rpn, textAlign: "center" }}>RPN</Text>
-        <Text style={{ width: col.prazo, paddingHorizontal: 3 }}>Prazos (a partir da emissão)</Text>
+        <Text style={{ width: col.prazo, paddingHorizontal: 3 }}>Prazos / plano de ação</Text>
       </View>
       {itens.map((i) => (
         <View key={`${i.setorId}-${i.fator.id}`} style={s.linha} wrap={false}>
@@ -205,7 +219,7 @@ function TabelaFmeaPdf({ itens, vazio }: { itens: ItemFmea[]; vazio: string }) {
             <NotaFmea v={i.fmea.d} />
           </View>
           <Text style={{ width: col.rpn, textAlign: "center", fontWeight: 700 }}>{i.fmea.rpn}</Text>
-          <Text style={{ width: col.prazo, paddingHorizontal: 3, fontSize: 7.5 }}>{textoPrazos(i.prazos)}</Text>
+          <Text style={{ width: col.prazo, paddingHorizontal: 3, fontSize: 7.5 }}>{textoPrazosOuAcoes(i.prazos, i.acoes)}</Text>
         </View>
       ))}
     </View>
@@ -585,7 +599,7 @@ export async function gerarRelatorioFrprtPdf(params: {
               {r.celula.fmea && r.prazos && (
                 <Text style={{ fontSize: 7.5, color: PRIORIDADES[r.celula.fmea.prioridade].cor }}>
                   FMEA: S {r.celula.fmea.s} · O {r.celula.fmea.o} · D {r.celula.fmea.d} · RPN {r.celula.fmea.rpn} —{" "}
-                  {textoPrazos(r.prazos)}
+                  {textoPrazosOuAcoes(r.prazos, r.acoes)}
                 </Text>
               )}
               <Text style={s.pequeno}>Fator de risco PGR: {r.fator.fatorRisco}</Text>
@@ -690,10 +704,10 @@ export async function gerarRelatorioFrprtPdf(params: {
               </View>
             ))}
             <Text style={{ fontWeight: 700, color: AZUL, marginTop: 8, marginBottom: 3 }}>Prioridade e prazos</Text>
-            {(Object.keys(REGRA_PRAZOS) as Prioridade[]).map((pr) => (
+            {(Object.keys(fmea.regrasPrazo) as Prioridade[]).map((pr) => (
               <View key={pr} style={{ flexDirection: "row", alignItems: "center", marginBottom: 3 }}>
                 <Prio p={pr} />
-                <Text style={{ marginLeft: 5, flex: 1 }}>{REGRA_PRAZOS[pr].texto}</Text>
+                <Text style={{ marginLeft: 5, flex: 1 }}>{textoRegraPrazo(fmea.regrasPrazo[pr])}</Text>
               </View>
             ))}
           </View>
