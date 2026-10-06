@@ -122,6 +122,12 @@ export function situacaoDaAcao(
 
 // ── Geração a partir do Eixo 2 ──
 
+/**
+ * Navegadores enviam quebras de linha de <textarea> como CRLF: normaliza para
+ * LF, senão um texto não editado parece "alterado" no histórico.
+ */
+export const semCrlf = (v: string) => v.replace(/\r\n?/g, "\n").trim();
+
 /** Texto comparável: sem espaços sobrando e sem diferença de maiúsculas. */
 export function normalizarTexto(t: string): string {
   return t.replace(/\s+/g, " ").trim().toLocaleLowerCase("pt-BR");

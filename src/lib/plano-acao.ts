@@ -16,6 +16,7 @@ import {
   lerData,
   lerReais,
   normalizarTexto,
+  semCrlf,
   type Eficacia,
   type Fase,
 } from "@/lib/plano-acao-util";
@@ -76,7 +77,7 @@ export type DadosAcao = {
   setorIds: string[];
 };
 
-const texto = (fd: FormData, campo: string) => String(fd.get(campo) ?? "").trim();
+const texto = (fd: FormData, campo: string) => semCrlf(String(fd.get(campo) ?? ""));
 const opcional = (v: string) => (v === "" ? null : v);
 
 export function lerDadosAcao(fd: FormData): DadosAcao | { erro: string } {

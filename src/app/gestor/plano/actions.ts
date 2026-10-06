@@ -16,7 +16,7 @@ import {
   verificarAcao,
   type Autor,
 } from "@/lib/plano-acao";
-import type { Eficacia, Fase } from "@/lib/plano-acao-util";
+import { semCrlf, type Eficacia, type Fase } from "@/lib/plano-acao-util";
 
 export type EstadoForm = { erro?: string; sucesso?: string } | undefined;
 
@@ -96,7 +96,7 @@ export async function andamentoAction(id: string, _e: EstadoForm, fd: FormData):
     ctx.workspaceId,
     String(fd.get("versao") ?? ""),
     Number(fd.get("percentual")),
-    String(fd.get("nota") ?? "").trim(),
+    semCrlf(String(fd.get("nota") ?? "")),
     ctx.autor,
   );
   if (!r.ok) return { erro: r.erro };
@@ -113,7 +113,7 @@ export async function verificarAction(id: string, _e: EstadoForm, fd: FormData):
     String(fd.get("versao") ?? ""),
     {
       eficacia: String(fd.get("eficacia") ?? "") as Eficacia,
-      verificacao: String(fd.get("verificacao") ?? "").trim(),
+      verificacao: semCrlf(String(fd.get("verificacao") ?? "")),
       criarCorretiva: fd.get("corretiva") === "on",
     },
     ctx.autor,

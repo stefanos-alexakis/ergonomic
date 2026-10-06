@@ -24,7 +24,9 @@ async function criarEmpresa(page: Page, nome: string, gestorEmail: string) {
   await page.getByLabel("E-mail", { exact: true }).fill(gestorEmail);
   await page.getByLabel("Senha provisória").fill("senhaDoGestor123");
   await page.getByRole("button", { name: "Criar empresa" }).click();
-  await expect(page).toHaveURL(/\/admin$/);
+  // Criar empresa calcula o hash da senha do gestor (bcrypt): com 8 testes em
+  // paralelo passa dos 5 s padrão — o teste mede o resultado, não a velocidade.
+  await expect(page).toHaveURL(/\/admin$/, { timeout: 15_000 });
 }
 
 async function planilhaOcorrencias(linhas: unknown[][]) {
@@ -119,6 +121,8 @@ test("Eixo 3 publicado e Painel FRPRT com o cruzamento dos três eixos", async (
           questaoId: p.questaoEixo2!.id,
           setorId: producao.id,
           condicao: p.fatorRisco.dimensao.nome.startsWith("5.") ? "PRECISA_MELHORAR" : "EFICAZ",
+          // Um plano de ação escrito no Eixo 2 (1ª questão do fator 5) — vira ação no Plano de ação.
+          planoAcao: p.id === perguntas.find((x) => x.fatorRisco.dimensao.nome.startsWith("5."))!.id ? "Limitar horas extras habituais" : null,
         })),
       },
     },
@@ -218,6 +222,51 @@ test("Eixo 3 publicado e Painel FRPRT com o cruzamento dos três eixos", async (
   expect(pdf.status()).toBe(200);
   expect(pdf.headers()["content-type"]).toContain("application/pdf");
   expect((await pdf.body()).subarray(0, 4).toString()).toBe("%PDF");
+
+  // ── Plano de ação (5W2H + PDCA) ────────────────────────────────────
+  await page.getByRole("link", { name: "Plano de ação" }).click();
+  const pendencias = page.getByRole("region", { name: "Fatores do PGR sem ação" });
+  await expect(pendencias).toContainText("Produção · 5. Horários e Jornada");
+  await page.getByRole("button", { name: "Gerar ações a partir do Eixo 2" }).click();
+  await expect(page.getByText("1 ação(ões) criada(s)")).toBeVisible();
+  await expect(pendencias).not.toContainText("5. Horários e Jornada"); // agora coberto pela ação
+  await expect(pendencias).toContainText("10. Equilíbrio Trabalho-Vida");
+  // Gerar de novo não duplica.
+  await page.getByRole("button", { name: "Gerar ações a partir do Eixo 2" }).click();
+  await expect(page.getByText(/Nada novo/)).toBeVisible();
+
+  const linhaAcao = page.getByRole("table", { name: "Ações do plano" }).locator("tr", { hasText: "Limitar horas extras habituais" });
+  await expect(linhaAcao.getByText("Alta", { exact: true })).toBeVisible(); // prioridade FMEA de Horários
+  await linhaAcao.getByRole("link", { name: "Limitar horas extras habituais" }).click();
+
+  // P → D exige quem/quando/onde.
+  await page.getByRole("button", { name: "Iniciar execução (D)" }).click();
+  await expect(page.getByText("Para iniciar a execução, preencha: responsável (quem).")).toBeVisible();
+  await page.getByLabel(/^Quem/).fill("Ana Lima");
+  await page.getByLabel("Quanto custa (R$)").fill("2.500,00");
+  await page.getByRole("button", { name: "Salvar ação" }).click();
+  await expect(page.getByText("Ação salva.")).toBeVisible();
+  await expect(page.getByLabel("Quanto custa (R$)")).toHaveValue("2500,00");
+
+  await page.getByRole("button", { name: "Iniciar execução (D)" }).click();
+  await expect(page.getByRole("region", { name: "Andamento" })).toBeVisible();
+  await page.getByRole("button", { name: "Enviar para verificação (C)" }).click();
+  const verificacao = page.getByRole("region", { name: "Verificação de eficácia" });
+  await expect(verificacao.locator("tr", { hasText: "Produção" })).toContainText("4,95");
+  await verificacao.getByLabel("Eficaz", { exact: true }).check();
+  await verificacao.getByRole("button", { name: "Registrar verificação" }).click();
+  await expect(verificacao.getByText("Eficaz", { exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Histórico" })).toContainText("Responsável: — → Ana Lima");
+
+  // O painel passa a mostrar a ação no lugar do prazo sugerido.
+  await page.getByRole("link", { name: "Painel FRPRT" }).click();
+  await expect(
+    page.getByRole("region", { name: "Matriz FMEA" }).locator("tr", { hasText: "Produção · 5. Horários e Jornada" }),
+  ).toContainText("Ação #1");
+
+  const xlsx = await page.request.get("/gestor/plano/exportar?formato=xlsx");
+  expect(xlsx.status()).toBe(200);
+  expect((await xlsx.body()).subarray(0, 2).toString()).toBe("PK");
 });
 
 test("Eixo 3: gestor de outra empresa não abre o levantamento alheio", async ({ page }) => {
@@ -232,6 +281,24 @@ test("Eixo 3: gestor de outra empresa não abre o levantamento alheio", async ({
   await page.getByRole("button", { name: "Continuar para a planilha" }).click();
   await expect(page).toHaveURL(/\/gestor\/eixo3\/(?!novo$)[^/]+$/);
   await expect(page.getByText("Planilha de ocorrências")).toBeVisible();
+  const url = new URL(page.url()).pathname;
+
+  await login(page, emailB, "senhaDoGestor123", /\/gestor$/);
+  expect((await page.goto(url))?.status()).toBe(404);
+});
+
+test("Plano de ação: gestor de outra empresa não abre a ação alheia", async ({ page }) => {
+  const sufixo = Date.now();
+  const emailA = `gestor-pa-a-${sufixo}@teste.local`;
+  const emailB = `gestor-pa-b-${sufixo}@teste.local`;
+  await criarEmpresa(page, `Empresa PA A ${sufixo}`, emailA);
+  await criarEmpresa(page, `Empresa PA B ${sufixo}`, emailB);
+
+  await login(page, emailA, "senhaDoGestor123", /\/gestor$/);
+  await page.goto("/gestor/plano/nova");
+  await page.getByLabel(/^O quê/).fill("Ação da empresa A");
+  await page.getByRole("button", { name: "Criar ação" }).click();
+  await expect(page).toHaveURL(/\/gestor\/plano\/(?!nova$)[^/]+$/);
   const url = new URL(page.url()).pathname;
 
   await login(page, emailB, "senhaDoGestor123", /\/gestor$/);

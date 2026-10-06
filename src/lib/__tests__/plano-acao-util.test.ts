@@ -9,6 +9,7 @@ import {
   lerReais,
   reaisParaCampo,
   seguroParaPlanilha,
+  semCrlf,
   situacaoDaAcao,
 } from "@/lib/plano-acao-util";
 
@@ -103,5 +104,11 @@ describe("seguroParaPlanilha — evita fórmula ao abrir no Excel", () => {
     expect(seguroParaPlanilha("=HYPERLINK(\"x\")")).toBe("'=HYPERLINK(\"x\")");
     expect(seguroParaPlanilha("-10")).toBe("'-10");
     expect(seguroParaPlanilha("Treinar líderes")).toBe("Treinar líderes");
+  });
+});
+
+describe("semCrlf — quebra de linha do <textarea> não vira 'alteração'", () => {
+  it("CRLF e CR viram LF", () => {
+    expect(semCrlf("- a\r\n- b\r- c  ")).toBe("- a\n- b\n- c");
   });
 });
