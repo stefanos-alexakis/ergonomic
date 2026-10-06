@@ -49,7 +49,7 @@ async function planilhaOcorrencias(linhas: unknown[][]) {
  *  - Eixo 2: tudo "eficaz" (0,80), exceto Horários e Jornada "precisa melhorar" (0,90);
  *  - Eixo 3: F51.2 relacionado ao trabalho → ×1,10 só em Horários e Equilíbrio Trabalho-Vida.
  *  Horários = 5 × 0,90 × 1,10 = 4,95 (PGR) · Equilíbrio = 5 × 0,80 × 1,10 = 4,40 (PGR)
- *  demais = 5 × 0,80 = 4,00 (controle) · setor = média 4,10 → nota 257.
+ *  demais = 5 × 0,80 = 4,00 (controle) · setor = média 4,10 (alto risco).
  *  - Administrativo: 2 respondentes → amostra insuficiente (anonimato).
  */
 test("Eixo 3 publicado e Painel FRPRT com o cruzamento dos três eixos", async ({ page }) => {
@@ -170,7 +170,7 @@ test("Eixo 3 publicado e Painel FRPRT com o cruzamento dos três eixos", async (
   const geral = page.getByRole("region", { name: "Resultado geral da empresa" });
   await expect(geral.getByText("4,10", { exact: true })).toBeVisible();
   await expect(geral.getByText("Risco existente", { exact: true })).toBeVisible();
-  await expect(geral).toContainText("Nota 257 de 800");
+  await expect(geral).toContainText("Alto risco · índice de 1 a 5");
   await expect(geral).toContainText("exige plano de ação e inclusão no PGR");
   const cartoesSetores = page.getByRole("region", { name: "Pontuação dos setores" });
   await expect(cartoesSetores).toContainText("Produção");
@@ -180,7 +180,6 @@ test("Eixo 3 publicado e Painel FRPRT com o cruzamento dos três eixos", async (
   const linhaResumo = resumo.locator("tr", { hasText: "Produção" });
   await expect(linhaResumo.getByText("60%")).toBeVisible(); // 6 de 10 colaboradores
   await expect(linhaResumo.getByText("4,10")).toBeVisible();
-  await expect(linhaResumo.getByText(/257/)).toBeVisible();
   await expect(resumo.locator("tr", { hasText: "Administrativo" }).getByText(/Amostra insuficiente/)).toBeVisible();
 
   // Empate em 100% dos setores: o fator mais grave (Horários, 4,95) vem primeiro.

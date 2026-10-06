@@ -1,43 +1,16 @@
 /**
  * Score final FRPRT (metodologia §6 e §7) — funções puras.
  *
- *   Risco final = Eixo 1 (média 1–5, maior = pior) × Fator Eixo 2 × Fator Eixo 3
- *   Nota final  = 100 + 175 × (5 − risco)  — a mesma régua do Score Base
+ *   Índice final = Eixo 1 (média 1–5, maior = pior) × Fator Eixo 2 × Fator Eixo 3
  *
- * Decisão do usuário: mostrar as duas leituras lado a lado, mas cor,
- * conclusão e encaminhamento ao PGR saem SEMPRE dos cortes da metodologia
- * (3,00 / 4,00) aplicados ao risco — nunca de faixas da nota — para não
- * haver duas classificações discordando na mesma tela.
+ * Tudo — cor, faixa, conclusão e encaminhamento ao PGR — sai dos cortes da
+ * metodologia (3,00 / 4,00) aplicados a esse índice. A antiga nota 100–1000
+ * foi retirada do sistema (decisão do usuário): era só uma conversão do
+ * índice para exibição e não entrava em nenhum cálculo.
  */
-
-// Eixo 1 (percepção) vale até 80% da pontuação final — os 20% restantes
-// ficam reservados para os multiplicadores dos Eixos 2 (políticas,
-// atenuante) e 3 (atestados, agravante), ainda não implementados
-// (decisão do usuário, ver review.md). Escala estilo Serasa: 1000 =
-// melhor cenário possível.
-export const SCORE_BASE_MAXIMO = 800;
-
-// Piso: mesmo no pior cenário possível (todo mundo respondeu "sempre" em
-// tudo), a nota base não zera — trava em 100. Sem piso, um agravante do
-// Eixo 3 aplicado sobre um score já em 0 não teria efeito nenhum (0 ×
-// qualquer coisa = 0, ou 0 − qualquer coisa continua ilegível como
-// "nota"), justo no cenário mais grave, onde o agravante mais precisa
-// aparecer (decisão do usuário).
-export const SCORE_BASE_MINIMO = 100;
 
 export function calcularRiscoFinal(eixo1: number, fatorEixo2: number, fatorEixo3: number): number {
   return eixo1 * fatorEixo2 * fatorEixo3;
-}
-
-/**
- * Mesma régua do Score Base (risco 1 → 800, risco 5 → 100). Com o Eixo 2
- * atenuando, o risco pode cair abaixo de 1 e a nota passar de 800 (máx.
- * ~835); com o Eixo 3 agravando, o risco passa de 5 e a nota trava no piso.
- */
-export function notaDoRisco(risco: number): number {
-  const amplitudePorPonto = (SCORE_BASE_MAXIMO - SCORE_BASE_MINIMO) / 4; // 175
-  const nota = Math.round(SCORE_BASE_MINIMO + amplitudePorPonto * (5 - risco));
-  return Math.min(1000, Math.max(SCORE_BASE_MINIMO, nota));
 }
 
 export type Conclusao = "SEM_RISCO" | "CONTROLE" | "RISCO_EXISTENTE";

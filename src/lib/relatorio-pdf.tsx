@@ -1,5 +1,5 @@
 import { Document, Page, View, Text, StyleSheet, renderToBuffer } from "@react-pdf/renderer";
-import { calcularScoreBase, calcularNivelRisco, SCORE_BASE_MINIMO, type DashboardPesquisa } from "@/lib/dashboard";
+import { calcularNivelRisco, type DashboardPesquisa } from "@/lib/dashboard";
 
 const styles = StyleSheet.create({
   page: { padding: 32, fontSize: 10 },
@@ -58,20 +58,12 @@ export async function gerarRelatorioPdf(params: {
         ) : (
           <>
             <Text>
-              Score Base (Eixo 1): {dashboard.scoreBase} / {dashboard.scoreBaseMaximo} pontos —{" "}
+              Índice geral do Eixo 1:{" "}
               <Text style={{ color: COR_POR_TOM[calcularNivelRisco(dashboard.mediaGeral!).tom], fontWeight: 700 }}>
-                {calcularNivelRisco(dashboard.mediaGeral!).rotulo}
+                {dashboard.mediaGeral!.toFixed(2).replace(".", ",")} · {calcularNivelRisco(dashboard.mediaGeral!).rotulo}
               </Text>{" "}
-              (quanto maior, melhor; piso de {SCORE_BASE_MINIMO} pontos). Mesma régua do Painel FRPRT: média até
-              3,00 (nota 450 ou mais) baixo risco · até 4,00 (nota 275 ou mais) médio risco · acima disso alto risco.
-            </Text>
-            <Text>
-              Média geral de risco:{" "}
-              <Text style={{ color: COR_POR_TOM[calcularNivelRisco(dashboard.mediaGeral!).tom], fontWeight: 700 }}>
-                {dashboard.mediaGeral?.toFixed(2)}
-              </Text>{" "}
-              (escala 1–5) · verde baixo risco (até 3,00) · amarelo médio risco (3,01 a 4,00) · vermelho alto risco
-              (acima de 4,00)
+              (escala 1–5, quanto maior, mais exposição). Mesma régua do Painel FRPRT: verde baixo risco (até 3,00) ·
+              amarelo médio risco (3,01 a 4,00) · vermelho alto risco (acima de 4,00).
             </Text>
 
             <Text style={styles.h2}>Por dimensão</Text>
@@ -79,7 +71,7 @@ export async function gerarRelatorioPdf(params: {
               <View key={d.nome} style={styles.linha}>
                 <Text style={styles.colNome}>{d.nome}</Text>
                 <Text style={{ ...styles.colValor, color: COR_POR_TOM[calcularNivelRisco(d.media).tom], fontWeight: 700 }}>
-                  {d.media.toFixed(2)} · {calcularNivelRisco(d.media).rotulo}
+                  {d.media.toFixed(2).replace(".", ",")} · {calcularNivelRisco(d.media).rotulo}
                 </Text>
               </View>
             ))}
@@ -94,20 +86,19 @@ export async function gerarRelatorioPdf(params: {
                 <View key={titulo}>
                   <Text style={styles.h2}>{titulo}</Text>
                   {grupos.map((g) => {
-                    const scoreGrupo = g.suprimido ? null : calcularScoreBase(g.mediaGeral);
                     return (
                       <View key={g.nome} style={styles.linha}>
                         <Text style={styles.colNome}>{g.nome}</Text>
                         <Text
                           style={
-                            scoreGrupo !== null
+                            !g.suprimido
                               ? { ...styles.colValor, color: COR_POR_TOM[calcularNivelRisco(g.mediaGeral).tom] }
                               : styles.colValor
                           }
                         >
                           {g.suprimido
                             ? "dados insuficientes"
-                            : `${g.total} · média ${g.mediaGeral.toFixed(2)} · score ${scoreGrupo}`}
+                            : `${g.total} resp. · índice ${g.mediaGeral.toFixed(2).replace(".", ",")} · ${calcularNivelRisco(g.mediaGeral).rotulo}`}
                         </Text>
                       </View>
                     );

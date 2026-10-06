@@ -1,11 +1,11 @@
 import { Document, Page, View, Text, Image, StyleSheet, renderToBuffer } from "@react-pdf/renderer";
 import type { PainelFrprt } from "@/lib/painel-frprt";
-import { CONCLUSOES, formatarEfeito, formatarRisco, notaDoRisco, posicaoNaRegua } from "@/lib/score-final";
+import { CONCLUSOES, formatarEfeito, formatarRisco, posicaoNaRegua } from "@/lib/score-final";
 import { ORIENTACOES_EIXO3 } from "@/lib/planilha-modelo-eixo3";
 
 /**
  * Relatório FRPRT — mesma ordem e linguagem visual do painel: resultado
- * geral em destaque (nota, cor e descrição do risco), pontuação dos
+ * geral em destaque (índice, cor e descrição), pontuação dos
  * setores, principais achados, e depois o detalhamento (matriz de decisão,
  * riscos para o PGR, fontes e nota metodológica).
  */
@@ -147,7 +147,7 @@ export async function gerarRelatorioFrprtPdf(params: {
                   <Text style={{ fontSize: 13, fontWeight: 700, color: CONCLUSOES[geral.conclusao].cor }}>
                     {CONCLUSOES[geral.conclusao].rotulo}
                   </Text>
-                  <Text>Nota {geral.nota} de 800</Text>
+                  <Text>{CONCLUSOES[geral.conclusao].curto} · índice de 1 a 5</Text>
                 </View>
               </View>
               <Text style={{ marginTop: 4 }}>{CONCLUSOES[geral.conclusao].descricao}</Text>
@@ -230,7 +230,6 @@ export async function gerarRelatorioFrprtPdf(params: {
                           <Text style={{ fontSize: 17, fontWeight: 700, color: c?.cor ?? "#a1a1aa" }}>
                             {l.final !== null ? formatarRisco(l.final) : "—"}
                           </Text>
-                          {l.nota !== null && <Text style={{ fontSize: 7 }}>nota {l.nota}</Text>}
                         </View>
                       </View>
                     );
@@ -288,7 +287,6 @@ export async function gerarRelatorioFrprtPdf(params: {
                   >
                     {formatarRisco(l.final)}
                   </Text>
-                  <Text style={{ fontSize: 6.5, color: CINZA }}>nota {l.nota}</Text>
                 </View>
               </>
             )}
@@ -408,7 +406,7 @@ export async function gerarRelatorioFrprtPdf(params: {
               wrap={false}
             >
               <Text style={{ fontWeight: 700, fontSize: 9.5 }}>
-                {r.setor} · {r.fator.nome} — risco {formatarRisco(r.celula.final!)} (nota {notaDoRisco(r.celula.final!)})
+                {r.setor} · {r.fator.nome} — índice {formatarRisco(r.celula.final!)}
               </Text>
               <Text style={s.pequeno}>Fator de risco PGR: {r.fator.fatorRisco}</Text>
               <Text>Possíveis consequências: {r.apoio.consequencias.join(" ")}</Text>
@@ -450,7 +448,7 @@ export async function gerarRelatorioFrprtPdf(params: {
           <Text>
             Risco final = Eixo 1 (média 1–5 por fator e setor) × Fator do Eixo 2 (0,80 eficaz/N.A. · 0,90 precisa
             melhorar · 1,00 inexistente) × Fator do Eixo 3 (×1,10 quando há CID-F relacionado ao trabalho e compatível
-            com o fator pela matriz Fatores × CID F). Nota = 100 + 175 × (5 - risco). Resultado geral = média dos
+            com o fator pela matriz Fatores × CID F). Resultado geral = média dos
             setores avaliados. Setores com menos de {limite} respostas no Eixo 1 não têm score, para proteger o
             anonimato.
           </Text>

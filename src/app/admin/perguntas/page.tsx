@@ -82,7 +82,7 @@ export default async function PerguntasPage({ searchParams }: { searchParams: Pr
     <AppShell contexto="Administração" homeHref="/admin" nav={NAV}>
       <PageHeader
         eyebrow="Plataforma"
-        title={`Pesos das perguntas — ${eixo === 1 ? "Score Base (Eixo 1)" : "Medidas de controle (Eixo 2)"}${
+        title={`Pesos das perguntas — ${eixo === 1 ? "Percepção (Eixo 1)" : "Medidas de controle (Eixo 2)"}${
           questionario ? ` · versão ${questionario.versao}` : ""
         }`}
       />
@@ -92,7 +92,7 @@ export default async function PerguntasPage({ searchParams }: { searchParams: Pr
       </nav>
       <p className="text-sm text-zinc-500 mb-6 max-w-2xl">
         {eixo === 1
-          ? "Todas as perguntas nascem com peso 1 (mesma influência no cálculo). Aumentar o peso de uma pergunta faz ela pesar mais na média — e portanto no Score Base — de quem respondeu."
+          ? "Todas as perguntas nascem com peso 1 (mesma influência no cálculo). Aumentar o peso de uma pergunta faz ela pesar mais na média — e portanto no índice do Eixo 1 — de quem respondeu."
           : "Peso de cada medida no fator do Eixo 2 (média ponderada das medidas do fator, por setor). Com todos em 1, o cálculo é exatamente a média da metodologia."}{" "}
         Os pesos abaixo são do questionário em uso e valem para todas as empresas, recalculando na
         hora os resultados desta versão. Pesquisas e avaliações de versões anteriores mantêm os

@@ -5,7 +5,6 @@ import { getWorkspaceDoGestor, resolvePesquisaDoWorkspace } from "@/lib/pesquisa
 import { listarCatalogoOrganizacional } from "@/lib/estrutura";
 import {
   calcularDashboard,
-  calcularScoreBase,
   calcularNivelRisco,
   type ResumoGrupo,
 } from "@/lib/dashboard";
@@ -83,8 +82,8 @@ function TabelaGrupo({ titulo, grupos }: { titulo: string; grupos: GrupoComSupre
           <Tr>
             <Th>Grupo</Th>
             <Th>Respostas</Th>
-            <Th>Média de risco (1–5)</Th>
-            <Th>Score Base</Th>
+            <Th>Índice (1–5)</Th>
+            <Th>Faixa</Th>
           </Tr>
         </Thead>
         <tbody>
@@ -101,15 +100,8 @@ function TabelaGrupo({ titulo, grupos }: { titulo: string; grupos: GrupoComSupre
                   <Td>
                     <PilulaMedia media={g.mediaGeral} />
                   </Td>
-                  <Td className="font-medium">
-                    <span className="flex items-center gap-2">
-                      <span className="tabular-nums" style={{ color: corDaMedia(g.mediaGeral).cor }}>
-                        {calcularScoreBase(g.mediaGeral)}
-                      </span>
-                      <Badge tom={calcularNivelRisco(g.mediaGeral).tom}>
-                        {calcularNivelRisco(g.mediaGeral).rotulo}
-                      </Badge>
-                    </span>
+                  <Td>
+                    <Badge tom={calcularNivelRisco(g.mediaGeral).tom}>{calcularNivelRisco(g.mediaGeral).rotulo}</Badge>
                   </Td>
                 </>
               )}
@@ -234,16 +226,15 @@ export default async function DashboardPage({
                 style={{ borderColor: corDaMedia(dashboard.mediaGeral!).cor, background: corDaMedia(dashboard.mediaGeral!).fundo }}
               >
                 <span className="text-4xl font-bold tabular-nums" style={{ color: corDaMedia(dashboard.mediaGeral!).cor }}>
-                  {dashboard.scoreBase}
+                  {dashboard.mediaGeral!.toFixed(2).replace(".", ",")}
                 </span>
                 <Badge tom={calcularNivelRisco(dashboard.mediaGeral!).tom}>
                   {calcularNivelRisco(dashboard.mediaGeral!).rotulo}
                 </Badge>
                 <span className="text-sm text-zinc-700">
-                  / {dashboard.scoreBaseMaximo} pontos — Score Base (Eixo 1: percepção dos colaboradores). Quanto
-                  maior, melhor. Mesma régua do Painel FRPRT: média até 3,00 (nota 450 ou mais) baixo risco · até
-                  4,00 (nota 275 ou mais) médio risco · acima disso alto risco. O resultado final, com os Eixos 2 e 3,
-                  está no{" "}
+                  Índice geral do Eixo 1 (percepção dos colaboradores), de 1 a 5 — quanto maior, mais exposição. Mesma
+                  régua do Painel FRPRT: até 3,00 baixo risco · até 4,00 médio risco · acima disso alto risco. O
+                  resultado final, com os Eixos 2 e 3, está no{" "}
                   <Link href="/gestor/painel" className="underline hover:no-underline">
                     Painel FRPRT
                   </Link>
@@ -254,8 +245,6 @@ export default async function DashboardPage({
               <LegendaCores />
 
               <p className="text-sm text-zinc-700 mb-6">
-                Média geral de risco: <PilulaMedia media={dashboard.mediaGeral!} />{" "}
-                <span className="text-zinc-500">(escala 1–5, quanto maior, mais exposição a risco)</span> ·{" "}
                 {dashboard.totalFiltrado} {dashboard.totalFiltrado === 1 ? "resposta considerada" : "respostas consideradas"}
               </p>
 

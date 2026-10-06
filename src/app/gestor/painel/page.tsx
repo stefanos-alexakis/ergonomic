@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { calcularPainelFrprt } from "@/lib/painel-frprt";
-import { CONCLUSOES, formatarRisco, notaDoRisco, type Conclusao } from "@/lib/score-final";
+import { CONCLUSOES, formatarRisco, type Conclusao } from "@/lib/score-final";
 import { ShellGestor } from "@/components/shell/shell-gestor";
 import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
@@ -175,7 +175,7 @@ export default async function PainelFrprtPage({
         </ul>
       )}
 
-      {/* Topo: nota geral em destaque + nota de cada setor */}
+      {/* Topo: índice geral em destaque + índice de cada setor */}
       {geral ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
           <CartaoGeral geral={geral} />
@@ -303,7 +303,6 @@ export default async function PainelFrprtPage({
                   </h3>
                   <span className="flex items-center gap-2 text-sm">
                     <Risco valor={r.celula.final} conclusao={r.celula.conclusao} grande />
-                    <span className="text-zinc-500">nota {notaDoRisco(r.celula.final!)}</span>
                   </span>
                 </div>
                 <p className="text-xs text-zinc-500 mb-3">Fator de risco PGR: {r.fator.fatorRisco}</p>

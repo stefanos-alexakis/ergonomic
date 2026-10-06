@@ -59,7 +59,7 @@ export function CabecalhoPainel({
   );
 }
 
-/** Régua 1–5 com as três faixas da metodologia e o marcador na nota. */
+/** Régua 1–5 com as três faixas da metodologia e o marcador no índice. */
 export function Regua({ risco }: { risco: number }) {
   return (
     <div className="w-full">
@@ -112,7 +112,7 @@ function Numero({ valor, rotulo }: { valor: string | number; rotulo: string }) {
   );
 }
 
-/** Resultado geral em destaque: nota, cor, descrição do risco e régua. */
+/** Resultado geral em destaque: índice, cor, descrição e régua. */
 export function CartaoGeral({ geral }: { geral: ResultadoGeral }) {
   const c = CONCLUSOES[geral.conclusao];
   return (
@@ -133,9 +133,7 @@ export function CartaoGeral({ geral }: { geral: ResultadoGeral }) {
             <p className="text-lg font-bold leading-tight" style={{ color: c.cor }}>
               {c.rotulo}
             </p>
-            <p className="text-sm text-zinc-700">
-              Nota <strong>{geral.nota}</strong> de 800
-            </p>
+            <p className="text-sm text-zinc-700">{c.curto} · índice de 1 a 5</p>
           </div>
         </div>
         <p className="text-sm text-zinc-800 mt-3">{c.descricao}</p>
@@ -188,7 +186,6 @@ export function CartoesSetores({ linhas, limite }: { linhas: LinhaSetorPainel[];
                 <p className="text-3xl font-black tabular-nums leading-none" style={{ color: c?.cor ?? "#a1a1aa" }}>
                   {l.final !== null ? formatarRisco(l.final) : "—"}
                 </p>
-                {l.nota !== null && <p className="text-xs text-zinc-600 tabular-nums">nota {l.nota}</p>}
               </div>
             </div>
           );
@@ -223,7 +220,7 @@ function PilulaRisco({ valor, conclusao }: { valor: number; conclusao: Conclusao
   );
 }
 
-/** Tabela da imagem de referência: barras por eixo e nota final colorida. */
+/** Tabela da imagem de referência: barras por eixo e índice final colorido. */
 export function TabelaSetores({ linhas, limite }: { linhas: LinhaSetorPainel[]; limite: number }) {
   return (
     <div className="overflow-x-auto rounded-xl border border-zinc-200">
@@ -272,7 +269,6 @@ export function TabelaSetores({ linhas, limite }: { linhas: LinhaSetorPainel[]; 
                   </td>
                   <td className="px-3 py-3 text-center">
                     <PilulaRisco valor={l.final} conclusao={l.conclusao!} />
-                    <p className="text-xs text-zinc-500 mt-1 tabular-nums">nota {l.nota}</p>
                   </td>
                 </>
               )}

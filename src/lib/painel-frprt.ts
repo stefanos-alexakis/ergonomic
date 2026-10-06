@@ -3,7 +3,7 @@ import { calcularMedia } from "@/lib/dashboard";
 import { calcularResultado } from "@/lib/avaliacao-eixo2";
 import { calcularEixo3Setor } from "@/lib/eixo3";
 import { carregarMatriz } from "@/lib/levantamento-eixo3";
-import { calcularRiscoFinal, concluir, notaDoRisco, type Conclusao } from "@/lib/score-final";
+import { calcularRiscoFinal, concluir, type Conclusao } from "@/lib/score-final";
 
 /**
  * Painel FRPRT — cruza, por setor × fator de risco:
@@ -45,7 +45,6 @@ export type LinhaSetorPainel = {
   efeitoEixo2: number | null;
   efeitoEixo3: number | null;
   final: number | null;
-  nota: number | null;
   conclusao: Conclusao | null;
   fatoresEmRisco: number;
   temOcorrenciaRelacionada: boolean;
@@ -56,7 +55,6 @@ export type LinhaSetorPainel = {
 
 export type ResultadoGeral = {
   final: number;
-  nota: number;
   conclusao: Conclusao;
   setoresAvaliados: number;
   setoresEmRisco: number;
@@ -252,7 +250,6 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
       efeitoEixo2: media(comValor.map((c) => c.ajustado! - c.eixo1!)),
       efeitoEixo3: media(comValor.map((c) => c.final! - c.ajustado!)),
       final: finalSetor,
-      nota: finalSetor !== null ? notaDoRisco(finalSetor) : null,
       conclusao: finalSetor !== null ? concluir(finalSetor) : null,
       fatoresEmRisco: celulas.filter((c) => c.conclusao === "RISCO_EXISTENTE").length,
       temOcorrenciaRelacionada: (e3?.relacionadas ?? 0) > 0,
@@ -365,7 +362,6 @@ export function calcularGeral(linhas: LinhaSetorPainel[]): ResultadoGeral | null
   const totalColab = comHeadcount.reduce((a, l) => a + (l.colaboradores ?? 0), 0);
   return {
     final,
-    nota: notaDoRisco(final),
     conclusao: concluir(final),
     setoresAvaliados: comScore.length,
     setoresEmRisco: comScore.filter((l) => l.conclusao === "RISCO_EXISTENTE").length,
