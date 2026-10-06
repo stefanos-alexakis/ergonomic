@@ -11,7 +11,8 @@ Em produção: **https://pesquisa.agtrade.com.br**
 |---|---|---|
 | [Guia rápido do Score](score-frprt.html) | Todos | Uma página, com régua e exemplos. Abra no navegador. |
 | [Manual de uso](manual-de-uso.md) | Admin e gestores | Passo a passo de cada tela. |
-| [Metodologia e cálculos](metodologia.md) | Técnico SST, consultoria | Fórmulas, cortes, regras de anonimato e da matriz CID. |
+| [Metodologia e cálculos](metodologia.md) | Técnico SST, consultoria | Fórmulas, cortes, FMEA, regras de anonimato e da matriz CID. |
+| [Proposta da Matriz FMEA](proposta-fmea.html) | Consultoria | Severidade por fator com evidências, agravantes, matriz e prazos. |
 | [Arquitetura](arquitetura.md) | Desenvolvimento | Stack, pastas, modelo de dados, segurança e LGPD. |
 | [Operação](operacao.md) | Desenvolvimento / TI | Ambiente local, testes, publicação, backup. |
 
@@ -55,9 +56,9 @@ O resultado aparece no **Painel FRPRT** e no **relatório PDF**, prontos para al
 2. **Estrutura organizacional** — setores e departamentos (manual ou por planilha) e número de
    colaboradores por setor.
 3. **Pesquisas e licenças (Eixo 1)** — questionário v2 com 35 perguntas em 13 fatores, códigos
-   anônimos (+5% de códigos de teste), cartões em PDF, painel da pesquisa com Score Base e relatório.
+   anônimos (+5% de códigos de teste), cartões em PDF, painel da pesquisa com índice e faixas de cor, e relatório.
 4. **Eixo 2 · Medidas de controle** — avaliação por setor, com exceções e plano de ação.
 5. **Eixo 3 · Atestados CID-F** — publicação de planilha, mapeamento de setores, declaração de
    veracidade e painel de ocorrências.
-6. **Painel FRPRT** — cruzamento dos três eixos, principais achados, matriz de decisão, lista para o
-   PGR e relatório PDF.
+6. **Painel FRPRT** — cruzamento dos três eixos, principais achados, **Matriz FMEA** (prioridade de
+   ação e prazos), matriz de decisão, lista para o PGR e relatório PDF.
