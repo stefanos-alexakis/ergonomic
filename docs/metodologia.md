@@ -124,9 +124,11 @@ desempata.
 | **S 2** | Baixa | Baixa | Baixa | Média | Média |
 | **S 1** | Baixa | Baixa | Baixa | Baixa | Média |
 
-**Prazos** (datas contadas da emissão do relatório): Alta — plano em 30 dias, medidas em 90,
-reavaliar em 6 meses · Média — plano em 90 dias, medidas em 180, reavaliar em 12 meses · Baixa —
-manter os controles, reavaliar em 24 meses.
+**Prazos sugeridos** (datas contadas da emissão): Alta — plano em 30 dias, medidas em 90, reavaliar
+em 6 meses · Média — plano em 90 dias, medidas em 180, reavaliar em 12 meses · Baixa — manter os
+controles, reavaliar em 24 meses. São os valores iniciais da tabela **Prazos padrão** (admin,
+`PrazoPrioridade`); a reavaliação é limitada a 24 meses (NR-1). Quando o fator tem ação no **Plano de
+ação**, valem os prazos definidos pela empresa na ação.
 
 O relatório PDF traz a página da Matriz FMEA e uma página com estes critérios documentados
 (NR-1, item 1.5.4.4.2).

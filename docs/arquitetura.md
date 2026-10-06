@@ -58,7 +58,8 @@ docs/                           esta documentação
 | Eixo 1 | `Pesquisa` (datas, licenças, limite de supressão), `CodigoAcesso` (tipo, status), `Resposta`, `RespostaItem` |
 | Eixo 2 | `QuestaoEixo2`, `AvaliacaoEixo2`, `AvaliacaoEixo2Setor`, `RespostaEixo2` (condição, plano de ação), `PraticaAdicional` |
 | Eixo 3 | `MatrizCidSituacao` (CIDs por pergunta), `LevantamentoEixo3` (período, declaração, hash do arquivo), `OcorrenciaEixo3` |
-| FMEA | `SeveridadeFator` (severidade-base 1–5 e justificativa por dimensão; editada em `/admin/severidade`) |
+| FMEA | `SeveridadeFator` (severidade-base 1–5 e justificativa por dimensão; editada em `/admin/severidade`), `PrazoPrioridade` (prazos padrão por prioridade; `/admin/prazos`) |
+| Plano de ação | `AcaoPlano` (5W2H, fase PDCA, eficácia, custo em centavos, origem no Eixo 2, ação corretiva), `AcaoPlanoSetor` (setores e índice-base para o antes × depois), `AcaoPlanoHistorico` (quem alterou o quê) |
 
 O catálogo (questionário, Eixo 2 e matriz CID) é global e versionado. Os dados de negócio são todos
 por `workspaceId`.

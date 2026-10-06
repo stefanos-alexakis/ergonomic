@@ -62,3 +62,5 @@ O resultado aparece no **Painel FRPRT** e no **relatório PDF**, prontos para al
    veracidade e painel de ocorrências.
 6. **Painel FRPRT** — cruzamento dos três eixos, principais achados, **Matriz FMEA** (prioridade de
    ação e prazos), matriz de decisão, lista para o PGR e relatório PDF.
+7. **Plano de ação** — ações 5W2H geradas do Eixo 2 ou criadas à mão, ciclo PDCA com verificação de
+   eficácia antes × depois, ações corretivas, histórico e exportação em Excel e PDF.
