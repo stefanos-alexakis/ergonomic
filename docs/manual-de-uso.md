@@ -68,7 +68,7 @@ Regras de acesso do colaborador:
 
 ### 2.3 Painel e relatório da pesquisa
 Mostra o **Score Base** (só Eixo 1, escala 100–800, quanto maior melhor, com a mesma régua de cores
-do Painel FRPRT: 450 ou mais sem risco, 275 ou mais atenção, abaixo risco alto), participação, resultados
+do Painel FRPRT: 450 ou mais baixo risco (verde), 275 ou mais médio risco (amarelo), abaixo alto risco (vermelho)), participação, resultados
 por fator, por setor e por departamento, e **Baixar relatório (PDF)**.
 Setores ou departamentos com menos de 5 respostas aparecem como **amostra insuficiente**. Isso
 protege o anonimato e não pode ser desligado.

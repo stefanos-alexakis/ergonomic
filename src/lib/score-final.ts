@@ -57,7 +57,7 @@ export const CONCLUSOES: Record<
 > = {
   SEM_RISCO: {
     rotulo: "Sem risco indicado",
-    curto: "Sem risco",
+    curto: "Baixo risco",
     descricao: "Percepções e controles dentro do esperado — manter o monitoramento.",
     encaminhamento: "Sem inclusão automática",
     tom: "sucesso",
@@ -66,7 +66,7 @@ export const CONCLUSOES: Record<
   },
   CONTROLE: {
     rotulo: "Percepção de perigos com controle existente",
-    curto: "Atenção",
+    curto: "Médio risco",
     descricao: "Perigos percebidos, com medidas de controle existentes — acompanhar e manter os controles.",
     encaminhamento: "Acompanhar e manter controle",
     tom: "atencao",
@@ -75,7 +75,7 @@ export const CONCLUSOES: Record<
   },
   RISCO_EXISTENTE: {
     rotulo: "Risco existente",
-    curto: "Risco alto",
+    curto: "Alto risco",
     descricao: "Risco psicossocial confirmado — exige plano de ação e inclusão no PGR.",
     encaminhamento: "Plano de ação + inclusão no PGR",
     tom: "perigo",

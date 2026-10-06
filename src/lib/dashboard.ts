@@ -48,9 +48,9 @@ export function calcularScoreBase(mediaGeral: number): number {
  * `concluir`. Antes o Score Base usava faixas próprias da nota (400/600) e
  * a mesma nota podia ter rótulos diferentes nas duas telas. Recebe a média
  * (não a nota) para o arredondamento da nota nunca mudar a faixa.
- *   média ≤ 3,00 → nota ≥ 450 · Sem risco
- *   média ≤ 4,00 → nota ≥ 275 · Atenção
- *   acima        → nota < 275 · Risco alto
+ *   média ≤ 3,00 → nota ≥ 450 · Baixo risco (verde)
+ *   média ≤ 4,00 → nota ≥ 275 · Médio risco (amarelo)
+ *   acima        → nota < 275 · Alto risco (vermelho)
  */
 export function calcularNivelRisco(media: number): { rotulo: string; tom: "perigo" | "atencao" | "sucesso" } {
   const c = CONCLUSOES[concluir(media)];

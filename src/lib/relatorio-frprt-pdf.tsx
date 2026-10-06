@@ -171,10 +171,10 @@ export async function gerarRelatorioFrprtPdf(params: {
                   }}
                 />
                 <View style={{ flexDirection: "row", marginTop: 3 }}>
-                  <Text style={{ width: "50%", fontSize: 7, color: CONCLUSOES.SEM_RISCO.cor }}>1 · Sem risco</Text>
-                  <Text style={{ width: "25%", fontSize: 7, color: CONCLUSOES.CONTROLE.cor }}>3 · Atenção</Text>
+                  <Text style={{ width: "50%", fontSize: 7, color: CONCLUSOES.SEM_RISCO.cor }}>1 · Baixo risco</Text>
+                  <Text style={{ width: "25%", fontSize: 7, color: CONCLUSOES.CONTROLE.cor }}>3 · Médio risco</Text>
                   <Text style={{ width: "25%", fontSize: 7, color: CONCLUSOES.RISCO_EXISTENTE.cor, textAlign: "right" }}>
-                    4 · Risco (PGR) · 5
+                    4 · Alto risco (PGR) · 5
                   </Text>
                 </View>
               </View>

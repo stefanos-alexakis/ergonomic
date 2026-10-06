@@ -90,13 +90,13 @@ export function Regua({ risco }: { risco: number }) {
       </div>
       <div className="flex text-[11px] mt-1">
         <span className="w-1/2 font-medium" style={{ color: CONCLUSOES.SEM_RISCO.cor }}>
-          Sem risco
+          Baixo risco
         </span>
         <span className="w-1/4 font-medium" style={{ color: CONCLUSOES.CONTROLE.cor }}>
-          Atenção
+          Médio risco
         </span>
         <span className="w-1/4 font-medium text-right" style={{ color: CONCLUSOES.RISCO_EXISTENTE.cor }}>
-          Risco → PGR
+          Alto risco → PGR
         </span>
       </div>
     </div>

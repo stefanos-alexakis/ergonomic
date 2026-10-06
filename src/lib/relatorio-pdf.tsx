@@ -63,15 +63,24 @@ export async function gerarRelatorioPdf(params: {
                 {calcularNivelRisco(dashboard.mediaGeral!).rotulo}
               </Text>{" "}
               (quanto maior, melhor; piso de {SCORE_BASE_MINIMO} pontos). Mesma régua do Painel FRPRT: média até
-              3,00 (nota 450 ou mais) sem risco · até 4,00 (nota 275 ou mais) atenção · acima disso risco alto.
+              3,00 (nota 450 ou mais) baixo risco · até 4,00 (nota 275 ou mais) médio risco · acima disso alto risco.
             </Text>
-            <Text>Média geral de risco: {dashboard.mediaGeral?.toFixed(2)} (escala 1–5)</Text>
+            <Text>
+              Média geral de risco:{" "}
+              <Text style={{ color: COR_POR_TOM[calcularNivelRisco(dashboard.mediaGeral!).tom], fontWeight: 700 }}>
+                {dashboard.mediaGeral?.toFixed(2)}
+              </Text>{" "}
+              (escala 1–5) · verde baixo risco (até 3,00) · amarelo médio risco (3,01 a 4,00) · vermelho alto risco
+              (acima de 4,00)
+            </Text>
 
             <Text style={styles.h2}>Por dimensão</Text>
             {dashboard.porDimensao.map((d) => (
               <View key={d.nome} style={styles.linha}>
                 <Text style={styles.colNome}>{d.nome}</Text>
-                <Text style={styles.colValor}>{d.media.toFixed(2)}</Text>
+                <Text style={{ ...styles.colValor, color: COR_POR_TOM[calcularNivelRisco(d.media).tom], fontWeight: 700 }}>
+                  {d.media.toFixed(2)} · {calcularNivelRisco(d.media).rotulo}
+                </Text>
               </View>
             ))}
 

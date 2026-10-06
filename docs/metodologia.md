@@ -38,7 +38,7 @@ Score Base = 100 + 175 × (5 − média)      → 1 vale 800, 5 vale 100
 ```
 
 A classificação usa **a mesma régua do Painel FRPRT** (função `concluir`, aplicada à média):
-até 3,00 sem risco (nota 450 ou mais) · até 4,00 atenção (nota 275 ou mais) · acima, risco alto.
+até 3,00 baixo risco, verde (nota 450 ou mais) · até 4,00 médio risco, amarelo (nota 275 ou mais) · acima, alto risco, vermelho.
 
 ## Eixo 2 — Medidas de controle
 
