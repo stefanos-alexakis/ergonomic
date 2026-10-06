@@ -5,6 +5,7 @@ import {
   calcularMedia,
   calcularNivelRisco,
   calcularScoreBase,
+  compararPorNumeroDaDimensao,
   normalizarValor,
   SCORE_BASE_MAXIMO,
   SCORE_BASE_MINIMO,
@@ -111,5 +112,29 @@ describe("agruparEResumir", () => {
     expect(producao?.total).toBe(2);
     expect(producao?.mediaGeral).toBe(3);
     expect(r.find((g) => g.nome === "Administrativo")?.total).toBe(1);
+  });
+});
+
+describe("compararPorNumeroDaDimensao — painel do Eixo 1 em ordem de 1 a 13", () => {
+  it("ordena pelo número do fator, não pela média nem alfabeticamente", () => {
+    const nomes = [
+      "7. Gestão de Mudanças",
+      "10. Equilíbrio Trabalho-Vida",
+      "1.Instrução de trabalho",
+      "13. Trabalho Isolado ou Remoto",
+      "2. Demandas de Trabalho",
+    ];
+    expect(nomes.map((nome) => ({ nome })).sort(compararPorNumeroDaDimensao).map((d) => d.nome)).toEqual([
+      "1.Instrução de trabalho",
+      "2. Demandas de Trabalho",
+      "7. Gestão de Mudanças",
+      "10. Equilíbrio Trabalho-Vida",
+      "13. Trabalho Isolado ou Remoto",
+    ]);
+  });
+
+  it("dimensão sem número vai para o fim", () => {
+    const ordenado = [{ nome: "Outros" }, { nome: "3. Controle e Autonomia" }].sort(compararPorNumeroDaDimensao);
+    expect(ordenado.map((d) => d.nome)).toEqual(["3. Controle e Autonomia", "Outros"]);
   });
 });

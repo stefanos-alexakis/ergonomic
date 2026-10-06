@@ -57,6 +57,23 @@ export function calcularNivelRisco(media: number): { rotulo: string; tom: "perig
   return { rotulo: c.curto, tom: c.tom };
 }
 
+/**
+ * Número do fator no início do nome ("10. Equilíbrio…" → 10, e também
+ * "1.Instrução…" sem espaço). `Dimensao.ordem` não serve: reinicia a cada
+ * bloco do questionário.
+ */
+export function numeroDaDimensao(nome: string): number | null {
+  const m = /^\s*(\d+)/.exec(nome);
+  return m ? Number(m[1]) : null;
+}
+
+/** 1, 2, …, 13; dimensões sem número vão para o fim, em ordem alfabética. */
+export function compararPorNumeroDaDimensao(a: { nome: string }, b: { nome: string }): number {
+  const na = numeroDaDimensao(a.nome) ?? Number.POSITIVE_INFINITY;
+  const nb = numeroDaDimensao(b.nome) ?? Number.POSITIVE_INFINITY;
+  return na !== nb ? na - nb : a.nome.localeCompare(b.nome, "pt-BR");
+}
+
 export type ResumoGrupo = { nome: string; total: number; mediaGeral: number };
 
 /** Agrupa respondentes (já com a média pessoal calculada) por um nome de grupo. */
@@ -195,9 +212,10 @@ export async function calcularDashboard(
       itensPorDimensao.set(nomeDimensao, lista);
     }
   }
+  // Ordem numérica do fator (1 a 13), pedida pela cliente — não pela média.
   const porDimensao = Array.from(itensPorDimensao.entries())
     .map(([nome, itens]) => ({ nome, media: calcularMedia(itens) ?? 0 }))
-    .sort((a, b) => b.media - a.media);
+    .sort(compararPorNumeroDaDimensao);
 
   const resumirCampo = (campo: "setor" | "departamento") => {
     const respondentesDoCampo = mediasPessoais
