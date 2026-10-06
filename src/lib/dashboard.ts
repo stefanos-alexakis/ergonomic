@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { aplicarSupressaoGruposPequenos, type GrupoComSupressao } from "@/lib/agregacao";
-import { CONCLUSOES, SCORE_BASE_MAXIMO, SCORE_BASE_MINIMO, concluir } from "@/lib/score-final";
+import { CONCLUSOES, concluir } from "@/lib/score-final";
 
 /**
  * Toda a matemática de indicador mora aqui, num único lugar — nenhum
@@ -34,23 +34,12 @@ export function calcularMedia(itens: { valor: number; polaridade: Polaridade; pe
   return somaPonderada / somaPesos;
 }
 
-export { SCORE_BASE_MAXIMO, SCORE_BASE_MINIMO } from "@/lib/score-final";
-
-/** média está sempre em 1–5 (1 = nunca/melhor, 5 = sempre/pior) após normalizarValor. */
-export function calcularScoreBase(mediaGeral: number): number {
-  const amplitude = SCORE_BASE_MAXIMO - SCORE_BASE_MINIMO;
-  return Math.round(SCORE_BASE_MINIMO + (amplitude * (5 - mediaGeral)) / 4);
-}
-
 /**
- * Faixa de risco do Score Base — a MESMA régua do Painel FRPRT: os cortes
- * da metodologia (3,00 / 4,00) aplicados à média 1–5, pela mesma função
- * `concluir`. Antes o Score Base usava faixas próprias da nota (400/600) e
- * a mesma nota podia ter rótulos diferentes nas duas telas. Recebe a média
- * (não a nota) para o arredondamento da nota nunca mudar a faixa.
- *   média ≤ 3,00 → nota ≥ 450 · Sem risco
- *   média ≤ 4,00 → nota ≥ 275 · Atenção
- *   acima        → nota < 275 · Risco alto
+ * Faixa de uma média 1–5 do Eixo 1 — a MESMA régua do Painel FRPRT: os
+ * cortes da metodologia (3,00 / 4,00) pela mesma função `concluir`.
+ *   média ≤ 3,00 → Baixo risco (verde)
+ *   média ≤ 4,00 → Médio risco (amarelo)
+ *   acima        → Alto risco (vermelho)
  */
 export function calcularNivelRisco(media: number): { rotulo: string; tom: "perigo" | "atencao" | "sucesso" } {
   const c = CONCLUSOES[concluir(media)];
@@ -102,8 +91,6 @@ export type DashboardPesquisa = {
   suficiente: boolean; // false = "ainda não há respostas suficientes" (tasks.md Fase 6)
   limiteSupressaoGrupo: number;
   mediaGeral: number | null;
-  scoreBase: number | null;
-  scoreBaseMaximo: number;
   porDimensao: { nome: string; media: number }[];
   porSetor: GrupoComSupressao<ResumoGrupo>[];
   porDepartamento: GrupoComSupressao<ResumoGrupo>[];
@@ -141,8 +128,6 @@ export async function calcularDashboard(
       suficiente: false,
       limiteSupressaoGrupo,
       mediaGeral: null,
-      scoreBase: null,
-      scoreBaseMaximo: SCORE_BASE_MAXIMO,
       porDimensao: [],
       porSetor: [],
       porDepartamento: [],
@@ -178,8 +163,6 @@ export async function calcularDashboard(
       suficiente: true,
       limiteSupressaoGrupo,
       mediaGeral: null,
-      scoreBase: null,
-      scoreBaseMaximo: SCORE_BASE_MAXIMO,
       porDimensao: [],
       porSetor: [],
       porDepartamento: [],
@@ -199,7 +182,6 @@ export async function calcularDashboard(
     mediasPessoais.length > 0
       ? mediasPessoais.reduce((acc, m) => acc + m.media, 0) / mediasPessoais.length
       : null;
-  const scoreBase = mediaGeral !== null ? calcularScoreBase(mediaGeral) : null;
 
   // Por dimensão: junta todas as respostas de todas as pessoas que
   // caem naquela dimensão e faz a média normalizada.
@@ -233,8 +215,6 @@ export async function calcularDashboard(
     suficiente: true,
     limiteSupressaoGrupo,
     mediaGeral,
-    scoreBase,
-    scoreBaseMaximo: SCORE_BASE_MAXIMO,
     porDimensao,
     porSetor: resumirCampo("setor"),
     porDepartamento: resumirCampo("departamento"),
@@ -249,7 +229,6 @@ export type RespostaIndividual = {
   departamento: string | null;
   concluidoEm: Date;
   media: number;
-  scoreBase: number;
 };
 
 /**
@@ -290,7 +269,6 @@ export async function listarRespostasIndividuais(
       departamento: r.departamento?.nome ?? null,
       concluidoEm: r.concluidoEm!,
       media,
-      scoreBase: calcularScoreBase(media),
     };
   });
 }

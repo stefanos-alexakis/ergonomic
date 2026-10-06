@@ -48,4 +48,26 @@ test("gestor de empresa não acessa a tela de pesos", async ({ page }) => {
 
   await page.goto("/admin/perguntas");
   await expect(page.getByLabel(/^Peso da pergunta:/)).toHaveCount(0);
+
+  // A severidade FMEA também é metodologia global: gestor não acessa.
+  await page.goto("/admin/severidade");
+  await expect(page.getByLabel(/^Severidade-base:/)).toHaveCount(0);
+});
+
+test("admin da plataforma salva a severidade FMEA dos 13 fatores", async ({ page }) => {
+  await page.goto("/login");
+  await page.getByLabel("E-mail").fill(ADMIN_EMAIL);
+  await page.getByLabel("Senha").fill(ADMIN_SENHA);
+  await page.getByRole("button", { name: "Entrar" }).click();
+  await expect(page).toHaveURL(/\/admin$/);
+
+  await page.getByRole("link", { name: "Severidade dos fatores (FMEA)" }).click();
+  await expect(page.getByRole("heading", { name: "Severidade dos fatores" })).toBeVisible();
+  await expect(page.getByLabel(/^Severidade-base:/)).toHaveCount(13);
+  await expect(page.getByLabel("Severidade-base: 11. Violência no Trabalho")).toHaveValue("5");
+
+  // Salva sem alterar valores: exercita a action (permissão + validação)
+  // sem mudar a metodologia usada pelos outros testes.
+  await page.getByRole("button", { name: "Salvar severidades" }).click();
+  await expect(page.getByText("Severidades salvas.")).toBeVisible();
 });

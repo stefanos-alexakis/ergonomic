@@ -5,11 +5,11 @@ import { getWorkspaceDoGestor, resolvePesquisaDoWorkspace } from "@/lib/pesquisa
 import { listarCatalogoOrganizacional } from "@/lib/estrutura";
 import {
   calcularDashboard,
-  calcularScoreBase,
   calcularNivelRisco,
   type ResumoGrupo,
 } from "@/lib/dashboard";
 import type { GrupoComSupressao } from "@/lib/agregacao";
+import { CONCLUSOES, concluir, type Conclusao } from "@/lib/score-final";
 import { AppShell } from "@/components/shell/app-shell";
 import { NAV_GESTOR } from "@/components/shell/nav-gestor";
 import { BannerImpersonacao } from "@/components/shell/banner-impersonacao";
@@ -23,6 +23,55 @@ export const dynamic = "force-dynamic";
 
 const NAV = NAV_GESTOR;
 
+/** Cor da faixa de risco de uma média 1–5 — mesmos cortes e cores do Painel FRPRT. */
+function corDaMedia(media: number) {
+  return CONCLUSOES[concluir(media)];
+}
+
+/** Média em pílula colorida: verde baixo, amarelo médio, vermelho alto risco. */
+function PilulaMedia({ media }: { media: number }) {
+  const c = corDaMedia(media);
+  return (
+    <span
+      className="inline-block rounded-md px-2 py-0.5 text-sm font-semibold tabular-nums"
+      style={{ background: c.fundo, color: c.cor }}
+      title={c.curto}
+    >
+      {media.toFixed(2)}
+    </span>
+  );
+}
+
+/** Barra 1–5 com a cor da faixa, para leitura rápida da tabela por dimensão. */
+// Mesmas cores das faixas da régua do Painel FRPRT (verde, amarelo, vermelho).
+const COR_BARRA: Record<Conclusao, string> = { SEM_RISCO: "#34d399", CONTROLE: "#fbbf24", RISCO_EXISTENTE: "#f87171" };
+
+function BarraMedia({ media }: { media: number }) {
+  const pct = Math.min(100, Math.max(0, ((media - 1) / 4) * 100));
+  return (
+    <div className="h-2 w-40 rounded-full bg-zinc-100 overflow-hidden" aria-hidden="true">
+      <div className="h-full rounded-full" style={{ width: `${pct}%`, background: COR_BARRA[concluir(media)] }} />
+    </div>
+  );
+}
+
+function LegendaCores() {
+  const faixas: [Conclusao, string][] = [
+    ["SEM_RISCO", "até 3,00"],
+    ["CONTROLE", "3,01 a 4,00"],
+    ["RISCO_EXISTENTE", "acima de 4,00"],
+  ];
+  return (
+    <div className="flex flex-wrap gap-2 text-xs mb-6" aria-label="Legenda de cores">
+      {faixas.map(([k, faixa]) => (
+        <span key={k} className="rounded-md px-2 py-1 font-medium" style={{ background: CONCLUSOES[k].fundo, color: CONCLUSOES[k].cor }}>
+          {CONCLUSOES[k].curto} · média {faixa}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 function TabelaGrupo({ titulo, grupos }: { titulo: string; grupos: GrupoComSupressao<ResumoGrupo>[] }) {
   if (grupos.length === 0) return null;
   return (
@@ -33,8 +82,8 @@ function TabelaGrupo({ titulo, grupos }: { titulo: string; grupos: GrupoComSupre
           <Tr>
             <Th>Grupo</Th>
             <Th>Respostas</Th>
-            <Th>Média de risco (1–5)</Th>
-            <Th>Score Base</Th>
+            <Th>Índice (1–5)</Th>
+            <Th>Faixa</Th>
           </Tr>
         </Thead>
         <tbody>
@@ -48,14 +97,11 @@ function TabelaGrupo({ titulo, grupos }: { titulo: string; grupos: GrupoComSupre
               ) : (
                 <>
                   <Td>{g.total}</Td>
-                  <Td className="font-medium">{g.mediaGeral.toFixed(2)}</Td>
-                  <Td className="font-medium">
-                    <span className="flex items-center gap-2">
-                      {calcularScoreBase(g.mediaGeral)}
-                      <Badge tom={calcularNivelRisco(g.mediaGeral).tom}>
-                        {calcularNivelRisco(g.mediaGeral).rotulo}
-                      </Badge>
-                    </span>
+                  <Td>
+                    <PilulaMedia media={g.mediaGeral} />
+                  </Td>
+                  <Td>
+                    <Badge tom={calcularNivelRisco(g.mediaGeral).tom}>{calcularNivelRisco(g.mediaGeral).rotulo}</Badge>
                   </Td>
                 </>
               )}
@@ -175,16 +221,20 @@ export default async function DashboardPage({
             </p>
           ) : (
             <>
-              <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-5 py-4 mb-6 flex items-baseline gap-3">
-                <span className="text-3xl font-bold text-zinc-900">{dashboard.scoreBase}</span>
+              <div
+                className="rounded-lg border-2 px-5 py-4 mb-3 flex flex-wrap items-baseline gap-3"
+                style={{ borderColor: corDaMedia(dashboard.mediaGeral!).cor, background: corDaMedia(dashboard.mediaGeral!).fundo }}
+              >
+                <span className="text-4xl font-bold tabular-nums" style={{ color: corDaMedia(dashboard.mediaGeral!).cor }}>
+                  {dashboard.mediaGeral!.toFixed(2).replace(".", ",")}
+                </span>
                 <Badge tom={calcularNivelRisco(dashboard.mediaGeral!).tom}>
                   {calcularNivelRisco(dashboard.mediaGeral!).rotulo}
                 </Badge>
-                <span className="text-sm text-zinc-500">
-                  / {dashboard.scoreBaseMaximo} pontos — Score Base (Eixo 1: percepção dos colaboradores). Quanto
-                  maior, melhor. Mesma régua do Painel FRPRT: média até 3,00 (nota 450 ou mais) sem risco · até
-                  4,00 (nota 275 ou mais) atenção · acima disso risco alto. O resultado final, com os Eixos 2 e 3,
-                  está no{" "}
+                <span className="text-sm text-zinc-700">
+                  Índice geral do Eixo 1 (percepção dos colaboradores), de 1 a 5 — quanto maior, mais exposição. Mesma
+                  régua do Painel FRPRT: até 3,00 baixo risco · até 4,00 médio risco · acima disso alto risco. O
+                  resultado final, com os Eixos 2 e 3, está no{" "}
                   <Link href="/gestor/painel" className="underline hover:no-underline">
                     Painel FRPRT
                   </Link>
@@ -192,9 +242,9 @@ export default async function DashboardPage({
                 </span>
               </div>
 
+              <LegendaCores />
+
               <p className="text-sm text-zinc-700 mb-6">
-                Média geral de risco: <strong className="font-semibold">{dashboard.mediaGeral?.toFixed(2)}</strong>{" "}
-                <span className="text-zinc-500">(escala 1–5, quanto maior, mais exposição a risco)</span> ·{" "}
                 {dashboard.totalFiltrado} {dashboard.totalFiltrado === 1 ? "resposta considerada" : "respostas consideradas"}
               </p>
 
@@ -205,7 +255,15 @@ export default async function DashboardPage({
                     {dashboard.porDimensao.map((d) => (
                       <Tr key={d.nome}>
                         <Td className="text-zinc-900">{d.nome}</Td>
-                        <Td className="font-medium">{d.media.toFixed(2)}</Td>
+                        <Td className="w-44">
+                          <BarraMedia media={d.media} />
+                        </Td>
+                        <Td className="w-20">
+                          <PilulaMedia media={d.media} />
+                        </Td>
+                        <Td className="w-32 text-xs font-medium" style={{ color: corDaMedia(d.media).cor }}>
+                          {corDaMedia(d.media).curto}
+                        </Td>
                       </Tr>
                     ))}
                   </tbody>

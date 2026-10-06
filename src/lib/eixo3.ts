@@ -93,6 +93,8 @@ export type ResultadoEixo3Setor = {
   fatorPorFator: Map<string, number>;
   /** fatorId → CIDs que causaram o agravamento */
   cidsPorFator: Map<string, string[]>;
+  /** fatorId → maior afastamento (dias) entre as ocorrências relacionadas e compatíveis (FMEA) */
+  maiorAfastamentoPorFator: Map<string, number>;
   ocorrencias: number;
   relacionadas: number;
   inconclusivas: number;
@@ -106,6 +108,7 @@ export function calcularEixo3Setor(
   matriz: MatrizPorFator,
 ): ResultadoEixo3Setor {
   const cidsPorFator = new Map<string, Set<string>>();
+  const maiorAfastamentoPorFator = new Map<string, number>();
   const semCorrespondencia = new Set<string>();
   let relacionadas = 0;
   let inconclusivas = 0;
@@ -118,7 +121,10 @@ export function calcularEixo3Setor(
     if (o.relacao === "INCONCLUSIVO") inconclusivas++;
     if (o.relacao !== "SIM") continue; // só "Sim" agrava (decisão do usuário)
     relacionadas++;
-    for (const f of fatores) cidsPorFator.set(f, (cidsPorFator.get(f) ?? new Set()).add(o.cid));
+    for (const f of fatores) {
+      cidsPorFator.set(f, (cidsPorFator.get(f) ?? new Set()).add(o.cid));
+      maiorAfastamentoPorFator.set(f, Math.max(maiorAfastamentoPorFator.get(f) ?? 0, o.diasAfastados ?? 0));
+    }
   }
 
   const fatorPorFator = new Map<string, number>();
@@ -127,6 +133,7 @@ export function calcularEixo3Setor(
   return {
     fatorPorFator,
     cidsPorFator: new Map([...cidsPorFator].map(([k, v]) => [k, [...v].sort()])),
+    maiorAfastamentoPorFator,
     ocorrencias: ocorrencias.length,
     relacionadas,
     inconclusivas,

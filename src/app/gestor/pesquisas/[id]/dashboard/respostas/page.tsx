@@ -61,7 +61,7 @@ export default async function RespostasIndividuaisPage({
             <Th>Concluída em</Th>
             <Th>Setor</Th>
             <Th>Departamento</Th>
-            <Th>Score Base</Th>
+            <Th>Índice (1–5)</Th>
           </Tr>
         </Thead>
         <tbody>
@@ -75,7 +75,7 @@ export default async function RespostasIndividuaisPage({
                   href={`/gestor/pesquisas/${pesquisa.id}/dashboard/respostas/${r.id}`}
                   className="flex items-center gap-2 font-medium text-zinc-900 hover:underline"
                 >
-                  {r.scoreBase}
+                  <span className="tabular-nums">{r.media.toFixed(2).replace(".", ",")}</span>
                   <Badge tom={calcularNivelRisco(r.media).tom}>{calcularNivelRisco(r.media).rotulo}</Badge>
                   →
                 </Link>

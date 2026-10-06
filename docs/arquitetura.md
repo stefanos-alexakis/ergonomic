@@ -23,7 +23,7 @@
 src/
   app/
     login/                      tela de login (admin e gestor)
-    admin/                      empresas, edição, pesos das perguntas
+    admin/                      empresas, edição, pesos das perguntas, severidade FMEA
     gestor/
       page.tsx                  lista de pesquisas (início do gestor)
       estrutura/                setores e departamentos (+ planilha modelo)
@@ -58,6 +58,7 @@ docs/                           esta documentação
 | Eixo 1 | `Pesquisa` (datas, licenças, limite de supressão), `CodigoAcesso` (tipo, status), `Resposta`, `RespostaItem` |
 | Eixo 2 | `QuestaoEixo2`, `AvaliacaoEixo2`, `AvaliacaoEixo2Setor`, `RespostaEixo2` (condição, plano de ação), `PraticaAdicional` |
 | Eixo 3 | `MatrizCidSituacao` (CIDs por pergunta), `LevantamentoEixo3` (período, declaração, hash do arquivo), `OcorrenciaEixo3` |
+| FMEA | `SeveridadeFator` (severidade-base 1–5 e justificativa por dimensão; editada em `/admin/severidade`) |
 
 O catálogo (questionário, Eixo 2 e matriz CID) é global e versionado. Os dados de negócio são todos
 por `workspaceId`.
@@ -96,4 +97,3 @@ por `workspaceId`.
 - SMTP e tarefas agendadas estão previstos (`.env.example`, dependências) mas não são usados.
 - Plano de segurança corporativa (2FA por e-mail, sessão de 48 h, trilha de auditoria) foi
   planejado e ainda não implementado.
-- Classificação FMEA dos riscos encaminhados ao PGR fica para uma fase seguinte.

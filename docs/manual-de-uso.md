@@ -33,6 +33,12 @@ daquela empresa. Uma faixa amarela no topo lembra que você está na visão de g
 **Pesos das perguntas** — define o peso de cada pergunta no Eixo 1 e de cada questão no Eixo 2
 (padrão 1). Vale para todas as empresas. Só o administrador da plataforma pode alterar.
 
+### 1.6 Severidade dos fatores (FMEA)
+**Severidade dos fatores (FMEA)** — define a severidade-base de cada um dos 13 fatores (1 a 5) e a
+justificativa técnica. É parte da metodologia: vale para todas as empresas, entra na Matriz FMEA do
+Painel FRPRT e aparece no relatório como critério documentado. Deve refletir a validação do
+profissional de SST responsável. Só o administrador da plataforma pode alterar.
+
 ---
 
 ## 2. Gestor da empresa
@@ -67,8 +73,9 @@ Regras de acesso do colaborador:
 - Código concluído não pode ser respondido de novo.
 
 ### 2.3 Painel e relatório da pesquisa
-Mostra o **Score Base** (só Eixo 1, escala 100–800, quanto maior melhor, com a mesma régua de cores
-do Painel FRPRT: 450 ou mais sem risco, 275 ou mais atenção, abaixo risco alto), participação, resultados
+Mostra o **índice geral do Eixo 1** (média de 1 a 5, quanto maior, mais exposição), com a mesma
+régua de cores do Painel FRPRT: até 3,00 baixo risco (verde), até 4,00 médio risco (amarelo), acima
+alto risco (vermelho). Também mostra participação, resultados
 por fator, por setor e por departamento, e **Baixar relatório (PDF)**.
 Setores ou departamentos com menos de 5 respostas aparecem como **amostra insuficiente**. Isso
 protege o anonimato e não pode ser desligado.
@@ -108,13 +115,18 @@ Junta os três eixos. Em **Fontes e filtros** escolha a pesquisa, a avaliação 
 levantamento do Eixo 3 (o padrão é o mais recente de cada), e filtre por setor ou departamento.
 
 O que aparece, nesta ordem:
-1. **Resultado geral da empresa** — risco, cor, descrição, nota e régua.
+1. **Resultado geral da empresa** — índice, cor, descrição e régua.
 2. **Pontuação dos setores** — um cartão por setor.
 3. **Painel resumido por setor** — tabela com as barras de cada eixo e o score final.
 4. **Principais achados** — frases curtas, fatores mais apontados e tratativas sugeridas.
-5. **Matriz de decisão** — cada fator de cada setor com conclusão e encaminhamento.
-6. **Riscos que vão para o PGR** — consequências possíveis, CIDs compatíveis, observação técnica
-   e plano de ação.
+5. **Matriz FMEA — prioridade de ação** — mapa Severidade × Ocorrência e duas listas: acima de 4,00
+   (plano de ação no PGR) e de 3,01 a 4,00 (acompanhamento). Cada item traz S, O, D, RPN, a
+   prioridade (Alta, Média, Baixa) e as **datas** de plano, implantação e reavaliação, contadas a
+   partir do dia em que o painel ou o relatório é emitido. Em "Critérios da classificação FMEA" estão
+   a tabela de severidade e as regras.
+6. **Matriz de decisão** — cada fator de cada setor com conclusão e encaminhamento.
+7. **Riscos que vão para o PGR** — na ordem de prioridade da FMEA, com prazos, consequências
+   possíveis, CIDs compatíveis, observação técnica e plano de ação.
 
 **Baixar relatório (PDF)** gera o mesmo conteúdo para anexar ao PGR. Como ler os números: veja o
 [Guia rápido do Score](score-frprt.html).

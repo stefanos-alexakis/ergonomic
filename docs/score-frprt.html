@@ -126,20 +126,20 @@
   </header>
 
   <section aria-label="Fórmula" class="formula">
-    <div class="termo t1"><b>Eixo 1 · Percepção</b><span class="num">nota 1 a 5</span><small>o que os colaboradores sentem</small></div>
+    <div class="termo t1"><b>Eixo 1 · Percepção</b><span class="num">média 1 a 5</span><small>o que os colaboradores sentem</small></div>
     <span class="op">×</span>
     <div class="termo t2"><b>Eixo 2 · Controles</b><span class="num">×0,80 a ×1,00</span><small>o que a empresa já faz</small></div>
     <span class="op">×</span>
     <div class="termo t3"><b>Eixo 3 · Atestados</b><span class="num">×1,00 ou ×1,10</span><small>o que já aconteceu</small></div>
     <span class="op">=</span>
-    <div class="termo tf"><b>Risco final</b><span class="num">1 a 5</span><small>quanto maior, pior</small></div>
+    <div class="termo tf"><b>Índice final</b><span class="num">1 a 5</span><small>quanto maior, pior</small></div>
   </section>
 
   <section class="eixos" aria-label="Os três eixos">
     <div class="eixo x1">
       <h3>Eixo 1 — Percepção dos colaboradores</h3>
       <p>Questionário anônimo com 35 perguntas. Para cada setor e fator sai uma média de <span class="num">1</span> (melhor) a <span class="num">5</span> (pior).</p>
-      <ul><li>Setor com menos de 5 respostas não recebe nota, para proteger o anonimato.</li></ul>
+      <ul><li>Setor com menos de 5 respostas não recebe índice, para proteger o anonimato.</li></ul>
     </div>
     <div class="eixo x2">
       <h3>Eixo 2 — Medidas de controle</h3>
@@ -159,25 +159,25 @@
 
   <section aria-labelledby="t-regua" style="display:flex;flex-direction:column;gap:6px">
     <h2 id="t-regua">Como ler o resultado</h2>
-    <div class="regua" role="img" aria-label="Régua de 1 a 5: até 3 sem risco, de 3 a 4 atenção, acima de 4 risco existente. Exemplos A em 2,56, B em 3,69 e C em 4,07.">
+    <div class="regua" role="img" aria-label="Régua de 1 a 5: até 3 baixo risco, de 3 a 4 médio risco, acima de 4 alto risco. Exemplos A em 2,56, B em 3,69 e C em 4,07.">
       <!-- posição = (risco − 1) ÷ 4 -->
       <div class="marca" style="left:39%"><b>A</b><i></i></div>
       <div class="marca" style="left:67.25%"><b>B</b><i></i></div>
       <div class="marca" style="left:76.75%"><b>C</b><i></i></div>
       <div class="faixa"><span></span><span></span><span></span></div>
       <div class="eixo-x">
-        <span style="left:0">risco 1<br>nota 800</span>
-        <span style="left:50%">3,00<br>450</span>
-        <span style="left:75%">4,00<br>275</span>
-        <span style="left:100%">5<br>100</span>
+        <span style="left:0">índice 1<br>melhor</span>
+        <span style="left:50%">3,00<br>&nbsp;</span>
+        <span style="left:75%">4,00<br>&nbsp;</span>
+        <span style="left:100%">5<br>pior</span>
       </div>
     </div>
     <div class="zonas">
-      <div class="zona z1"><b>Até 3,00 · Sem risco</b><span>Percepções e controles dentro do esperado. Manter o monitoramento.</span></div>
-      <div class="zona z2"><b>3,01 a 4,00 · Atenção</b><span>Perigo percebido, com controle existente. Acompanhar e manter os controles.</span></div>
-      <div class="zona z3"><b>Acima de 4,00 · Risco</b><span>Risco existente. Plano de ação e inclusão no PGR.</span></div>
+      <div class="zona z1"><b>Até 3,00 · Baixo risco</b><span>Percepções e controles dentro do esperado. Manter o monitoramento.</span></div>
+      <div class="zona z2"><b>3,01 a 4,00 · Médio risco</b><span>Perigo percebido, com controle existente. Acompanhar e manter os controles.</span></div>
+      <div class="zona z3"><b>Acima de 4,00 · Alto risco</b><span>Risco existente. Plano de ação e inclusão no PGR.</span></div>
     </div>
-    <p class="sub" style="max-width:none">A <strong>nota</strong> é a mesma informação numa escala em que maior é melhor: <span class="num">nota = 100 + 175 × (5 − risco)</span>. Risco 1 vale 800; risco 5 vale 100. Com controles eficazes a nota pode passar de 800.</p>
+    <p class="sub" style="max-width:none">Acima de 3,00, cada fator recebe uma <strong>prioridade FMEA</strong> (Alta, Média ou Baixa) pela severidade do dano, pela ocorrência (Eixo 1) e pela detecção (Eixo 2), com datas para plano de ação, implantação e reavaliação.</p>
   </section>
 
   <section aria-labelledby="t-ex" style="display:flex;flex-direction:column;gap:6px">
@@ -185,16 +185,16 @@
     <div class="tabela">
       <table>
         <thead>
-          <tr><th></th><th>Setor · fator</th><th class="num">Eixo 1</th><th class="num">Eixo 2</th><th class="num">Eixo 3</th><th class="num">Risco final</th><th class="num">Nota</th><th>Leitura</th></tr>
+          <tr><th></th><th>Setor · fator</th><th class="num">Eixo 1</th><th class="num">Eixo 2</th><th class="num">Eixo 3</th><th class="num">Índice final</th><th>FMEA</th><th>Leitura</th></tr>
         </thead>
         <tbody>
-          <tr><td class="letra">A</td><td>Administrativo · Liderança</td><td class="num">3,20</td><td class="num">×0,80</td><td class="num">×1,00</td><td class="num"><span class="pilula p1">2,56</span></td><td class="num">527</td><td>Controle eficaz trouxe o fator para a faixa verde.</td></tr>
-          <tr><td class="letra">B</td><td>Produção · Demandas</td><td class="num">4,10</td><td class="num">×0,90</td><td class="num">×1,00</td><td class="num"><span class="pilula p2">3,69</span></td><td class="num">329</td><td>Percepção alta, mas há controle (a melhorar). Acompanhar.</td></tr>
-          <tr><td class="letra">C</td><td>Produção · Horários e jornada</td><td class="num">3,70</td><td class="num">×1,00</td><td class="num">×1,10</td><td class="num"><span class="pilula p3">4,07</span></td><td class="num">263</td><td>Sem controle e com atestado F51.2 ligado ao trabalho. Sem o atestado ficaria em 3,70; vai para o PGR.</td></tr>
+          <tr><td class="letra">A</td><td>Administrativo · Liderança</td><td class="num">3,20</td><td class="num">×0,80</td><td class="num">×1,00</td><td class="num"><span class="pilula p1">2,56</span></td><td>—</td><td>Controle eficaz trouxe o fator para a faixa verde.</td></tr>
+          <tr><td class="letra">B</td><td>Produção · Demandas</td><td class="num">4,10</td><td class="num">×0,90</td><td class="num">×1,00</td><td class="num"><span class="pilula p2">3,69</span></td><td>Média</td><td>Percepção alta, mas há controle (a melhorar). Acompanhar.</td></tr>
+          <tr><td class="letra">C</td><td>Produção · Horários e jornada</td><td class="num">3,70</td><td class="num">×1,00</td><td class="num">×1,10</td><td class="num"><span class="pilula p3">4,07</span></td><td>Alta</td><td>Sem controle e com atestado F51.2 ligado ao trabalho. Sem o atestado ficaria em 3,70; vai para o PGR.</td></tr>
         </tbody>
       </table>
     </div>
   </section>
 
-  <p class="rodape">O risco de cada setor é a média dos seus 13 fatores, e o resultado geral da empresa é a média dos setores avaliados. Um CID não comprova, sozinho, nexo causal: o Eixo 3 funciona como indicador coletivo do setor, nunca como prova individual.</p>
+  <p class="rodape">O índice de cada setor é a média dos seus 13 fatores, e o resultado geral da empresa é a média dos setores avaliados. Um CID não comprova, sozinho, nexo causal: o Eixo 3 funciona como indicador coletivo do setor, nunca como prova individual.</p>
 </article>

@@ -1,11 +1,9 @@
 import { AppShell } from "@/components/shell/app-shell";
+import { NAV_ADMIN } from "@/components/shell/nav-gestor";
 import { PageHeader } from "@/components/ui/page-header";
 import { NovaEmpresaForm } from "./form";
 
-const NAV = [
-  { href: "/admin", label: "Empresas", icone: "empresas" as const, ativoEm: ["/admin/empresas"] },
-  { href: "/admin/perguntas", label: "Pesos das perguntas", icone: "pesos" as const },
-];
+const NAV = NAV_ADMIN;
 
 export default function NovaEmpresaPage() {
   return (

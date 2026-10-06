@@ -4,11 +4,8 @@ import {
   agruparEResumir,
   calcularMedia,
   calcularNivelRisco,
-  calcularScoreBase,
   compararPorNumeroDaDimensao,
   normalizarValor,
-  SCORE_BASE_MAXIMO,
-  SCORE_BASE_MINIMO,
 } from "@/lib/dashboard";
 
 describe("normalizarValor", () => {
@@ -54,42 +51,25 @@ describe("calcularMedia", () => {
   });
 });
 
-describe("calcularScoreBase — Eixo 1 vale até 80% da pontuação, com piso de 100 (100–800 de 0–1000)", () => {
-  it("média 1 (nunca — melhor cenário) dá o score máximo", () => {
-    expect(calcularScoreBase(1)).toBe(SCORE_BASE_MAXIMO);
-  });
-
-  it("média 5 (sempre — pior cenário) trava no piso, nunca zera (senão um agravante do Eixo 3 não teria efeito)", () => {
-    expect(calcularScoreBase(5)).toBe(SCORE_BASE_MINIMO);
-    expect(calcularScoreBase(5)).toBe(100);
-  });
-
-  it("média 3 (às vezes) fica no meio do caminho entre o piso e o teto", () => {
-    expect(calcularScoreBase(3)).toBe(SCORE_BASE_MINIMO + (SCORE_BASE_MAXIMO - SCORE_BASE_MINIMO) / 2);
-  });
-});
-
 describe("calcularNivelRisco — mesma régua do Painel FRPRT (cortes 3,00 / 4,00 na média)", () => {
-  it("média 1 (melhor cenário) é sem risco", () => {
-    expect(calcularNivelRisco(1)).toEqual({ rotulo: "Sem risco", tom: "sucesso" });
+  it("média 1 (melhor cenário) é baixo risco", () => {
+    expect(calcularNivelRisco(1)).toEqual({ rotulo: "Baixo risco", tom: "sucesso" });
   });
 
-  it("média 3,00 exata ainda é sem risco (nota 450)", () => {
-    expect(calcularNivelRisco(3)).toEqual({ rotulo: "Sem risco", tom: "sucesso" });
-    expect(calcularScoreBase(3)).toBe(450);
+  it("média 3,00 exata ainda é baixo risco", () => {
+    expect(calcularNivelRisco(3)).toEqual({ rotulo: "Baixo risco", tom: "sucesso" });
   });
 
-  it("média 3,01 já é atenção", () => {
-    expect(calcularNivelRisco(3.01)).toEqual({ rotulo: "Atenção", tom: "atencao" });
+  it("média 3,01 já é médio risco", () => {
+    expect(calcularNivelRisco(3.01)).toEqual({ rotulo: "Médio risco", tom: "atencao" });
   });
 
-  it("média 4,00 exata ainda é atenção (nota 275)", () => {
-    expect(calcularNivelRisco(4)).toEqual({ rotulo: "Atenção", tom: "atencao" });
-    expect(calcularScoreBase(4)).toBe(275);
+  it("média 4,00 exata ainda é médio risco", () => {
+    expect(calcularNivelRisco(4)).toEqual({ rotulo: "Médio risco", tom: "atencao" });
   });
 
-  it("média 4,01 já é risco alto", () => {
-    expect(calcularNivelRisco(4.01)).toEqual({ rotulo: "Risco alto", tom: "perigo" });
+  it("média 4,01 já é alto risco", () => {
+    expect(calcularNivelRisco(4.01)).toEqual({ rotulo: "Alto risco", tom: "perigo" });
   });
 
   it("concorda com a conclusão do Painel FRPRT em toda a escala", () => {

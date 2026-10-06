@@ -298,11 +298,45 @@ async function seedMatrizCid(v: VersaoQuestionario) {
   console.log(`Seed da matriz Fatores × CID F (v${v.versao}) concluído: ${itens.length} situações.`);
 }
 
+type SeveridadeSeed = { fator: number; severidade: number; justificativa: string };
+
+/**
+ * Severidade-base FMEA de cada fator (docs/proposta-fmea.html). Só CRIA o
+ * que falta: depois de publicada, a tabela é ajustada pelo admin na tela
+ * "Severidade dos fatores" e um novo seed não pode desfazer esse ajuste.
+ */
+async function seedSeveridadeFmea(v: VersaoQuestionario) {
+  const path = join(__dirname, "seed-data", "severidade-fmea-v2.json");
+  const itens = JSON.parse(readFileSync(path, "utf-8")) as SeveridadeSeed[];
+  const dimensoes = await prisma.dimensao.findMany({
+    where: { bloco: { questionarioId: v.id } },
+    select: { id: true, nome: true },
+  });
+  const porNumero = new Map(dimensoes.map((d) => [Number.parseInt(d.nome, 10), d.id]));
+  if (itens.length !== porNumero.size) {
+    throw new Error(`Severidade FMEA: ${itens.length} fatores no arquivo, ${porNumero.size} dimensões na v${v.versao}.`);
+  }
+  let criados = 0;
+  for (const item of itens) {
+    const dimensaoId = porNumero.get(item.fator);
+    if (!dimensaoId) throw new Error(`Severidade FMEA: fator ${item.fator} sem dimensão na v${v.versao}.`);
+    if (item.severidade < 1 || item.severidade > 5) throw new Error(`Severidade FMEA: fator ${item.fator} fora de 1–5.`);
+    const existente = await prisma.severidadeFator.findUnique({ where: { dimensaoId } });
+    if (existente) continue;
+    await prisma.severidadeFator.create({
+      data: { dimensaoId, severidade: item.severidade, justificativa: item.justificativa },
+    });
+    criados++;
+  }
+  console.log(`Seed da severidade FMEA (v${v.versao}): ${criados} criada(s), ${itens.length - criados} mantida(s).`);
+}
+
 async function main() {
   await seedQuestionario(V1);
   await seedQuestionario(V2);
   await seedEixo2(V2);
   await seedMatrizCid(V2);
+  await seedSeveridadeFmea(V2);
   await ativarVersao(V2);
 }
 
