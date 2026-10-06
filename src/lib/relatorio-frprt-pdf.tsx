@@ -2,6 +2,17 @@ import { Document, Page, View, Text, Image, StyleSheet, renderToBuffer } from "@
 import type { PainelFrprt } from "@/lib/painel-frprt";
 import { CONCLUSOES, formatarEfeito, formatarRisco, posicaoNaRegua } from "@/lib/score-final";
 import { ORIENTACOES_EIXO3 } from "@/lib/planilha-modelo-eixo3";
+import {
+  FAIXAS_D,
+  FAIXAS_O,
+  MATRIZ_S_O,
+  PRIORIDADES,
+  REGRA_PRAZOS,
+  ROTULO_AGRAVANTE,
+  type Prazos,
+  type Prioridade,
+} from "@/lib/fmea";
+import type { ItemFmea } from "@/lib/painel-frprt";
 
 /**
  * Relatório FRPRT — mesma ordem e linguagem visual do painel: resultado
@@ -104,13 +115,110 @@ function Barra({ valor, maximo, cor, texto, largura = 70 }: { valor: number; max
   );
 }
 
+const dataLocal = (d: Date) => d.toLocaleDateString("pt-BR");
+/** A Helvetica padrão (WinAnsi) não tem estes símbolos — texto livre do admin passa por aqui. */
+const paraPdf = (t: string) =>
+  t.replace(/≈/g, "~").replace(/≥/g, ">=").replace(/≤/g, "<=").replace(/−/g, "-").replace(/→/g, "->");
+const COR_NOTA = ["#4d7c0f", "#a16207", "#c2410c", "#b91c1c", "#7f1d1d"];
+
+function Prio({ p }: { p: Prioridade }) {
+  return (
+    <Text
+      style={{
+        backgroundColor: PRIORIDADES[p].fundo,
+        color: PRIORIDADES[p].cor,
+        fontWeight: 700,
+        fontSize: 8,
+        paddingVertical: 1,
+        paddingHorizontal: 5,
+        borderRadius: 3,
+      }}
+    >
+      {PRIORIDADES[p].rotulo}
+    </Text>
+  );
+}
+
+function NotaFmea({ v }: { v: number }) {
+  return (
+    <Text
+      style={{
+        backgroundColor: COR_NOTA[v - 1],
+        color: "#fff",
+        fontWeight: 700,
+        width: 14,
+        textAlign: "center",
+        paddingVertical: 1.5,
+        borderRadius: 2,
+      }}
+    >
+      {v}
+    </Text>
+  );
+}
+
+function textoPrazos(pz: Prazos): string {
+  return pz.plano
+    ? `Plano até ${dataLocal(pz.plano)} · medidas até ${dataLocal(pz.implantacao!)} · reavaliar em ${dataLocal(pz.reavaliacao)}`
+    : `Manter os controles · reavaliar em ${dataLocal(pz.reavaliacao)}`;
+}
+
+function TabelaFmeaPdf({ itens, vazio }: { itens: ItemFmea[]; vazio: string }) {
+  if (itens.length === 0) return <Text style={{ marginBottom: 6 }}>{vazio}</Text>;
+  const col = { prio: "9%", nome: "33%", idx: "7%", n: "5%", rpn: "6%", prazo: "30%" };
+  return (
+    <View style={{ marginBottom: 8 }}>
+      <View style={{ flexDirection: "row", backgroundColor: "#f4f4f5", paddingVertical: 3, fontWeight: 700, color: "#52525b", fontSize: 7.5 }}>
+        <Text style={{ width: col.prio, paddingHorizontal: 3 }}>Prioridade</Text>
+        <Text style={{ width: col.nome, paddingHorizontal: 3 }}>Setor · fator</Text>
+        <Text style={{ width: col.idx, textAlign: "center" }}>Índice</Text>
+        <Text style={{ width: col.n, textAlign: "center" }}>S</Text>
+        <Text style={{ width: col.n, textAlign: "center" }}>O</Text>
+        <Text style={{ width: col.n, textAlign: "center" }}>D</Text>
+        <Text style={{ width: col.rpn, textAlign: "center" }}>RPN</Text>
+        <Text style={{ width: col.prazo, paddingHorizontal: 3 }}>Prazos (a partir da emissão)</Text>
+      </View>
+      {itens.map((i) => (
+        <View key={`${i.setorId}-${i.fator.id}`} style={s.linha} wrap={false}>
+          <View style={{ width: col.prio, paddingHorizontal: 3, alignItems: "flex-start" }}>
+            <Prio p={i.fmea.prioridade} />
+          </View>
+          <View style={{ width: col.nome, paddingHorizontal: 3 }}>
+            <Text style={{ fontWeight: 700 }}>
+              {i.setor} · {i.fator.nome}
+            </Text>
+            <Text style={{ fontSize: 7, color: CINZA }}>
+              S-base {i.fmea.sBase}
+              {i.fmea.agravantes.map((a) => ` · +1 ${ROTULO_AGRAVANTE[a]}`).join("")}
+            </Text>
+          </View>
+          <Text style={{ width: col.idx, textAlign: "center", color: CONCLUSOES[i.celula.conclusao!].cor, fontWeight: 700 }}>
+            {formatarRisco(i.celula.final!)}
+          </Text>
+          <View style={{ width: col.n, alignItems: "center" }}>
+            <NotaFmea v={i.fmea.s} />
+          </View>
+          <View style={{ width: col.n, alignItems: "center" }}>
+            <NotaFmea v={i.fmea.o} />
+          </View>
+          <View style={{ width: col.n, alignItems: "center" }}>
+            <NotaFmea v={i.fmea.d} />
+          </View>
+          <Text style={{ width: col.rpn, textAlign: "center", fontWeight: 700 }}>{i.fmea.rpn}</Text>
+          <Text style={{ width: col.prazo, paddingHorizontal: 3, fontSize: 7.5 }}>{textoPrazos(i.prazos)}</Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
 export async function gerarRelatorioFrprtPdf(params: {
   workspaceNome: string;
   painel: PainelFrprt;
   logo?: { buffer: Buffer; formato: "png" | "jpeg" };
 }): Promise<Buffer> {
   const { workspaceNome, painel } = params;
-  const { opcoes, fatores, linhas, principais, pgr, limite, geral, achados } = painel;
+  const { opcoes, fatores, linhas, principais, pgr, limite, geral, achados, fmea } = painel;
   const logo = params.logo ? `data:image/${params.logo.formato};base64,${params.logo.buffer.toString("base64")}` : undefined;
   const periodo = opcoes.pesquisa
     ? `${mes(opcoes.pesquisa.dataInicio)}–${mes(opcoes.pesquisa.dataFim)}/${opcoes.pesquisa.dataFim.getUTCFullYear()}`
@@ -339,10 +447,75 @@ export async function gerarRelatorioFrprtPdf(params: {
         )}
       </Page>
 
-      {/* Página 3 — matriz de decisão */}
+      {/* Página 3 — Matriz FMEA */}
       <Page size="A4" orientation="landscape" style={s.page}>
         {cab}
-        <Secao numero={3} titulo="Matriz de decisão por setor e fator" />
+        <Secao numero={3} titulo="Matriz FMEA — prioridade de ação" />
+        <View style={{ flexDirection: "row", marginBottom: 10 }}>
+          {/* Mapa S × O com a contagem */}
+          <View style={{ marginRight: 16 }}>
+            <View style={{ flexDirection: "row" }}>
+              <Text style={{ width: 24 }} />
+              {[1, 2, 3, 4, 5].map((o) => (
+                <Text key={o} style={{ width: 26, textAlign: "center", fontSize: 7, color: CINZA }}>
+                  O {o}
+                </Text>
+              ))}
+            </View>
+            {[5, 4, 3, 2, 1].map((sv) => (
+              <View key={sv} style={{ flexDirection: "row", marginTop: 2 }}>
+                <Text style={{ width: 24, fontSize: 7, color: CINZA, paddingTop: 5 }}>S {sv}</Text>
+                {[1, 2, 3, 4, 5].map((o) => {
+                  const pr = PRIORIDADES[MATRIZ_S_O[sv - 1]![o - 1]!];
+                  const n = fmea.contagemSO[sv - 1]![o - 1]!;
+                  return (
+                    <Text
+                      key={o}
+                      style={{
+                        width: 24,
+                        marginRight: 2,
+                        height: 18,
+                        paddingTop: 4,
+                        textAlign: "center",
+                        backgroundColor: pr.fundo,
+                        color: pr.cor,
+                        fontWeight: 700,
+                        borderRadius: 2,
+                      }}
+                    >
+                      {n || ""}
+                    </Text>
+                  );
+                })}
+              </View>
+            ))}
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={{ marginBottom: 3 }}>
+              S · Severidade: gravidade do dano típico do fator (1–5), agravada no setor (+1 cada, até 5) por atestado
+              CID-F relacionado ao trabalho, afastamento acima de 15 dias e respondentes expostos (50% ou mais).
+            </Text>
+            <Text style={{ marginBottom: 3 }}>
+              O · Ocorrência: média do Eixo 1 no fator. D · Detecção: medidas de controle do Eixo 2 (1 = eficazes, 5 =
+              inexistentes).
+            </Text>
+            <Text style={{ marginBottom: 3 }}>
+              Prioridade: matriz S × O (ao lado, com a quantidade de setor × fator); detecção 4–5 sobe um nível,
+              detecção 1 desce um (severidade 5 nunca abaixo de Média). RPN = S × O × D desempata.
+            </Text>
+            <Text style={s.pequeno}>Prazos contados da emissão deste relatório: {dataLocal(fmea.emitidoEm)}.</Text>
+          </View>
+        </View>
+        <Text style={{ fontWeight: 700, color: AZUL, marginBottom: 4 }}>ACIMA DE 4,00 — PLANO DE AÇÃO NO PGR</Text>
+        <TabelaFmeaPdf itens={fmea.pgr} vazio="Nenhum fator acima de 4,00." />
+        <Text style={{ fontWeight: 700, color: AZUL, marginTop: 6, marginBottom: 4 }}>DE 3,01 A 4,00 — ACOMPANHAMENTO</Text>
+        <TabelaFmeaPdf itens={fmea.acompanhamento} vazio="Nenhum fator entre 3,01 e 4,00." />
+      </Page>
+
+      {/* Página 4 — matriz de decisão */}
+      <Page size="A4" orientation="landscape" style={s.page}>
+        {cab}
+        <Secao numero={4} titulo="Matriz de decisão por setor e fator" />
         <View style={{ flexDirection: "row", backgroundColor: "#f4f4f5", paddingVertical: 4, fontWeight: 700, color: "#52525b" }} fixed>
           <Text style={{ width: "14%", paddingHorizontal: 3 }}>Setor</Text>
           <Text style={{ width: "20%", paddingHorizontal: 3 }}>Fator</Text>
@@ -395,7 +568,7 @@ export async function gerarRelatorioFrprtPdf(params: {
       {/* Página 4 — PGR, fontes e metodologia */}
       <Page size="A4" orientation="landscape" style={s.page}>
         {cab}
-        <Secao numero={4} titulo="Riscos existentes que vão para o PGR" />
+        <Secao numero={5} titulo="Riscos existentes que vão para o PGR" />
         {pgr.length === 0 ? (
           <Text>Nenhum fator acima de 4,00.</Text>
         ) : (
@@ -407,7 +580,14 @@ export async function gerarRelatorioFrprtPdf(params: {
             >
               <Text style={{ fontWeight: 700, fontSize: 9.5 }}>
                 {r.setor} · {r.fator.nome} — índice {formatarRisco(r.celula.final!)}
+                {r.celula.fmea ? ` · prioridade ${PRIORIDADES[r.celula.fmea.prioridade].rotulo}` : ""}
               </Text>
+              {r.celula.fmea && r.prazos && (
+                <Text style={{ fontSize: 7.5, color: PRIORIDADES[r.celula.fmea.prioridade].cor }}>
+                  FMEA: S {r.celula.fmea.s} · O {r.celula.fmea.o} · D {r.celula.fmea.d} · RPN {r.celula.fmea.rpn} —{" "}
+                  {textoPrazos(r.prazos)}
+                </Text>
+              )}
               <Text style={s.pequeno}>Fator de risco PGR: {r.fator.fatorRisco}</Text>
               <Text>Possíveis consequências: {r.apoio.consequencias.join(" ")}</Text>
               <Text>
@@ -423,7 +603,7 @@ export async function gerarRelatorioFrprtPdf(params: {
           ))
         )}
 
-        <Secao numero={5} titulo="Fontes e metodologia" />
+        <Secao numero={6} titulo="Fontes e metodologia" />
         <View style={s.caixa}>
           <Text>
             Eixo 1 — Percepção dos colaboradores:{" "}
@@ -462,9 +642,62 @@ export async function gerarRelatorioFrprtPdf(params: {
           ))}
         </View>
         <Text style={s.pequeno}>
-          Emitido em {new Date().toLocaleDateString("pt-BR")}. A classificação FMEA dos riscos encaminhados ao PGR é
-          etapa posterior de priorização e não substitui a identificação acima.
+          Emitido em {dataLocal(fmea.emitidoEm)}. A classificação FMEA prioriza os fatores identificados; não substitui a
+          avaliação clínica nem estabelece nexo causal individual.
         </Text>
+      </Page>
+
+      {/* Página final — critérios FMEA documentados (NR-1, 1.5.4.4.2) */}
+      <Page size="A4" orientation="landscape" style={s.page}>
+        {cab}
+        <Secao numero={7} titulo="Critérios da classificação FMEA" />
+        <Text style={[s.pequeno, { marginBottom: 6 }]}>
+          Critérios de severidade, probabilidade (ocorrência) e classificação documentados conforme a NR-1, item
+          1.5.4.4.2. Severidade-base validada pelo profissional de SST responsável.
+        </Text>
+        <View style={{ flexDirection: "row" }}>
+          <View style={{ width: "62%", marginRight: 12 }}>
+            <Text style={{ fontWeight: 700, color: AZUL, marginBottom: 3 }}>Severidade-base por fator</Text>
+            {fmea.severidades.map((sv) => (
+              <View key={sv.fator.id} style={s.linha} wrap={false}>
+                <Text style={{ width: "30%", paddingRight: 4 }}>{sv.fator.nome}</Text>
+                <View style={{ width: "6%", alignItems: "center" }}>
+                  {sv.severidade !== null ? <NotaFmea v={sv.severidade} /> : <Text>—</Text>}
+                </View>
+                <Text style={{ width: "64%", fontSize: 7.5, color: "#3f3f46" }}>
+                  {sv.justificativa ? paraPdf(sv.justificativa) : "Sem severidade cadastrada (usa 3)."}
+                </Text>
+              </View>
+            ))}
+            <Text style={[s.pequeno, { marginTop: 4 }]}>
+              Agravantes no setor (+1 cada, até 5): {ROTULO_AGRAVANTE.ATESTADO}; {ROTULO_AGRAVANTE.AFASTAMENTO_LONGO} (só
+              atestado relacionado); {ROTULO_AGRAVANTE.EXPOSTOS}, com média individual 4 ou mais no fator.
+            </Text>
+          </View>
+          <View style={{ width: "38%" }}>
+            <Text style={{ fontWeight: 700, color: AZUL, marginBottom: 3 }}>O · Ocorrência (Eixo 1)</Text>
+            {FAIXAS_O.map((f, i) => (
+              <View key={f} style={{ flexDirection: "row", alignItems: "center", marginBottom: 2 }}>
+                <NotaFmea v={i + 1} />
+                <Text style={{ marginLeft: 5 }}>média {f}</Text>
+              </View>
+            ))}
+            <Text style={{ fontWeight: 700, color: AZUL, marginTop: 8, marginBottom: 3 }}>D · Detecção e controle (Eixo 2)</Text>
+            {FAIXAS_D.map((f, i) => (
+              <View key={f} style={{ flexDirection: "row", alignItems: "center", marginBottom: 2 }}>
+                <NotaFmea v={i + 1} />
+                <Text style={{ marginLeft: 5 }}>{f}</Text>
+              </View>
+            ))}
+            <Text style={{ fontWeight: 700, color: AZUL, marginTop: 8, marginBottom: 3 }}>Prioridade e prazos</Text>
+            {(Object.keys(REGRA_PRAZOS) as Prioridade[]).map((pr) => (
+              <View key={pr} style={{ flexDirection: "row", alignItems: "center", marginBottom: 3 }}>
+                <Prio p={pr} />
+                <Text style={{ marginLeft: 5, flex: 1 }}>{REGRA_PRAZOS[pr].texto}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
       </Page>
     </Document>
   );
