@@ -19,6 +19,7 @@ import {
   Tratativas,
   periodoCurto,
 } from "./componentes";
+import { CriteriosFmea, MapaSO, PilulaPrioridade, TabelaFmea, TextoPrazos } from "./fmea";
 
 export const dynamic = "force-dynamic";
 
@@ -64,7 +65,7 @@ export default async function PainelFrprtPage({
     );
   }
 
-  const { opcoes, fatores, limite, linhas, principais, pgr, avaliacaoIncompleta, geral, achados } = painel;
+  const { opcoes, fatores, limite, linhas, principais, pgr, avaliacaoIncompleta, geral, achados, fmea } = painel;
   const query = new URLSearchParams(Object.entries(sp).filter(([, v]) => v) as [string, string][]).toString();
   const avisos: string[] = [];
   if (!opcoes.pesquisa) avisos.push("Nenhuma pesquisa do questionário atual — sem Eixo 1 não há score.");
@@ -229,9 +230,63 @@ export default async function PainelFrprtPage({
         )}
       </section>
 
-      {/* 3 — matriz de decisão */}
+      {/* 3 — FMEA: prioridade de ação para o PGR */}
+      <section className="mb-12" aria-label="Matriz FMEA">
+        <TituloSecao
+          numero={3}
+          titulo="Matriz FMEA — prioridade de ação"
+          sub={`Severidade × Ocorrência × Detecção, com prazos contados da emissão (${fmea.emitidoEm.toLocaleDateString("pt-BR")})`}
+        />
+        {fmea.severidadeIncompleta && (
+          <p className="mb-4 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+            Há fatores sem severidade cadastrada pelo administrador — usando 3 provisoriamente.
+          </p>
+        )}
+        <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-8 items-start mb-8">
+          <div>
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-[#183b56] mb-3">Mapa S × O</h3>
+            <MapaSO contagem={fmea.contagemSO} />
+            <p className="text-xs text-zinc-500 mt-2 max-w-xs">
+              Quantidade de setor × fator acima de 3,00 em cada combinação. A cor é o nível base, antes do ajuste pela
+              detecção.
+            </p>
+          </div>
+          <div className="flex flex-col gap-3 text-sm text-zinc-700">
+            <p>
+              <strong>S · Severidade</strong>: gravidade do dano típico do fator (1–5), agravada no setor por atestado
+              CID-F relacionado ao trabalho, afastamento acima de 15 dias e 50% ou mais dos respondentes expostos.
+            </p>
+            <p>
+              <strong>O · Ocorrência</strong>: média do Eixo 1 no fator. <strong>D · Detecção</strong>: medidas de
+              controle do Eixo 2 (1 = eficazes, 5 = inexistentes).
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {(["ALTA", "MEDIA", "BAIXA"] as const).map((p) => (
+                <span key={p} className="flex items-center gap-1.5 text-xs text-zinc-600">
+                  <PilulaPrioridade prioridade={p} />
+                  {[...fmea.pgr, ...fmea.acompanhamento].filter((i) => i.fmea.prioridade === p).length}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-[#183b56] mb-3">
+          Acima de 4,00 — plano de ação no PGR
+        </h3>
+        <TabelaFmea itens={fmea.pgr} vazio="Nenhum fator acima de 4,00." />
+
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-[#183b56] mt-8 mb-3">
+          De 3,01 a 4,00 — acompanhamento
+        </h3>
+        <TabelaFmea itens={fmea.acompanhamento} vazio="Nenhum fator entre 3,01 e 4,00." />
+
+        <CriteriosFmea severidades={fmea.severidades} />
+      </section>
+
+      {/* 4 — matriz de decisão */}
       <section className="mb-10" aria-label="Matriz de decisão">
-        <TituloSecao numero={3} titulo="Matriz de decisão" sub="Cada fator de cada setor: os três eixos, o resultado e o encaminhamento" />
+        <TituloSecao numero={4} titulo="Matriz de decisão" sub="Cada fator de cada setor: os três eixos, o resultado e o encaminhamento" />
         <div className="overflow-x-auto rounded-lg border border-zinc-200">
           <table className="w-full text-sm">
             <thead className="bg-zinc-50 text-xs text-zinc-500">
@@ -287,10 +342,12 @@ export default async function PainelFrprtPage({
         <p className="text-xs text-zinc-500 mt-2">* Setor fora da avaliação do Eixo 2: entra como ×1,00.</p>
       </section>
 
-      {/* 4 — PGR */}
+      {/* 5 — PGR */}
       <section aria-label="Riscos para o PGR">
-        <TituloSecao numero={4} titulo="Riscos existentes que vão para o PGR" />
-        <p className="text-sm text-zinc-500 mb-3">Apenas resultados finais acima de 4,00 — respeitando os filtros.</p>
+        <TituloSecao numero={5} titulo="Riscos existentes que vão para o PGR" />
+        <p className="text-sm text-zinc-500 mb-3">
+          Apenas resultados finais acima de 4,00, na ordem de prioridade da FMEA — respeitando os filtros.
+        </p>
         {pgr.length === 0 ? (
           <p className="text-sm text-zinc-500">Nenhum fator acima de 4,00.</p>
         ) : (
@@ -302,9 +359,16 @@ export default async function PainelFrprtPage({
                     {r.setor} · {r.fator.nome}
                   </h3>
                   <span className="flex items-center gap-2 text-sm">
+                    {r.celula.fmea && <PilulaPrioridade prioridade={r.celula.fmea.prioridade} />}
                     <Risco valor={r.celula.final} conclusao={r.celula.conclusao} grande />
                   </span>
                 </div>
+                {r.celula.fmea && r.prazos && (
+                  <p className="text-xs text-zinc-600 mb-2">
+                    FMEA: S {r.celula.fmea.s} · O {r.celula.fmea.o} · D {r.celula.fmea.d} · RPN {r.celula.fmea.rpn} —{" "}
+                    <TextoPrazos prazos={r.prazos} />
+                  </p>
+                )}
                 <p className="text-xs text-zinc-500 mb-3">Fator de risco PGR: {r.fator.fatorRisco}</p>
                 <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-sm">
                   <div>

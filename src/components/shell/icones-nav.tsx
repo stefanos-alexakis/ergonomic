@@ -32,6 +32,8 @@ const CAMINHOS: Record<NonNullable<ItemNav["icone"]>, ReactNode> = {
   painel: <path d="M4 20h16M7 16v-5M12 16V7M17 16v-8" />,
   // prédio
   empresas: <path d="M4 21V5l8-2v18M12 9h8v12M4 21h16M7 8h2M7 12h2M7 16h2M15 13h2M15 17h2" />,
+  // alerta (severidade)
+  severidade: <path d="M12 3 2 20h20L12 3zM12 10v4M12 17h0" />,
   // balança
   pesos: <path d="M12 4v16M6 20h12M5 8h14M5 8l-2 6a3 3 0 0 0 4 0L5 8zM19 8l-2 6a3 3 0 0 0 4 0l-2-6z" />,
 };

@@ -61,7 +61,7 @@ export type Agravante = "ATESTADO" | "AFASTAMENTO_LONGO" | "EXPOSTOS";
 export const ROTULO_AGRAVANTE: Record<Agravante, string> = {
   ATESTADO: "atestado relacionado ao trabalho",
   AFASTAMENTO_LONGO: `afastamento acima de ${DIAS_AFASTAMENTO_LONGO} dias`,
-  EXPOSTOS: `${Math.round(PARCELA_EXPOSTOS * 100)}% ou mais dos respondentes expostos`,
+  EXPOSTOS: `respondentes expostos (${Math.round(PARCELA_EXPOSTOS * 100)}% ou mais)`,
 };
 
 export type EntradaSeveridade = {

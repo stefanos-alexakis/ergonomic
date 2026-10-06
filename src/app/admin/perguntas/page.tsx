@@ -3,15 +3,13 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { getActor } from "@/lib/tenant";
 import { AppShell } from "@/components/shell/app-shell";
+import { NAV_ADMIN } from "@/components/shell/nav-gestor";
 import { PageHeader } from "@/components/ui/page-header";
 import { PesosForm } from "./form";
 
 export const dynamic = "force-dynamic";
 
-const NAV = [
-  { href: "/admin", label: "Empresas", icone: "empresas" as const, ativoEm: ["/admin/empresas"] },
-  { href: "/admin/perguntas", label: "Pesos das perguntas", icone: "pesos" as const },
-];
+const NAV = NAV_ADMIN;
 
 export default async function PerguntasPage({ searchParams }: { searchParams: Promise<{ eixo?: string }> }) {
   // Não depender só do middleware — mesmo padrão de carregarEmpresaOuNotFound.

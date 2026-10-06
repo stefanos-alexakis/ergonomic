@@ -2,6 +2,7 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { getActor } from "@/lib/tenant";
 import { AppShell } from "@/components/shell/app-shell";
+import { NAV_ADMIN } from "@/components/shell/nav-gestor";
 import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
 import { Table, Thead, Th, Tr, Td } from "@/components/ui/table";
@@ -12,10 +13,7 @@ import { assumirVisaoGestorAction } from "./actions";
 // nunca deve ser pré-renderizada estaticamente no build.
 export const dynamic = "force-dynamic";
 
-const NAV = [
-  { href: "/admin", label: "Empresas", icone: "empresas" as const, ativoEm: ["/admin/empresas"] },
-  { href: "/admin/perguntas", label: "Pesos das perguntas", icone: "pesos" as const },
-];
+const NAV = NAV_ADMIN;
 
 export default async function AdminHomePage() {
   const actor = await getActor();
