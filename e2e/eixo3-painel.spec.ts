@@ -140,7 +140,7 @@ test("Eixo 3 publicado e Painel FRPRT com o cruzamento dos três eixos", async (
     name: "ocorrencias.xlsx",
     mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     buffer: await planilhaOcorrencias([
-      ["producao", "F51.2", "Ciclo vigília-sono", "10/03/2025", 5, "Sim", "Escalas noturnas"],
+      ["producao", "F51.2", "Ciclo vigília-sono", "10/03/2025", 20, "Sim", "Escalas noturnas"],
       ["PRODUÇÃO", "F43.1", "TEPT", "12/05/2025", 15, "Não", null],
       ["Galpão Norte", "F41", "Ansiedade", "20/06/2025", 3, "Inconclusivo", null],
     ]),
@@ -191,6 +191,23 @@ test("Eixo 3 publicado e Painel FRPRT com o cruzamento dos três eixos", async (
   await expect(matriz.locator("tr", { hasText: "5. Horários e Jornada" }).getByText("4,95")).toBeVisible();
   await expect(matriz.locator("tr", { hasText: "10. Equilíbrio Trabalho-Vida" }).getByText("4,40")).toBeVisible();
   await expect(matriz.locator("tr", { hasText: "1. Instrução de Trabalho" }).getByText("4,00").first()).toBeVisible();
+
+  // FMEA (à mão): Horários — S 4 +1 atestado +1 afastamento de 20 dias +1 expostos (100%) → 5 (teto);
+  // O 5 (média 5,00); D 3 (Eixo 2 ×0,90) → matriz S5×O5 Alta, D 3 mantém → Alta, RPN 75.
+  // Equilíbrio — S 3+3 → 5; O 5; D 1 (×0,80) desce um nível → Média, RPN 25.
+  // Instrução de Trabalho (índice 4,00, acompanhamento) — S 2 +1 expostos = 3; O 5; D 1 → Média, RPN 15.
+  const fmea = page.getByRole("region", { name: "Matriz FMEA" });
+  const horarios = fmea.locator("tr", { hasText: "Produção · 5. Horários e Jornada" });
+  await expect(horarios.getByText("Alta", { exact: true })).toBeVisible();
+  await expect(horarios.getByText("75", { exact: true })).toBeVisible();
+  await expect(horarios).toContainText("afastamento acima de 15 dias");
+  await expect(horarios).toContainText("Plano até");
+  const equilibrio = fmea.locator("tr", { hasText: "Produção · 10. Equilíbrio Trabalho-Vida" });
+  await expect(equilibrio.getByText("Média", { exact: true })).toBeVisible();
+  await expect(equilibrio.getByText("25", { exact: true })).toBeVisible();
+  const instrucao = fmea.locator("tr", { hasText: "Produção · 1. Instrução de Trabalho" });
+  await expect(instrucao.getByText("Média", { exact: true })).toBeVisible();
+  await expect(instrucao.getByText("15", { exact: true })).toBeVisible();
 
   const pgr = page.getByRole("region", { name: "Riscos para o PGR" });
   await expect(pgr.locator("article")).toHaveCount(2);

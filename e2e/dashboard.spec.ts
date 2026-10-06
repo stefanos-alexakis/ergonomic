@@ -139,7 +139,10 @@ test("painel do gestor: estado insuficiente, depois contagem e supressão corret
   await expect(page.getByTestId("contador-concluidas")).toHaveText("17");
   await expect(page.getByTestId("contador-iniciadas")).toHaveText("17");
   await expect(page.getByTestId("contador-distribuidos")).toHaveText("37"); // 20 do botão + 17 semeados
-  await expect(page.getByText(/Média geral de risco: 3\.00/)).toBeVisible();
+  // Índice geral do Eixo 1 em destaque (a escala de notas 100–1000 saiu do sistema).
+  const destaque = page.locator("div", { hasText: /^3,00.*Índice geral do Eixo 1/ }).first();
+  await expect(destaque).toBeVisible();
+  await expect(destaque).toContainText("Baixo risco");
 
   const linhaGrande = page.locator("tr", { hasText: "Setor Grande E2E" });
   await expect(linhaGrande).toBeVisible();
