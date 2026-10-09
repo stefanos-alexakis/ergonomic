@@ -12,6 +12,8 @@ Em produção: **https://pesquisa.agtrade.com.br**
 | [Guia rápido do Score](score-frprt.html) | Todos | Uma página, com régua e exemplos. Abra no navegador. |
 | [Manual de uso](manual-de-uso.md) | Admin e gestores | Passo a passo de cada tela. |
 | [Metodologia e cálculos](metodologia.md) | Técnico SST, consultoria | Fórmulas, cortes, FMEA, regras de anonimato e da matriz CID. |
+| [Metodologia final (Word)](Metodologia-FRPRT.docx) | Cliente, consultoria | Documento final validado (v1.0, out/2026), com exemplos e anexos. Mesmo texto do relatório completo ([versão Markdown](metodologia-final.md)). |
+| [Inclusão dos CIDs Z no Eixo 3 (Word)](Inclusao-CIDs-Z-Eixo3.docx) | Cliente | Proposta de classificação dos CIDs do capítulo Z, aguardando validação. |
 | [Proposta da Matriz FMEA](proposta-fmea.html) | Consultoria | Severidade por fator com evidências, agravantes, matriz e prazos. |
 | [Arquitetura](arquitetura.md) | Desenvolvimento | Stack, pastas, modelo de dados, segurança e LGPD. |
 | [Operação](operacao.md) | Desenvolvimento / TI | Ambiente local, testes, publicação, backup. |
