@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { rm } from "node:fs/promises";
 import { join } from "node:path";
-import { validarImagem, salvarLogoWorkspace } from "@/lib/upload";
+import { validarImagem, salvarLogoWorkspace, lerUpload } from "@/lib/upload";
 
 function arquivo(bytes: number[], nome: string, tipo: string): File {
   return new File([Uint8Array.from(bytes)], nome, { type: tipo });
@@ -42,7 +42,7 @@ describe("validarImagem — validação por conteúdo real, sem tocar em disco (
   });
 });
 
-describe("salvarLogoWorkspace — grava em public/uploads de verdade", () => {
+describe("salvarLogoWorkspace — grava em uploads/ (fora de public/) de verdade", () => {
   it("grava o arquivo e devolve um caminho público, sem sobrar nada depois do teste", async () => {
     const png = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0];
     const r = await salvarLogoWorkspace(arquivo(png, "logo.png", "image/png"));
@@ -50,10 +50,31 @@ describe("salvarLogoWorkspace — grava em public/uploads de verdade", () => {
     if (!r.ok) return;
 
     expect(r.caminhoPublico).toMatch(/^\/uploads\/[\w-]+\.png$/);
+    const lido = await lerUpload(r.caminhoPublico);
+    expect(lido?.contentType).toBe("image/png");
+    expect(lido?.buffer.length).toBe(png.length);
 
     // Limpeza cirúrgica: apaga só o arquivo que este teste criou, pelo
     // nome exato devolvido — nunca a pasta inteira (foi isso que apagou
     // um logo real numa sessão anterior, ver review.md §6.10).
-    await rm(join(process.cwd(), "public", r.caminhoPublico), { force: true });
+    await rm(join(process.cwd(), r.caminhoPublico), { force: true });
+  });
+});
+
+describe("lerUpload — só lê nomes no formato gerado (contra path traversal)", () => {
+  it.each([
+    "../.env",
+    "/uploads/../../.env",
+    "..%2F.env",
+    "logo.png",
+    "3c3a2fdf-44d1-40e0-bac3-9264735becca.svg",
+    "3c3a2fdf-44d1-40e0-bac3-9264735becca.png/../x",
+    "",
+  ])("recusa %s", async (nome) => {
+    expect(await lerUpload(nome)).toBeNull();
+  });
+
+  it("devolve null para um nome válido que não existe", async () => {
+    expect(await lerUpload("/uploads/00000000-0000-0000-0000-000000000000.png")).toBeNull();
   });
 });

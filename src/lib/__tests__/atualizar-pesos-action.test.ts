@@ -17,6 +17,7 @@ const { getActor, updateMany, transaction } = vi.hoisted(() => {
 });
 
 vi.mock("@/lib/tenant", () => ({ getActor }));
+vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("@/lib/db", () => ({ db: { $transaction: transaction } }));
 
 import { atualizarPesosAction } from "@/app/admin/perguntas/actions";
@@ -47,14 +48,13 @@ describe("atualizarPesosAction", () => {
     expect(transaction).not.toHaveBeenCalled();
   });
 
-  it("admin da plataforma atualiza, restrito ao questionário ativo", async () => {
+  it("admin da plataforma atualiza, restrito ao questionário ativo (peso e marcação do PGR)", async () => {
     getActor.mockResolvedValue({ userId: "admin", isPlatformAdmin: true });
-    const r = await atualizarPesosAction(undefined, form({ peso_p1: "2,5" }));
+    const r = await atualizarPesosAction(undefined, form({ peso_p1: "2,5", peso_p2: "1", pgr_p2: "on" }));
     expect(r).toEqual({ sucesso: true });
-    expect(updateMany).toHaveBeenCalledWith({
-      where: { id: "p1", fatorRisco: { dimensao: { bloco: { questionario: { ativo: true } } } } },
-      data: { peso: 2.5 },
-    });
+    const ativo = { fatorRisco: { dimensao: { bloco: { questionario: { ativo: true } } } } };
+    expect(updateMany).toHaveBeenCalledWith({ where: { id: "p1", ...ativo }, data: { peso: 2.5, vaiParaPgr: false } });
+    expect(updateMany).toHaveBeenCalledWith({ where: { id: "p2", ...ativo }, data: { peso: 1, vaiParaPgr: true } });
   });
 
   it("pergunta de versão anterior (0 linhas afetadas) vira erro amigável, sem sucesso parcial", async () => {

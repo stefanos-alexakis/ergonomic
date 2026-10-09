@@ -4,13 +4,21 @@ import { redirect } from "next/navigation";
 import { getActor } from "@/lib/tenant";
 import { getWorkspaceDoGestor, criarPesquisa } from "@/lib/pesquisa";
 import { db } from "@/lib/db";
+import { lerOrientacao, valoresDigitados } from "@/lib/orientacao";
 
-export type EstadoCriarPesquisa = { erro?: string } | undefined;
+export type EstadoCriarPesquisa = { erro?: string; valores?: Record<string, string> } | undefined;
+
+const CAMPOS = ["nome", "licencas", "dataInicio", "dataFim", "videoYoutube", "textoOrientacao", "exibirPrePesquisa"];
 
 export async function criarPesquisaAction(
   _estadoAnterior: EstadoCriarPesquisa,
   formData: FormData,
 ): Promise<EstadoCriarPesquisa> {
+  const resultado = await criar(formData);
+  return resultado && { ...resultado, valores: valoresDigitados(formData, CAMPOS) };
+}
+
+async function criar(formData: FormData): Promise<{ erro: string } | undefined> {
   const actor = await getActor();
   if (!actor) return { erro: "Sem sessão." };
 
@@ -33,6 +41,9 @@ export async function criarPesquisaAction(
     return { erro: "Datas inválidas." };
   }
 
+  const orientacao = lerOrientacao(formData);
+  if (!orientacao.ok) return { erro: orientacao.erro };
+
   const resultado = await criarPesquisa({
     workspaceId: workspace.id,
     questionarioId: questionario.id,
@@ -40,6 +51,7 @@ export async function criarPesquisaAction(
     dataInicio,
     dataFim,
     licencasSolicitadas: licencas,
+    orientacao: orientacao.dados,
   });
 
   if (!resultado.ok) return { erro: resultado.erro };

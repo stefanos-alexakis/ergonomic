@@ -90,13 +90,13 @@ export function Regua({ risco }: { risco: number }) {
       </div>
       <div className="flex text-[11px] mt-1">
         <span className="w-1/2 font-medium" style={{ color: CONCLUSOES.SEM_RISCO.cor }}>
-          Baixo risco
+          Índice baixo
         </span>
         <span className="w-1/4 font-medium" style={{ color: CONCLUSOES.CONTROLE.cor }}>
-          Médio risco
+          Índice médio
         </span>
         <span className="w-1/4 font-medium text-right" style={{ color: CONCLUSOES.RISCO_EXISTENTE.cor }}>
-          Alto risco → PGR
+          Índice alto → plano de ação
         </span>
       </div>
     </div>
@@ -133,7 +133,7 @@ export function CartaoGeral({ geral }: { geral: ResultadoGeral }) {
             <p className="text-lg font-bold leading-tight" style={{ color: c.cor }}>
               {c.rotulo}
             </p>
-            <p className="text-sm text-zinc-700">{c.curto} · índice de 1 a 5</p>
+            <p className="text-sm text-zinc-700">{c.curto} · escala de 1 a 5</p>
           </div>
         </div>
         <p className="text-sm text-zinc-800 mt-3">{c.descricao}</p>
@@ -141,8 +141,8 @@ export function CartaoGeral({ geral }: { geral: ResultadoGeral }) {
       <Regua risco={geral.final} />
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         <Numero valor={geral.setoresAvaliados} rotulo="setores avaliados" />
-        <Numero valor={geral.setoresEmRisco} rotulo="setores em risco alto" />
-        <Numero valor={geral.fatoresPgr} rotulo="itens para o PGR" />
+        <Numero valor={geral.setoresEmRisco} rotulo="setores com índice alto" />
+        <Numero valor={geral.fatoresPgr} rotulo="situações no PGR" />
         <Numero
           valor={geral.participacao !== null ? `${Math.round(geral.participacao * 100)}%` : "—"}
           rotulo="participação"
@@ -174,7 +174,7 @@ export function CartoesSetores({ linhas, limite }: { linhas: LinhaSetorPainel[];
                 {c ? (
                   <p className="text-xs font-medium" style={{ color: c.cor }}>
                     {c.curto}
-                    {l.fatoresEmRisco > 0 ? ` · ${l.fatoresEmRisco} p/ PGR` : ""}
+                    {l.situacoesPgr > 0 ? ` · ${l.situacoesPgr} no PGR` : ""}
                   </p>
                 ) : (
                   <p className="text-xs text-zinc-500">

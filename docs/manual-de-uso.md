@@ -17,9 +17,14 @@ Acesso: **https://pesquisa.agtrade.com.br/login** (admin e gestor). O colaborado
   automaticamente, conforme o contraste.
 - **Gestor responsável** (nome, e-mail e senha inicial).
 
-### 1.2 Editar ou inativar uma empresa
-Clique no nome da empresa na lista. Dá para trocar nome, logo e cores, e inativar. O gestor de
-uma empresa inativa não consegue entrar.
+### 1.2 Editar, inativar ou excluir uma empresa
+Clique no nome da empresa na lista. Dá para trocar nome, logo e cores, e inativar. Na própria lista,
+ao lado do status, os botões **inativar** / **ativar** mudam o status direto. O gestor de uma empresa
+inativa não consegue entrar.
+
+**Excluir** fica no fim da tela de edição e só aparece com a empresa **inativa**. A tela mostra tudo o
+que será apagado (pesquisas e respostas, Eixos 2 e 3, plano de ação, setores, logo e os gestores que
+só pertencem a ela) e pede que você digite o nome da empresa. A exclusão é definitiva.
 
 ### 1.3 Redefinir a senha do gestor
 Na tela de edição da empresa, quadro **Redefinir senha do gestor**. Informe a nova senha e repasse ao gestor.
@@ -51,9 +56,20 @@ usuário. O histórico de cada ação registra o nome com a marca "(consultoria)
 
 ---
 
+
+### 1.8 Consultores e textos do relatório
+- **Consultores** — quem assina o relatório completo: nome, formação, registro profissional, cargo e
+  e-mail. Vale para todas as empresas. Relatórios já emitidos guardam uma cópia dos dados: editar ou
+  excluir o consultor não os altera.
+- **Textos do relatório** — o dossiê da legislação. Enquanto estiver vazio, o relatório mostra "em
+  elaboração". Linha em branco separa parágrafos; "# " vira subtítulo e "- " vira item de lista.
+- A **metodologia** do relatório é gerada pelo sistema com as regras vigentes (mínimo de respostas,
+  prazos, severidades e situações do PGR). O mesmo texto está em `docs/metodologia-final.md`
+  (gerado por `npx tsx scripts/gerar-metodologia.ts`).
+
 ## 2. Gestor da empresa
 
-O menu do gestor tem: **Pesquisas · Setores e departamentos · Eixo 2 · Eixo 3 · Painel FRPRT**.
+O menu do gestor tem: **Eixo 1 · Pesquisa com os colaboradores · Setores e departamentos · Eixo 2 · Eixo 3 · Painel FRPRT**.
 A ordem recomendada de trabalho é a do menu.
 
 ### 2.1 Setores e departamentos
@@ -62,7 +78,7 @@ A ordem recomendada de trabalho é a do menu.
   pesquisa e a taxa de atestados no painel.
 
 ### 2.2 Criar uma pesquisa (Eixo 1)
-**Pesquisas → + Nova pesquisa**: nome, quantidade de licenças, data/hora de início e de
+**Eixo 1 · Pesquisa com os colaboradores → + Nova pesquisa**: nome, quantidade de licenças, data/hora de início e de
 encerramento.
 
 Na página da pesquisa:
@@ -82,14 +98,40 @@ Regras de acesso do colaborador:
   para terminar.
 - Código concluído não pode ser respondido de novo.
 
+
+### 2.2.1 Vídeo, texto de orientação e pré-pesquisa
+Na criação da pesquisa (ou depois, em **Editar orientação e pré-pesquisa**, na página da pesquisa):
+
+- **Vídeo orientativo:** cole o link do YouTube (qualquer formato: `youtube.com/watch?v=…`, `youtu.be/…`,
+  `shorts/…`). Outros sites são recusados. O vídeo é exibido no modo de privacidade do YouTube.
+- **Texto de orientação:** texto simples, até 3.000 caracteres.
+- Vídeo e texto aparecem no topo da tela **Onde você trabalha**, que todo colaborador vê uma vez antes do
+  questionário.
+- **Exibir a pré-pesquisa:** 8 perguntas de perfil (tempo de empresa, idade, sexo, peso, altura, bebidas,
+  outra atividade remunerada, apostas). Quando ligada, é **obrigatória**: não há botão de pular e todas
+  as perguntas precisam de resposta; só a pergunta sobre sexo tem "Prefiro não responder". Idade, peso e
+  altura são perguntados em faixas. Se for ligada com a coleta em andamento, quem já começou o
+  questionário não a vê.
+- **Resultado:** no painel da pesquisa e no relatório PDF, o quadro **Perfil dos participantes** mostra só os
+  totais da pesquisa inteira, separados do questionário, e fica oculto com menos de 3 pré-pesquisas. O
+  cruzamento com setor e com o índice do Eixo 1 existe só na área do administrador
+  (**Pré-pesquisa (cruzamentos)**).
+
 ### 2.3 Painel e relatório da pesquisa
 Mostra o **índice geral do Eixo 1** (média de 1 a 5, quanto maior, mais exposição), com a mesma
-régua de cores do Painel FRPRT: até 3,00 baixo risco (verde), até 4,00 médio risco (amarelo), acima
-alto risco (vermelho). Também mostra participação, resultados
+régua de cores do Painel FRPRT: até 3,00 índice baixo (verde), até 4,00 índice médio (amarelo), acima
+índice alto (vermelho). Também mostra participação, resultados
 por fator, por setor e por departamento, e **Baixar relatório (PDF)**.
-Setores ou departamentos com menos de 5 respostas aparecem como **amostra insuficiente**. Isso
+Setores ou departamentos com menos de 3 respostas aparecem como **amostra insuficiente**. Isso
 protege o anonimato e não pode ser desligado.
 
+
+**Distribuição das respostas (pergunta a pergunta)** — botão no painel da pesquisa. Mostra, para cada
+uma das 35 perguntas, agrupadas pelos 13 fatores, quantas pessoas marcaram cada opção (Nunca a Sempre)
+e o % de expostos, com o índice do fator ao lado. Filtro por setor ("Todos os setores" por padrão);
+setores abaixo do mínimo de respostas não aparecem separados. Em vermelho, as perguntas em que 50% ou
+mais marcaram Frequentemente ou Sempre (definição de exposto da metodologia). **Baixar Excel** gera
+uma aba "Todos" e uma aba por setor.
 ### 2.4 Eixo 2 · Medidas de controle
 **Eixo 2 → + Nova avaliação**
 1. **Confirme os setores** avaliados.
@@ -129,14 +171,17 @@ O que aparece, nesta ordem:
 2. **Pontuação dos setores** — um cartão por setor.
 3. **Painel resumido por setor** — tabela com as barras de cada eixo e o score final.
 4. **Principais achados** — frases curtas, fatores mais apontados e tratativas sugeridas.
-5. **Matriz FMEA — prioridade de ação** — mapa Severidade × Ocorrência e duas listas: acima de 4,00
-   (plano de ação no PGR) e de 3,01 a 4,00 (acompanhamento). Cada item traz S, O, D, RPN, a
+5. **Matriz FMEA — prioridade de ação** — mapa Severidade × Ocorrência e duas listas: **PGR**
+   (situações inerentes à função acima de 3,00) e **fatores acima de 3,00 → plano de ação**. Cada item traz S, O, D, RPN, a
    prioridade (Alta, Média, Baixa) e as **datas** de plano, implantação e reavaliação, contadas a
    partir do dia em que o painel ou o relatório é emitido. Em "Critérios da classificação FMEA" estão
    a tabela de severidade e as regras.
-6. **Matriz de decisão** — cada fator de cada setor com conclusão e encaminhamento.
-7. **Riscos que vão para o PGR** — na ordem de prioridade da FMEA, com prazos, consequências
-   possíveis, CIDs compatíveis, observação técnica e plano de ação.
+6. **Matriz de decisão** — cada fator de cada setor com conclusão e encaminhamento, por setor e depois
+   por fator (1–13). Quando uma situação daquele fator vai para o PGR, aparece "PGR: situação N".
+7. **Riscos que vão para o PGR** — só as situações inerentes à função (marcadas "PGR" pelo
+   administrador em **Pesos das perguntas**) com índice próprio no setor acima de 3,00. Os demais
+   fatores, mesmo com nota alta, ficam fora do PGR e vão para o plano de ação. Na ordem da FMEA, com
+   prazos, consequências possíveis, CIDs compatíveis, observação técnica e plano de ação.
 
 **Baixar relatório (PDF)** gera o mesmo conteúdo para anexar ao PGR. Como ler os números: veja o
 [Guia rápido do Score](score-frprt.html). Onde o fator já tem ação no Plano de ação, o painel e o
@@ -150,8 +195,10 @@ Um plano contínuo da empresa, que atravessa os ciclos de pesquisa e avaliação
   em vários setores (por exemplo, "responder para todos") viram **uma** ação com vários setores.
   Gerar de novo não duplica nem apaga o que foi editado, e ações canceladas não voltam. A ação já
   nasce com a prioridade da FMEA e prazos sugeridos.
-- **Fatores que vão para o PGR sem ação** — lista em vermelho no topo, com **Criar ação** já
-  preenchida com setor, fator e uma tratativa sugerida.
+- **Situações que vão para o PGR sem ação** — lista em vermelho no topo, com **Criar ação** já
+  preenchida com setor, fator, situação (no "por quê") e uma tratativa sugerida. A ação criada por
+  ali fica ligada à situação. Uma situação conta como coberta por ação gerada da própria questão do
+  Eixo 2 ou por ação manual do mesmo fator.
 - **+ Nova ação** — ação manual.
 
 **5W2H** (todos editáveis, inclusive os prazos): o quê, por quê, onde (setores), quem (responsável e
@@ -180,6 +227,20 @@ Se duas pessoas editarem a mesma ação ao mesmo tempo, a segunda recebe o aviso
 página — nada é sobrescrito sem ver.
 
 ---
+
+
+### 2.8 Relatório completo
+No Painel FRPRT, botão **Relatório completo**. O documento traz capa (empresa e logo), sumário, dossiê da
+legislação, metodologia e anonimato, Eixo 1 por setor e fator, Eixo 2 (fatores e planos registrados),
+Eixo 3 (indicadores por setor, sem identificação), as páginas do Painel FRPRT (índices, FMEA e PGR), o
+plano de ação, a conclusão do consultor e os responsáveis técnicos.
+
+- **Consultoria** (admin na visão de gestor): escolhe as fontes (mais recente, uma específica ou "não
+  considerar"), escreve a conclusão, marca quem assina, **salva o rascunho** e pode **pré-visualizar**.
+  **Emitir versão N** grava o PDF (os prazos da FMEA contam da data de emissão). Cada emissão é uma nova
+  versão; as anteriores continuam disponíveis. A assinatura digital é feita depois, sobre o PDF emitido.
+- **Gestor da empresa**: vê a lista de versões emitidas e baixa os PDFs.
+- O logo em WebP não aparece no PDF (formato não aceito pelo gerador): envie PNG ou JPG.
 
 ## 3. Colaborador
 

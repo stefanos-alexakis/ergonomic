@@ -64,7 +64,7 @@ test("gestor cria pesquisa e importa estrutura organizacional por planilha", asy
   await linhaPesquisa.getByRole("link", { name: "Pesquisa E2E 2026" }).click();
   await page.getByRole("button", { name: "Gerar licenças e códigos de acesso" }).click();
   await expect(page.getByText("Agendada", { exact: true })).toBeVisible();
-  await page.getByRole("link", { name: "Pesquisas" }).click();
+  await page.getByRole("link", { name: "Eixo 1 · Pesquisa com os colaboradores" }).click();
 
   // 3b. Tentar criar outra pesquisa com o MESMO nome tem que ser recusado —
   // o nome vira o slug da URL pública, então duas pesquisas com o mesmo

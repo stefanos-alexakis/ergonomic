@@ -42,7 +42,9 @@ export function FormularioAcao({
   setores,
   fatores,
   somenteLeitura,
+  questaoEixo2Id,
 }: {
+  questaoEixo2Id?: string;
   acaoId?: string;
   versao?: string;
   valores: ValoresAcao;
@@ -56,6 +58,7 @@ export function FormularioAcao({
   return (
     <form action={formAction} className="flex flex-col gap-5">
       {versao && <input type="hidden" name="versao" value={versao} />}
+      {questaoEixo2Id && <input type="hidden" name="questaoEixo2Id" value={questaoEixo2Id} />}
       <fieldset disabled={somenteLeitura || pendente} className="flex flex-col gap-5">
         <Campo rotulo="O quê" dica="a ação">
           <Textarea name="oque" defaultValue={valores.oque} required minLength={3} maxLength={LIMITES.oque} rows={2} />

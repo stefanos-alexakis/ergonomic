@@ -33,8 +33,8 @@ O questionário v1 (42 perguntas) fica inativo e não entra no Painel FRPRT.
 
 ### Índice do Eixo 1 (painel da pesquisa)
 O painel da pesquisa mostra a própria média de 1 a 5 como **índice**, com a **mesma régua do Painel
-FRPRT** (função `concluir`): até 3,00 baixo risco (verde) · 3,01 a 4,00 médio risco (amarelo) ·
-acima de 4,00 alto risco (vermelho).
+FRPRT** (função `concluir`): até 3,00 índice baixo (verde) · 3,01 a 4,00 índice médio (amarelo) ·
+acima de 4,00 índice alto (vermelho).
 
 > A antiga escala de notas 100–1000 ("Score Base") foi retirada do sistema em outubro de 2026: era
 > só uma conversão do índice e não entrava em nenhum cálculo.
@@ -73,11 +73,47 @@ relação ao trabalho = **Sim**, no setor, com CID compatível com o fator. Caso
 
 | Índice final | Faixa | Conclusão | Encaminhamento |
 |---|---|---|---|
-| até 3,00 | Baixo risco (verde) | Sem risco indicado | Sem inclusão automática |
-| 3,01 a 4,00 | Médio risco (amarelo) | Perigo com controle existente | Acompanhar e manter controle |
-| acima de 4,00 | Alto risco (vermelho) | Risco existente | Plano de ação + inclusão no PGR |
+| até 3,00 | Índice baixo (verde) | Sem risco indicado | Sem inclusão automática |
+| 3,01 a 4,00 | Índice médio (amarelo) | Perigo com controle existente | Acompanhar e manter controle |
+| acima de 4,00 | Índice alto (vermelho) | Risco existente | Plano de ação |
 
 A comparação é feita em centésimos (3,00 calculado nunca "escorrega" para a faixa seguinte).
+
+**Terminologia (cliente, out/2026):** antes da matriz FMEA fala-se em **índice** (índice baixo,
+médio ou alto; índice final). "Risco" aparece depois da classificação FMEA e no PGR (títulos como
+"Riscos existentes que vão para o PGR"), e nas conclusões da metodologia ("Sem risco indicado",
+"Risco existente"). A FMEA continua classificando por **prioridade** (Alta, Média, Baixa).
+
+## O que vai para o PGR (decisão da consultoria, out/2026)
+
+O PGR recebe **só as situações inerentes à função** — as perguntas marcadas "PGR" na tela
+**Pesos das perguntas** do administrador. Hoje são 8:
+
+| Nº | Situação | Fator |
+|---|---|---|
+| 8 | Trabalho monótono: repetitividade, estereotipia, padrão sonoro | 2. Demandas de Trabalho |
+| 10 | Baixas demandas de trabalho / subutilização | 2. Demandas de Trabalho |
+| 12 | Sequência de execução e/ou modo operatório imposto | 3. Controle e Autonomia |
+| 13 | Ritmo imposto por processo contínuo sem pausas | 4. Ritmo e Cadência |
+| 31 | Contato habitual com pessoas em sofrimento | 12. Situações Extremas |
+| 32 | Exposição a eventos traumáticos | 12. Situações Extremas |
+| 33 | Exposição a situações com possibilidade de acidente grave | 12. Situações Extremas |
+| 34 | Trabalho constante ou predominante em isolamento físico ou remoto | 13. Trabalho Isolado ou Remoto |
+
+Cada situação tem **índice próprio por setor**:
+
+```
+Índice da situação = média do Eixo 1 na pergunta × fator do Eixo 2 da questão ligada × fator do Eixo 3 da situação
+```
+
+- O Eixo 3 usa os CIDs **da situação** (aba 2 da matriz), com as mesmas regras de correspondência dos
+  fatores; a situação "Não específico" (33) nunca é agravada.
+- **Entra no PGR quando o índice passa de 3,00.**
+- Os demais fatores, **mesmo acima de 4,00, não entram no PGR**: vão para o plano de ação.
+- Setor abaixo do mínimo de respostas não gera nenhuma situação (anonimato).
+
+A numeração usada pela consultoria no pedido difere da do questionário (por exemplo, "Ritmo imposto"
+é a pergunta 13 aqui); a marcação foi feita pela descrição da situação.
 
 **Agregações**
 - Risco do setor = média dos fatores com dado.
@@ -90,11 +126,12 @@ A comparação é feita em centésimos (3,00 calculado nunca "escorrega" para a 
 > mesma função. A diferença é só o que entra no número: o painel da pesquisa usa apenas o Eixo 1;
 > o Painel FRPRT aplica também os Eixos 2 e 3.
 
-## FMEA — prioridade de ação para o PGR
+## FMEA — prioridade de ação
 
-Os fatores com índice acima de 3,00 são classificados por **Severidade (S) × Ocorrência (O) ×
-Detecção (D)**, em duas listas: **acima de 4,00** (plano de ação no PGR) e **3,01 a 4,00**
-(acompanhamento). Proposta completa e fontes: [proposta-fmea.html](proposta-fmea.html).
+Tudo o que fica acima de 3,00 é classificado por **Severidade (S) × Ocorrência (O) × Detecção (D)**,
+em duas listas: **PGR** (as situações acima, com S do fator a que pertencem, O da média da pergunta e
+D do Eixo 2 da questão) e **fatores acima de 3,00 → plano de ação** (fora do PGR). Proposta completa
+e fontes: [proposta-fmea.html](proposta-fmea.html).
 
 **S · Severidade (1–5)** = severidade-base do fator + agravantes no setor (+1 cada, até 5):
 - atestado CID-F com relação ao trabalho = **Sim** e compatível com o fator;
@@ -135,7 +172,7 @@ O relatório PDF traz a página da Matriz FMEA e uma página com estes critério
 
 ## Anonimato (regras que valem para todos os cálculos)
 
-- Grupo (setor, departamento) com menos respostas que o limite da pesquisa (padrão **5**) não tem
+- Grupo (setor, departamento) com menos respostas que o limite da pesquisa (padrão **3**) não tem
   índice exibido: "amostra insuficiente". O % de expostos da FMEA só é calculado nesses mesmos
   setores com amostra suficiente.
 - Se só um grupo for suprimido, o segundo menor também é, para impedir a dedução por subtração.
@@ -146,8 +183,8 @@ O relatório PDF traz a página da Matriz FMEA e uma página com estes critério
 
 Produção · Horários e jornada: Eixo 1 = 3,70; sem medida de controle (×1,00); um atestado F51.2
 relacionado ao trabalho (×1,10).
-3,70 × 1,00 × 1,10 = **4,07** → **alto risco**, vai para o PGR. Sem o atestado, ficaria em 3,70
-(médio risco).
+3,70 × 1,00 × 1,10 = **4,07** → **índice alto**, vai para o **plano de ação** (Horários e jornada
+não é situação do PGR). Sem o atestado, ficaria em 3,70 (índice médio).
 
 FMEA desse item: severidade-base 4 + 1 (atestado relacionado) = **S 5**; média 3,70 → **O 4**;
 sem controle → **D 5**. Matriz S5 × O4 = Alta; D 5 mantém Alta → **prioridade Alta**, RPN 100:

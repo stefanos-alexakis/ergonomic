@@ -184,7 +184,7 @@ function TabelaFmeaPdf({ itens, vazio }: { itens: ItemFmea[]; vazio: string }) {
     <View style={{ marginBottom: 8 }}>
       <View style={{ flexDirection: "row", backgroundColor: "#f4f4f5", paddingVertical: 3, fontWeight: 700, color: "#52525b", fontSize: 7.5 }}>
         <Text style={{ width: col.prio, paddingHorizontal: 3 }}>Prioridade</Text>
-        <Text style={{ width: col.nome, paddingHorizontal: 3 }}>Setor · fator</Text>
+        <Text style={{ width: col.nome, paddingHorizontal: 3 }}>Setor · fator / situação</Text>
         <Text style={{ width: col.idx, textAlign: "center" }}>Índice</Text>
         <Text style={{ width: col.n, textAlign: "center" }}>S</Text>
         <Text style={{ width: col.n, textAlign: "center" }}>O</Text>
@@ -193,13 +193,13 @@ function TabelaFmeaPdf({ itens, vazio }: { itens: ItemFmea[]; vazio: string }) {
         <Text style={{ width: col.prazo, paddingHorizontal: 3 }}>Prazos / plano de ação</Text>
       </View>
       {itens.map((i) => (
-        <View key={`${i.setorId}-${i.fator.id}`} style={s.linha} wrap={false}>
+        <View key={`${i.setorId}-${i.situacao?.perguntaId ?? i.fator.id}`} style={s.linha} wrap={false}>
           <View style={{ width: col.prio, paddingHorizontal: 3, alignItems: "flex-start" }}>
             <Prio p={i.fmea.prioridade} />
           </View>
           <View style={{ width: col.nome, paddingHorizontal: 3 }}>
             <Text style={{ fontWeight: 700 }}>
-              {i.setor} · {i.fator.nome}
+              {i.setor} · {i.situacao ? `${i.situacao.numero}. ${i.situacao.texto} (${i.fator.nome})` : i.fator.nome}
             </Text>
             <Text style={{ fontSize: 7, color: CINZA }}>
               S-base {i.fmea.sBase}
@@ -226,11 +226,20 @@ function TabelaFmeaPdf({ itens, vazio }: { itens: ItemFmea[]; vazio: string }) {
   );
 }
 
-export async function gerarRelatorioFrprtPdf(params: {
+export type ParamsFrprtPdf = {
   workspaceNome: string;
   painel: PainelFrprt;
   logo?: { buffer: Buffer; formato: "png" | "jpeg" };
-}): Promise<Buffer> {
+  /** Relatório completo: rodapé fixo (numeração) em cada página e marcador do sumário na primeira. */
+  rodape?: React.ReactNode;
+  inicio?: React.ReactNode;
+};
+
+/**
+ * As páginas do relatório FRPRT — usadas sozinhas (gerarRelatorioFrprtPdf)
+ * e dentro do relatório completo, para os dois nunca divergirem.
+ */
+export function PaginasFrprt(params: ParamsFrprtPdf) {
   const { workspaceNome, painel } = params;
   const { opcoes, fatores, linhas, principais, pgr, limite, geral, achados, fmea } = painel;
   const logo = params.logo ? `data:image/${params.logo.formato};base64,${params.logo.buffer.toString("base64")}` : undefined;
@@ -238,14 +247,20 @@ export async function gerarRelatorioFrprtPdf(params: {
     ? `${mes(opcoes.pesquisa.dataInicio)}–${mes(opcoes.pesquisa.dataFim)}/${opcoes.pesquisa.dataFim.getUTCFullYear()}`
     : null;
   const nomeFator = (id: string) => fatores.find((f) => f.id === id)?.nome ?? "";
-  const cab = <Cabecalho empresa={workspaceNome} periodo={periodo} logo={logo} />;
+  const cab = (
+    <>
+      <Cabecalho empresa={workspaceNome} periodo={periodo} logo={logo} />
+      {params.rodape}
+    </>
+  );
   const corAchado = { perigo: "#B91C1C", atencao: "#B45309", sucesso: "#047857", neutro: CINZA } as const;
 
-  const doc = (
-    <Document title={`Relatório FRPRT — ${workspaceNome}`}>
+  return (
+    <>
       {/* Página 1 — resultado geral e setores */}
       <Page size="A4" orientation="landscape" style={s.page}>
         {cab}
+        {params.inicio}
         {geral ? (
           <View style={{ flexDirection: "row" }}>
             {/* Resultado geral em destaque */}
@@ -269,7 +284,7 @@ export async function gerarRelatorioFrprtPdf(params: {
                   <Text style={{ fontSize: 13, fontWeight: 700, color: CONCLUSOES[geral.conclusao].cor }}>
                     {CONCLUSOES[geral.conclusao].rotulo}
                   </Text>
-                  <Text>{CONCLUSOES[geral.conclusao].curto} · índice de 1 a 5</Text>
+                  <Text>{CONCLUSOES[geral.conclusao].curto} · escala de 1 a 5</Text>
                 </View>
               </View>
               <Text style={{ marginTop: 4 }}>{CONCLUSOES[geral.conclusao].descricao}</Text>
@@ -293,10 +308,10 @@ export async function gerarRelatorioFrprtPdf(params: {
                   }}
                 />
                 <View style={{ flexDirection: "row", marginTop: 3 }}>
-                  <Text style={{ width: "50%", fontSize: 7, color: CONCLUSOES.SEM_RISCO.cor }}>1 · Baixo risco</Text>
-                  <Text style={{ width: "25%", fontSize: 7, color: CONCLUSOES.CONTROLE.cor }}>3 · Médio risco</Text>
+                  <Text style={{ width: "50%", fontSize: 7, color: CONCLUSOES.SEM_RISCO.cor }}>1 · Índice baixo</Text>
+                  <Text style={{ width: "25%", fontSize: 7, color: CONCLUSOES.CONTROLE.cor }}>3 · Índice médio</Text>
                   <Text style={{ width: "25%", fontSize: 7, color: CONCLUSOES.RISCO_EXISTENTE.cor, textAlign: "right" }}>
-                    4 · Alto risco (PGR) · 5
+                    4 · Índice alto · 5
                   </Text>
                 </View>
               </View>
@@ -304,8 +319,8 @@ export async function gerarRelatorioFrprtPdf(params: {
               <View style={{ flexDirection: "row", marginTop: 10 }}>
                 {[
                   [geral.setoresAvaliados, "setores avaliados"],
-                  [geral.setoresEmRisco, "setores em risco alto"],
-                  [geral.fatoresPgr, "itens para o PGR"],
+                  [geral.setoresEmRisco, "setores com índice alto"],
+                  [geral.fatoresPgr, "situações no PGR"],
                   [geral.participacao !== null ? `${Math.round(geral.participacao * 100)}%` : "—", "participação"],
                 ].map(([v, r]) => (
                   <View key={String(r)} style={{ width: "25%", backgroundColor: "#ffffffb0", borderRadius: 3, padding: 4, marginRight: 3 }}>
@@ -345,7 +360,7 @@ export async function gerarRelatorioFrprtPdf(params: {
                         <View style={{ width: "62%" }}>
                           <Text style={{ fontWeight: 700 }}>{l.nome}</Text>
                           <Text style={{ fontSize: 7, color: c?.cor ?? CINZA }}>
-                            {c ? `${c.curto}${l.fatoresEmRisco ? ` · ${l.fatoresEmRisco} p/ PGR` : ""}` : l.suprimido ? `Amostra insuficiente (n=${l.respondentes})` : "Sem dados"}
+                            {c ? `${c.curto}${l.situacoesPgr ? ` · ${l.situacoesPgr} no PGR` : ""}` : l.suprimido ? `Amostra insuficiente (n=${l.respondentes})` : "Sem dados"}
                           </Text>
                         </View>
                         <View style={{ alignItems: "flex-end" }}>
@@ -415,8 +430,9 @@ export async function gerarRelatorioFrprtPdf(params: {
           </View>
         ))}
         <Text style={[s.pequeno, { marginTop: 4 }]}>
-          Risco final = Eixo 1 × Eixo 2 × Eixo 3 (1–5, quanto maior, pior). Eixos 2 e 3 em pontos: quanto moveram o
-          Eixo 1. Até 3,00 sem risco · 3,01 a 4,00 com controle existente · acima de 4,00 risco existente (PGR).
+          Índice final = Eixo 1 × Eixo 2 × Eixo 3 (1–5, quanto maior, pior). Eixos 2 e 3 em pontos: quanto moveram o
+          Eixo 1. Até 3,00 sem risco · 3,01 a 4,00 com controle existente · acima de 4,00 risco existente (plano de ação). O PGR
+          recebe só as situações inerentes à função acima de 3,00 (seção 5).
         </Text>
       </Page>
 
@@ -514,16 +530,18 @@ export async function gerarRelatorioFrprtPdf(params: {
               inexistentes).
             </Text>
             <Text style={{ marginBottom: 3 }}>
-              Prioridade: matriz S × O (ao lado, com a quantidade de setor × fator); detecção 4–5 sobe um nível,
+              Prioridade: matriz S × O (ao lado, com a quantidade de itens); detecção 4–5 sobe um nível,
               detecção 1 desce um (severidade 5 nunca abaixo de Média). RPN = S × O × D desempata.
             </Text>
             <Text style={s.pequeno}>Prazos contados da emissão deste relatório: {dataLocal(fmea.emitidoEm)}.</Text>
           </View>
         </View>
-        <Text style={{ fontWeight: 700, color: AZUL, marginBottom: 4 }}>ACIMA DE 4,00 — PLANO DE AÇÃO NO PGR</Text>
-        <TabelaFmeaPdf itens={fmea.pgr} vazio="Nenhum fator acima de 4,00." />
-        <Text style={{ fontWeight: 700, color: AZUL, marginTop: 6, marginBottom: 4 }}>DE 3,01 A 4,00 — ACOMPANHAMENTO</Text>
-        <TabelaFmeaPdf itens={fmea.acompanhamento} vazio="Nenhum fator entre 3,01 e 4,00." />
+        <Text style={{ fontWeight: 700, color: AZUL, marginBottom: 4 }}>RISCOS DO PGR — SITUAÇÕES INERENTES À FUNÇÃO ACIMA DE 3,00</Text>
+        <TabelaFmeaPdf itens={fmea.pgr} vazio="Nenhuma situação do PGR acima de 3,00." />
+        <Text style={{ fontWeight: 700, color: AZUL, marginTop: 6, marginBottom: 4 }}>
+          RISCOS PARA O PLANO DE AÇÃO — FATORES ACIMA DE 3,00 (FORA DO PGR)
+        </Text>
+        <TabelaFmeaPdf itens={fmea.acompanhamento} vazio="Nenhum fator acima de 3,00." />
       </Page>
 
       {/* Página 4 — matriz de decisão */}
@@ -540,12 +558,13 @@ export async function gerarRelatorioFrprtPdf(params: {
           <Text style={{ width: "8%", paddingHorizontal: 3, textAlign: "center" }}>Final</Text>
           <Text style={{ width: "22%", paddingHorizontal: 3 }}>Conclusão / encaminhamento</Text>
         </View>
+        {/* Setor (A–Z), depois fator (1–13 — as células já vêm nessa ordem). */}
         {linhas
           .filter((l) => !l.suprimido)
+          .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"))
           .flatMap((l) =>
             l.celulas
               .filter((c) => c.final !== null)
-              .sort((a, b) => (b.final ?? 0) - (a.final ?? 0))
               .map((c) => (
                 <View key={`${l.setorId}-${c.fatorId}`} style={s.linha} wrap={false}>
                   <Text style={{ width: "14%", paddingHorizontal: 3 }}>{l.nome}</Text>
@@ -573,6 +592,10 @@ export async function gerarRelatorioFrprtPdf(params: {
                   </View>
                   <Text style={{ width: "22%", paddingHorizontal: 3 }}>
                     {CONCLUSOES[c.conclusao!].rotulo} — {CONCLUSOES[c.conclusao!].encaminhamento}
+                    {(() => {
+                      const noPgr = pgr.filter((r) => r.setorId === l.setorId && r.fator.id === c.fatorId);
+                      return noPgr.length ? ` · PGR: situação ${noPgr.map((r) => r.situacao.numero).sort((a, b) => a - b).join(", ")}` : "";
+                    })()}
                   </Text>
                 </View>
               )),
@@ -583,17 +606,21 @@ export async function gerarRelatorioFrprtPdf(params: {
       <Page size="A4" orientation="landscape" style={s.page}>
         {cab}
         <Secao numero={5} titulo="Riscos existentes que vão para o PGR" />
+        <Text style={[s.pequeno, { marginBottom: 4 }]}>
+          Só as situações inerentes à função, com índice próprio no setor acima de 3,00 (Eixo 1 da pergunta × Eixo 2 da
+          questão × Eixo 3 da situação). Os demais fatores, mesmo com nota alta, vão para o plano de ação.
+        </Text>
         {pgr.length === 0 ? (
-          <Text>Nenhum fator acima de 4,00.</Text>
+          <Text>Nenhuma situação do PGR acima de 3,00.</Text>
         ) : (
           pgr.map((r) => (
             <View
-              key={`${r.setor}-${r.fator.id}`}
-              style={[s.caixa, { borderColor: CONCLUSOES.RISCO_EXISTENTE.cor, borderLeftWidth: 4 }]}
+              key={`${r.setorId}-${r.situacao.perguntaId}`}
+              style={[s.caixa, { borderColor: CONCLUSOES[r.celula.conclusao!].cor, borderLeftWidth: 4 }]}
               wrap={false}
             >
               <Text style={{ fontWeight: 700, fontSize: 9.5 }}>
-                {r.setor} · {r.fator.nome} — índice {formatarRisco(r.celula.final!)}
+                {r.setor} · {r.situacao.numero}. {r.situacao.texto} — índice {formatarRisco(r.celula.final!)}
                 {r.celula.fmea ? ` · prioridade ${PRIORIDADES[r.celula.fmea.prioridade].rotulo}` : ""}
               </Text>
               {r.celula.fmea && r.prazos && (
@@ -602,7 +629,10 @@ export async function gerarRelatorioFrprtPdf(params: {
                   {textoPrazosOuAcoes(r.prazos, r.acoes)}
                 </Text>
               )}
-              <Text style={s.pequeno}>Fator de risco PGR: {r.fator.fatorRisco}</Text>
+              <Text style={s.pequeno}>
+                {r.fator.nome} · Fator de risco PGR: {r.fator.fatorRisco} · Eixo 1 {formatarRisco(r.celula.eixo1!)} × Eixo 2{" "}
+                {r.celula.fatorEixo2.toFixed(2).replace(".", ",")} × Eixo 3 {r.celula.fatorEixo3.toFixed(2).replace(".", ",")}
+              </Text>
               <Text>Possíveis consequências: {r.apoio.consequencias.join(" ")}</Text>
               <Text>
                 CID F compatíveis: {r.apoio.cids.join(", ") || "Não específico"}
@@ -640,7 +670,7 @@ export async function gerarRelatorioFrprtPdf(params: {
         </View>
         <View style={s.caixa}>
           <Text>
-            Risco final = Eixo 1 (média 1–5 por fator e setor) × Fator do Eixo 2 (0,80 eficaz/N.A. · 0,90 precisa
+            Índice final = Eixo 1 (média 1–5 por fator e setor) × Fator do Eixo 2 (0,80 eficaz/N.A. · 0,90 precisa
             melhorar · 1,00 inexistente) × Fator do Eixo 3 (×1,10 quando há CID-F relacionado ao trabalho e compatível
             com o fator pela matriz Fatores × CID F). Resultado geral = média dos
             setores avaliados. Setores com menos de {limite} respostas no Eixo 1 não têm score, para proteger o
@@ -713,8 +743,14 @@ export async function gerarRelatorioFrprtPdf(params: {
           </View>
         </View>
       </Page>
-    </Document>
+    </>
   );
+}
 
-  return renderToBuffer(doc);
+export async function gerarRelatorioFrprtPdf(params: ParamsFrprtPdf): Promise<Buffer> {
+  return renderToBuffer(
+    <Document title={`Relatório FRPRT — ${params.workspaceNome}`}>
+      <PaginasFrprt {...params} />
+    </Document>,
+  );
 }

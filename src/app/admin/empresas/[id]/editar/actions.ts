@@ -3,8 +3,8 @@
 import { redirect, notFound } from "next/navigation";
 import { getActor } from "@/lib/tenant";
 import { workspaceInputSchema } from "@/lib/validation";
-import { atualizarEmpresa, getEmpresaParaEditar, redefinirSenhaGestor } from "@/lib/workspace";
-import { salvarLogoWorkspace } from "@/lib/upload";
+import { atualizarEmpresa, excluirEmpresa, getEmpresaParaEditar, redefinirSenhaGestor } from "@/lib/workspace";
+import { apagarRelatorioPdf, apagarUpload, salvarLogoWorkspace } from "@/lib/upload";
 
 export type EstadoEditarEmpresa = { erro?: string } | undefined;
 
@@ -73,6 +73,26 @@ export async function redefinirSenhaGestorAction(
   if (!resultado.ok) return { erro: resultado.erro };
 
   return { mensagem: "Senha redefinida com sucesso." };
+}
+
+export type EstadoExcluirEmpresa = { erro?: string } | undefined;
+
+export async function excluirEmpresaAction(
+  workspaceId: string,
+  _estadoAnterior: EstadoExcluirEmpresa,
+  formData: FormData,
+): Promise<EstadoExcluirEmpresa> {
+  const actor = await getActor();
+  if (!actor?.isPlatformAdmin) return { erro: "Sem permissão." };
+
+  const resultado = await excluirEmpresa(workspaceId, String(formData.get("confirmacao") ?? ""));
+  if (!resultado.ok) return { erro: resultado.erro };
+
+  // Arquivo do logo só depois do banco: se a transação falhasse, a
+  // empresa continuaria existindo e não poderia ficar sem o logo.
+  await apagarUpload(resultado.logoUrl).catch(() => undefined);
+  for (const arquivo of resultado.arquivosRelatorios) await apagarRelatorioPdf(arquivo).catch(() => undefined);
+  redirect("/admin");
 }
 
 export async function carregarEmpresaOuNotFound(workspaceId: string) {

@@ -127,7 +127,7 @@ export default async function PlanoPage({ searchParams }: { searchParams: Promis
     setoresDaEmpresa(workspace.id),
   ]);
   const filtradas = filtrar(acoes, f, hoje);
-  const pendencias = painel ? pendenciasDoPgr(painel, acoes) : [];
+  const pendencias = painel ? pendenciasDoPgr(painel) : [];
   const temFiltro = Boolean(f.setor || f.fator || f.fase || f.situacao || f.prioridade || f.q);
   const quadro = f.visao === "quadro";
   const query = (extra: Record<string, string | undefined>) => {
@@ -167,18 +167,18 @@ export default async function PlanoPage({ searchParams }: { searchParams: Promis
       </div>
 
       {pendencias.length > 0 && (
-        <section className="mb-6 rounded-lg border border-red-200 bg-red-50/40 p-4" aria-label="Fatores do PGR sem ação">
-          <h2 className="text-sm font-semibold text-red-800 mb-2">Fatores que vão para o PGR sem ação ({pendencias.length})</h2>
+        <section className="mb-6 rounded-lg border border-red-200 bg-red-50/40 p-4" aria-label="Riscos do PGR sem ação">
+          <h2 className="text-sm font-semibold text-red-800 mb-2">Riscos do PGR sem ação — situações ({pendencias.length})</h2>
           <ul className="flex flex-col gap-2">
             {pendencias.map((p) => (
-              <li key={`${p.setorId}-${p.fator.id}`} className="flex flex-wrap items-center justify-between gap-2 text-sm">
+              <li key={`${p.setorId}-${p.situacao!.perguntaId}`} className="flex flex-wrap items-center justify-between gap-2 text-sm">
                 <span className="flex items-center gap-2">
                   <PilulaPrioridade prioridade={p.fmea.prioridade} />
-                  {p.setor} · {p.fator.nome}
+                  {p.setor} · {p.situacao!.numero}. {p.situacao!.texto}
                   <span className="text-xs text-zinc-500 tabular-nums">índice {formatarRisco(p.celula.final!)}</span>
                 </span>
                 <Link
-                  href={`/gestor/plano/nova?setor=${p.setorId}&fator=${p.fator.id}&prioridade=${p.fmea.prioridade}`}
+                  href={`/gestor/plano/nova?setor=${p.setorId}&fator=${p.fator.id}&situacao=${p.situacao!.perguntaId}&prioridade=${p.fmea.prioridade}`}
                   className="text-sm font-medium text-zinc-900 underline hover:no-underline"
                 >
                   Criar ação

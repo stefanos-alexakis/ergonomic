@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { gerarSlug } from "@/lib/validation";
+import type { DadosOrientacao } from "@/lib/orientacao";
 
 export type CriarPesquisaInput = {
   workspaceId: string;
@@ -8,6 +9,7 @@ export type CriarPesquisaInput = {
   dataInicio: Date;
   dataFim: Date;
   licencasSolicitadas: number;
+  orientacao?: DadosOrientacao;
 };
 
 export type CriarPesquisaResultado =
@@ -65,6 +67,7 @@ export async function criarPesquisa(
       dataFim: input.dataFim,
       licencasSolicitadas: input.licencasSolicitadas,
       status: "RASCUNHO",
+      ...input.orientacao,
     },
   });
 

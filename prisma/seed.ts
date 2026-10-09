@@ -331,12 +331,37 @@ async function seedSeveridadeFmea(v: VersaoQuestionario) {
   console.log(`Seed da severidade FMEA (v${v.versao}): ${criados} criada(s), ${itens.length - criados} mantida(s).`);
 }
 
+/**
+ * Marca as situações que vão para o PGR (seed-data/pgr-situacoes-v2.json),
+ * casando pela descrição da situação — a numeração da consultoria difere
+ * da nossa. Só na primeira vez (nenhuma marcada ainda na versão): depois,
+ * o admin ajusta na tela "Pesos das perguntas" e um novo seed não desfaz.
+ */
+async function seedSituacoesPgr(v: VersaoQuestionario) {
+  const path = join(__dirname, "seed-data", "pgr-situacoes-v2.json");
+  const { situacoes } = JSON.parse(readFileSync(path, "utf-8")) as { situacoes: string[] };
+  const daVersao = { fatorRisco: { dimensao: { bloco: { questionarioId: v.id } } } };
+  if (await prisma.pergunta.count({ where: { ...daVersao, vaiParaPgr: true } })) {
+    console.log(`Situações do PGR (v${v.versao}): já configuradas, mantidas.`);
+    return;
+  }
+  const perguntas = await prisma.pergunta.findMany({ where: daVersao, select: { id: true, situacaoInvestigada: true } });
+  const ids = situacoes.map((t) => {
+    const p = perguntas.find((x) => x.situacaoInvestigada.trim() === t.trim());
+    if (!p) throw new Error(`Situação do PGR não encontrada na v${v.versao}: "${t}"`);
+    return p.id;
+  });
+  await prisma.pergunta.updateMany({ where: { id: { in: ids } }, data: { vaiParaPgr: true } });
+  console.log(`Situações do PGR (v${v.versao}): ${ids.length} marcada(s).`);
+}
+
 async function main() {
   await seedQuestionario(V1);
   await seedQuestionario(V2);
   await seedEixo2(V2);
   await seedMatrizCid(V2);
   await seedSeveridadeFmea(V2);
+  await seedSituacoesPgr(V2);
   await ativarVersao(V2);
 }
 

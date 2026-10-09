@@ -52,24 +52,24 @@ describe("calcularMedia", () => {
 });
 
 describe("calcularNivelRisco — mesma régua do Painel FRPRT (cortes 3,00 / 4,00 na média)", () => {
-  it("média 1 (melhor cenário) é baixo risco", () => {
-    expect(calcularNivelRisco(1)).toEqual({ rotulo: "Baixo risco", tom: "sucesso" });
+  it("média 1 (melhor cenário) é índice baixo", () => {
+    expect(calcularNivelRisco(1)).toEqual({ rotulo: "Índice baixo", tom: "sucesso" });
   });
 
-  it("média 3,00 exata ainda é baixo risco", () => {
-    expect(calcularNivelRisco(3)).toEqual({ rotulo: "Baixo risco", tom: "sucesso" });
+  it("média 3,00 exata ainda é índice baixo", () => {
+    expect(calcularNivelRisco(3)).toEqual({ rotulo: "Índice baixo", tom: "sucesso" });
   });
 
-  it("média 3,01 já é médio risco", () => {
-    expect(calcularNivelRisco(3.01)).toEqual({ rotulo: "Médio risco", tom: "atencao" });
+  it("média 3,01 já é índice médio", () => {
+    expect(calcularNivelRisco(3.01)).toEqual({ rotulo: "Índice médio", tom: "atencao" });
   });
 
-  it("média 4,00 exata ainda é médio risco", () => {
-    expect(calcularNivelRisco(4)).toEqual({ rotulo: "Médio risco", tom: "atencao" });
+  it("média 4,00 exata ainda é índice médio", () => {
+    expect(calcularNivelRisco(4)).toEqual({ rotulo: "Índice médio", tom: "atencao" });
   });
 
-  it("média 4,01 já é alto risco", () => {
-    expect(calcularNivelRisco(4.01)).toEqual({ rotulo: "Alto risco", tom: "perigo" });
+  it("média 4,01 já é índice alto", () => {
+    expect(calcularNivelRisco(4.01)).toEqual({ rotulo: "Índice alto", tom: "perigo" });
   });
 
   it("concorda com a conclusão do Painel FRPRT em toda a escala", () => {

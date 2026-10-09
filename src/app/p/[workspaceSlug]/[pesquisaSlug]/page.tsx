@@ -10,6 +10,7 @@ import { listarCatalogoOrganizacional } from "@/lib/estrutura";
 import { FormularioCodigo } from "./formulario-codigo";
 import { FormularioOrganizacao } from "./formulario-organizacao";
 import { Questionario } from "./questionario";
+import { FormularioPrePesquisa } from "./formulario-pre-pesquisa";
 
 export const dynamic = "force-dynamic";
 
@@ -104,8 +105,14 @@ export default async function JornadaColaboradorPage({
         respostaId={estado.respostaId}
         setores={catalogo.setores}
         departamentos={catalogo.departamentos}
+        videoYoutubeId={pesquisa.videoYoutubeId}
+        textoOrientacao={pesquisa.textoOrientacao}
       />
     );
+  }
+
+  if (estado.tipo === "pre_pesquisa") {
+    return <FormularioPrePesquisa workspaceSlug={workspaceSlug} pesquisaSlug={pesquisaSlug} />;
   }
 
   // estado.tipo === "questionario" — paginado. Sem tela de revisão: a

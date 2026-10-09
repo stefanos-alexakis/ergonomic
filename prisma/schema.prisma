@@ -29,6 +29,8 @@ model Workspace {
   avaliacoesEixo2    AvaliacaoEixo2[]
   levantamentosEixo3 LevantamentoEixo3[]
   acoesPlano         AcaoPlano[]
+  relatorioRascunho  RelatorioRascunho?
+  relatoriosEmitidos RelatorioEmitido[]
 
   @@index([slug])
 }
@@ -153,6 +155,10 @@ model Pergunta {
   // o dashboard recalcula ao vivo com o peso vigente (não é congelado por
   // pesquisa — ver review.md sobre a decisão do usuário).
   peso                Float      @default(1)
+  // Situação que vai para o PGR quando o índice final dela passar de 3,00
+  // (pedido da consultoria, out/2026: só as situações inerentes à função
+  // entram no PGR; os demais fatores vão para o plano de ação).
+  vaiParaPgr          Boolean    @default(false)
 
   fatorRisco    FatorRisco         @relation(fields: [fatorRiscoId], references: [id], onDelete: Cascade)
   respostaItens RespostaItem[]
@@ -239,12 +245,19 @@ model Pesquisa {
   dataInicio           DateTime
   dataFim              DateTime
   licencasSolicitadas  Int
-  limiteSupressaoGrupo Int            @default(5)
+  limiteSupressaoGrupo Int            @default(3)
+  // Orientação ao colaborador (topo da tela "Onde você trabalha"): só o
+  // código do vídeo do YouTube (11 caracteres), nunca uma URL livre.
+  videoYoutubeId       String?
+  textoOrientacao      String?
+  // Pré-pesquisa de perfil (opcional para o colaborador, que pode pular).
+  exibirPrePesquisa    Boolean        @default(false)
   createdAt            DateTime       @default(now())
 
-  workspace    Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  questionario Questionario   @relation(fields: [questionarioId], references: [id])
+  workspace    Workspace             @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  questionario Questionario          @relation(fields: [questionarioId], references: [id])
   codigos      CodigoAcesso[]
+  prePesquisas RespostaPrePesquisa[]
 
   @@unique([workspaceId, slug])
   @@index([workspaceId])
@@ -287,6 +300,9 @@ model Resposta {
   funcaoId       String?
   iniciadoEm     DateTime  @default(now())
   concluidoEm    DateTime?
+  // Passou pela pré-pesquisa (respondeu ou pulou) — para não mostrar de
+  // novo. Sim/não, sem data/hora (nada que ajude a identificar alguém).
+  prePesquisaVista Boolean  @default(false)
 
   codigoAcesso CodigoAcesso   @relation(fields: [codigoAcessoId], references: [id], onDelete: Cascade)
   setor        SetorOrg?      @relation(fields: [setorId], references: [id])
@@ -294,11 +310,37 @@ model Resposta {
   segmento     Segmento?      @relation(fields: [segmentoId], references: [id])
   funcao       Funcao?        @relation(fields: [funcaoId], references: [id])
   itens        RespostaItem[]
+  prePesquisa  RespostaPrePesquisa?
 
   @@index([setorId])
   @@index([departamentoId])
   @@index([segmentoId])
   @@index([funcaoId])
+}
+
+// Pré-pesquisa de perfil (idade, sexo, peso, altura em FAIXAS; hábitos).
+// Dado pessoal sensível (LGPD): o vínculo com a resposta do Eixo 1 só é
+// usado no cruzamento da área do ADMIN da plataforma, sempre agregado e
+// com o mínimo de respostas. O gestor da empresa só vê totais separados.
+// Os valores são as chaves de src/lib/pre-pesquisa.ts; nulo = não
+// respondeu aquela pergunta. Sem data/hora de propósito.
+model RespostaPrePesquisa {
+  id           String  @id @default(cuid())
+  pesquisaId   String
+  respostaId   String  @unique
+  tempoEmpresa String?
+  faixaIdade   String?
+  sexo         String?
+  faixaPeso    String?
+  faixaAltura  String?
+  alcool       String?
+  outraRenda   String?
+  apostas      String?
+
+  pesquisa Pesquisa @relation(fields: [pesquisaId], references: [id], onDelete: Cascade)
+  resposta Resposta @relation(fields: [respostaId], references: [id], onDelete: Cascade)
+
+  @@index([pesquisaId])
 }
 
 model RespostaItem {
@@ -606,4 +648,65 @@ model PrazoPrioridade {
   reavaliacaoMeses Int
   atualizadoEm     DateTime @updatedAt
   atualizadoPorId  String?
+}
+
+// ── Relatório completo (pedido do cliente, out/2026) ─────────────────
+
+// Consultores que assinam os relatórios — cadastro da plataforma (admin),
+// reutilizado entre empresas. O relatório emitido guarda uma CÓPIA dos
+// dados: editar ou excluir aqui não altera documento já emitido.
+model Consultor {
+  id           String   @id @default(cuid())
+  nome         String
+  formacao     String?
+  registro     String? // registro profissional (CRP, CREA, MTE…)
+  cargo        String?
+  email        String?
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+}
+
+// Textos fixos do relatório mantidos pelo admin (ex.: "LEGISLACAO" — o
+// dossiê da legislação, ainda em elaboração pela consultoria).
+model TextoRelatorio {
+  chave        String   @id
+  conteudo     String
+  atualizadoEm DateTime @updatedAt
+  atualizadoPor String?
+}
+
+// Rascunho do relatório completo de uma empresa (um por empresa): fontes,
+// conclusão do consultor e quem assina.
+model RelatorioRascunho {
+  workspaceId    String   @id
+  pesquisaId     String?
+  avaliacaoId    String?
+  levantamentoId String?
+  conclusao      String?
+  consultorIds   String[]
+  atualizadoEm   DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+// Versão emitida (imutável): o PDF fica gravado em uploads/relatorios/
+// (fora de public/, baixado por rota com checagem de empresa).
+model RelatorioEmitido {
+  id             String   @id @default(cuid())
+  workspaceId    String
+  versao         Int
+  emitidoEm      DateTime @default(now())
+  emitidoPorId   String?
+  emitidoPorNome String
+  arquivo        String // nome do arquivo em uploads/relatorios/
+  tamanhoBytes   Int
+  // Retrato do que foi usado: nomes das fontes e consultores no momento.
+  fontes         Json
+  consultores    Json
+  conclusao      String?
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, versao])
+  @@index([workspaceId])
 }

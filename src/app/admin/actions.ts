@@ -1,8 +1,10 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { getActor } from "@/lib/tenant";
 import { iniciarImpersonacao, encerrarImpersonacao } from "@/lib/impersonacao";
+import { definirStatusEmpresa } from "@/lib/workspace";
 
 export async function assumirVisaoGestorAction(workspaceId: string): Promise<void> {
   const actor = await getActor();
@@ -20,4 +22,12 @@ export async function encerrarImpersonacaoAction(): Promise<void> {
 
   await encerrarImpersonacao(actor.userId);
   redirect("/admin");
+}
+
+export async function definirStatusEmpresaAction(workspaceId: string, ativa: boolean): Promise<void> {
+  const actor = await getActor();
+  if (!actor?.isPlatformAdmin) return;
+
+  await definirStatusEmpresa(workspaceId, ativa);
+  revalidatePath("/admin");
 }

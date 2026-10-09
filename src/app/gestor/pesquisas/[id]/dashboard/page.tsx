@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { perfilParticipantes } from "@/lib/perfil-participantes";
+import { PerfilParticipantesSecao } from "@/components/pesquisa/perfil-participantes";
 import { getActor } from "@/lib/tenant";
 import { getWorkspaceDoGestor, resolvePesquisaDoWorkspace } from "@/lib/pesquisa";
 import { listarCatalogoOrganizacional } from "@/lib/estrutura";
@@ -23,12 +25,12 @@ export const dynamic = "force-dynamic";
 
 const NAV = NAV_GESTOR;
 
-/** Cor da faixa de risco de uma média 1–5 — mesmos cortes e cores do Painel FRPRT. */
+/** Cor da faixa do índice de uma média 1–5 — mesmos cortes e cores do Painel FRPRT. */
 function corDaMedia(media: number) {
   return CONCLUSOES[concluir(media)];
 }
 
-/** Média em pílula colorida: verde baixo, amarelo médio, vermelho alto risco. */
+/** Média em pílula colorida: verde índice baixo, amarelo médio, vermelho alto. */
 function PilulaMedia({ media }: { media: number }) {
   const c = corDaMedia(media);
   return (
@@ -140,9 +142,10 @@ export default async function DashboardPage({
   const pesquisa = await resolvePesquisaDoWorkspace(id, workspace.id);
   if (!pesquisa) notFound();
 
-  const [dashboard, catalogo] = await Promise.all([
+  const [dashboard, catalogo, perfil] = await Promise.all([
     calcularDashboard(pesquisa.id, filtros),
     listarCatalogoOrganizacional(workspace.id),
+    perfilParticipantes(pesquisa.id),
   ]);
 
   const filtroAtivo = Boolean(filtros.setorId || filtros.departamentoId);
@@ -233,7 +236,7 @@ export default async function DashboardPage({
                 </Badge>
                 <span className="text-sm text-zinc-700">
                   Índice geral do Eixo 1 (percepção dos colaboradores), de 1 a 5 — quanto maior, mais exposição. Mesma
-                  régua do Painel FRPRT: até 3,00 baixo risco · até 4,00 médio risco · acima disso alto risco. O
+                  régua do Painel FRPRT: até 3,00 índice baixo · até 4,00 índice médio · acima disso índice alto. O
                   resultado final, com os Eixos 2 e 3, está no{" "}
                   <Link href="/gestor/painel" className="underline hover:no-underline">
                     Painel FRPRT
@@ -279,6 +282,15 @@ export default async function DashboardPage({
 
               <p className="text-sm mb-2">
                 <Link
+                  href={`/gestor/pesquisas/${pesquisa.id}/dashboard/distribuicao`}
+                  className="font-medium text-zinc-900 hover:underline"
+                >
+                  Distribuição das respostas (pergunta a pergunta) →
+                </Link>
+              </p>
+
+              <p className="text-sm mb-2">
+                <Link
                   href={`/gestor/pesquisas/${pesquisa.id}/dashboard/respostas${queryRespostas ? `?${queryRespostas}` : ""}`}
                   className="font-medium text-zinc-900 hover:underline"
                 >
@@ -295,6 +307,8 @@ export default async function DashboardPage({
           )}
         </>
       )}
+
+      {perfil && <PerfilParticipantesSecao perfil={perfil} />}
 
       <p className="mt-8">
         <Link href={`/gestor/pesquisas/${pesquisa.id}`} className="text-sm text-zinc-500 hover:text-zinc-900">

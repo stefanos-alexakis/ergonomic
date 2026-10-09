@@ -50,8 +50,11 @@ async function planilhaOcorrencias(linhas: unknown[][]) {
  *  - Produção: 6 respondentes, todas as respostas = 5 → Eixo 1 = 5,00 em todo fator;
  *  - Eixo 2: tudo "eficaz" (0,80), exceto Horários e Jornada "precisa melhorar" (0,90);
  *  - Eixo 3: F51.2 relacionado ao trabalho → ×1,10 só em Horários e Equilíbrio Trabalho-Vida.
- *  Horários = 5 × 0,90 × 1,10 = 4,95 (PGR) · Equilíbrio = 5 × 0,80 × 1,10 = 4,40 (PGR)
+ *  Horários = 5 × 0,90 × 1,10 = 4,95 · Equilíbrio = 5 × 0,80 × 1,10 = 4,40 (risco existente →
+ *  plano de ação, mas NÃO PGR: não são situações inerentes à função)
  *  demais = 5 × 0,80 = 4,00 (controle) · setor = média 4,10 (alto risco).
+ *  PGR (só as 8 situações marcadas, por situação): 5 × 0,80 × 1,00 = 4,00 em todas (F51.2 não é
+ *  compatível com nenhuma delas) → as 8 entram (acima de 3,00).
  *  - Administrativo: 2 respondentes → amostra insuficiente (anonimato).
  */
 test("Eixo 3 publicado e Painel FRPRT com o cruzamento dos três eixos", async ({ page }) => {
@@ -174,8 +177,8 @@ test("Eixo 3 publicado e Painel FRPRT com o cruzamento dos três eixos", async (
   const geral = page.getByRole("region", { name: "Resultado geral da empresa" });
   await expect(geral.getByText("4,10", { exact: true })).toBeVisible();
   await expect(geral.getByText("Risco existente", { exact: true })).toBeVisible();
-  await expect(geral).toContainText("Alto risco · índice de 1 a 5");
-  await expect(geral).toContainText("exige plano de ação e inclusão no PGR");
+  await expect(geral).toContainText("Índice alto · escala de 1 a 5");
+  await expect(geral).toContainText("exige plano de ação. Entra no PGR só pelas situações inerentes à função");
   const cartoesSetores = page.getByRole("region", { name: "Pontuação dos setores" });
   await expect(cartoesSetores).toContainText("Produção");
   await expect(cartoesSetores).toContainText(/Amostra insuficiente/);
@@ -195,6 +198,10 @@ test("Eixo 3 publicado e Painel FRPRT com o cruzamento dos três eixos", async (
   await expect(matriz.locator("tr", { hasText: "5. Horários e Jornada" }).getByText("4,95")).toBeVisible();
   await expect(matriz.locator("tr", { hasText: "10. Equilíbrio Trabalho-Vida" }).getByText("4,40")).toBeVisible();
   await expect(matriz.locator("tr", { hasText: "1. Instrução de Trabalho" }).getByText("4,00").first()).toBeVisible();
+  // Encaminhamento: fator com nota alta vai para o plano de ação; o PGR aparece só pelas situações.
+  await expect(matriz.locator("tr", { hasText: "5. Horários e Jornada" })).toContainText("Plano de ação");
+  await expect(matriz.locator("tr", { hasText: "5. Horários e Jornada" })).not.toContainText("PGR");
+  await expect(matriz.locator("tr", { hasText: "2. Demandas de Trabalho" })).toContainText("PGR: situação 8, 10");
 
   // FMEA (à mão): Horários — S 4 +1 atestado +1 afastamento de 20 dias +1 expostos (100%) → 5 (teto);
   // O 5 (média 5,00); D 3 (Eixo 2 ×0,90) → matriz S5×O5 Alta, D 3 mantém → Alta, RPN 75.
@@ -213,10 +220,18 @@ test("Eixo 3 publicado e Painel FRPRT com o cruzamento dos três eixos", async (
   await expect(instrucao.getByText("Média", { exact: true })).toBeVisible();
   await expect(instrucao.getByText("15", { exact: true })).toBeVisible();
 
+  // FMEA da situação 13 (fator 4, S-base 3): S 3 +1 expostos = 4; O 5; D 1 (×0,80) → S4×O5 Alta, desce → Média, RPN 20.
+  const ritmo = fmea.locator("tr", { hasText: "Produção · 13. Ritmo imposto por processo contínuo sem pausas" });
+  await expect(ritmo.getByText("Média", { exact: true })).toBeVisible();
+  await expect(ritmo.getByText("20", { exact: true })).toBeVisible();
+
   const pgr = page.getByRole("region", { name: "Riscos para o PGR" });
-  await expect(pgr.locator("article")).toHaveCount(2);
-  await expect(pgr.getByText("Produção · 5. Horários e Jornada")).toBeVisible();
-  await expect(pgr.getByText(/Registrados no setor e relacionados ao trabalho: F51\.2/).first()).toBeVisible();
+  await expect(pgr.locator("article")).toHaveCount(8);
+  await expect(pgr.getByText("Produção · 13. Ritmo imposto por processo contínuo sem pausas")).toBeVisible();
+  await expect(pgr.getByText("Produção · 34. Trabalho realizado de forma constante ou predominante em isolamento físico ou remoto")).toBeVisible();
+  // Fatores com nota alta, mas que não são situações do PGR, ficam de fora.
+  await expect(pgr).not.toContainText("Horários e Jornada");
+  await expect(pgr).not.toContainText("F51.2");
 
   const pdf = await page.request.get("/gestor/painel/relatorio");
   expect(pdf.status()).toBe(200);
@@ -225,12 +240,13 @@ test("Eixo 3 publicado e Painel FRPRT com o cruzamento dos três eixos", async (
 
   // ── Plano de ação (5W2H + PDCA) ────────────────────────────────────
   await page.getByRole("link", { name: "Plano de ação" }).click();
-  const pendencias = page.getByRole("region", { name: "Fatores do PGR sem ação" });
-  await expect(pendencias).toContainText("Produção · 5. Horários e Jornada");
+  const pendencias = page.getByRole("region", { name: "Riscos do PGR sem ação" });
+  await expect(pendencias.locator("li")).toHaveCount(8);
+  await expect(pendencias).toContainText("Produção · 13. Ritmo imposto por processo contínuo sem pausas");
   await page.getByRole("button", { name: "Gerar ações a partir do Eixo 2" }).click();
   await expect(page.getByText("1 ação(ões) criada(s)")).toBeVisible();
-  await expect(pendencias).not.toContainText("5. Horários e Jornada"); // agora coberto pela ação
-  await expect(pendencias).toContainText("10. Equilíbrio Trabalho-Vida");
+  // A ação gerada é do fator 5 (Horários): não cobre nenhuma situação do PGR.
+  await expect(pendencias.locator("li")).toHaveCount(8);
   // Gerar de novo não duplica.
   await page.getByRole("button", { name: "Gerar ações a partir do Eixo 2" }).click();
   await expect(page.getByText(/Nada novo/)).toBeVisible();
@@ -257,6 +273,20 @@ test("Eixo 3 publicado e Painel FRPRT com o cruzamento dos três eixos", async (
   await verificacao.getByRole("button", { name: "Registrar verificação" }).click();
   await expect(verificacao.getByText("Eficaz", { exact: true })).toBeVisible();
   await expect(page.getByRole("region", { name: "Histórico" })).toContainText("Responsável: — → Ana Lima");
+
+  // "Criar ação" a partir de uma situação do PGR: já vem ligada a ela e some das pendências.
+  await page.getByRole("link", { name: "Plano de ação" }).click();
+  await page
+    .getByRole("region", { name: "Riscos do PGR sem ação" })
+    .locator("li", { hasText: "13. Ritmo imposto" })
+    .getByRole("link", { name: "Criar ação" })
+    .click();
+  await expect(page.getByLabel(/^Por quê/)).toHaveValue(/PGR — situação 13: Ritmo imposto/);
+  await page.getByRole("button", { name: "Criar ação" }).click();
+  await expect(page).toHaveURL(/\/gestor\/plano\/(?!nova)[^/]+$/);
+  await page.getByRole("link", { name: "Plano de ação" }).click();
+  await expect(page.getByRole("region", { name: "Riscos do PGR sem ação" }).locator("li")).toHaveCount(7);
+  await expect(page.getByRole("region", { name: "Riscos do PGR sem ação" })).not.toContainText("13. Ritmo imposto");
 
   // O painel passa a mostrar a ação no lugar do prazo sugerido.
   await page.getByRole("link", { name: "Painel FRPRT" }).click();

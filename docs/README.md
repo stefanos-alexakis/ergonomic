@@ -32,10 +32,11 @@ A avaliação de cada empresa combina **três eixos**, sempre por **setor** e po
 | 3 · Atestados CID-F | RH/DP da empresa | O que já aconteceu | Agrava 10% (×1,10) quando há caso ligado ao trabalho |
 
 ```
-Risco final (1–5) = Eixo 1 × Fator Eixo 2 × Fator Eixo 3
+Índice final (1–5) = Eixo 1 × Fator Eixo 2 × Fator Eixo 3
   até 3,00  → sem risco
   3,01–4,00 → atenção (perigo com controle existente)
-  acima 4,00 → risco existente → plano de ação + PGR
+  acima 4,00 → risco existente → plano de ação
+  PGR: só as situações inerentes à função (8, marcadas pelo admin) com índice próprio acima de 3,00
 ```
 
 O resultado aparece no **Painel FRPRT** e no **relatório PDF**, prontos para alimentar o PGR.
