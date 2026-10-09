@@ -12,13 +12,14 @@ import { fatoresAtivos, setoresDaEmpresa } from "../dados";
 export const dynamic = "force-dynamic";
 
 /**
- * Nova ação manual. Vindo de "Criar ação" de um fator do PGR, chega com
- * setor, fator e prioridade: já preenche onde, o quê sugerido e prazos.
+ * Nova ação manual. Vindo de "Criar ação" de uma situação do PGR, chega
+ * com setor, fator, situação e prioridade: já preenche onde, o quê
+ * sugerido, por quê e prazos, e liga a ação à questão do Eixo 2 da situação.
  */
 export default async function NovaAcaoPage({
   searchParams,
 }: {
-  searchParams: Promise<{ setor?: string; fator?: string; prioridade?: string }>;
+  searchParams: Promise<{ setor?: string; fator?: string; situacao?: string; prioridade?: string }>;
 }) {
   const sp = await searchParams;
   const { actor, workspace } = await contextoGestor();
@@ -30,14 +31,25 @@ export default async function NovaAcaoPage({
   const hoje = diaDe(new Date());
   const prazos = prioridade ? calcularPrazos(prioridade, hoje, regras) : null;
 
-  // Sugestão de "o quê": primeira tratativa do catálogo do Eixo 2 para o fator.
-  const sugestao = fatorOk
-    ? await db.questaoEixo2.findFirst({
-        where: { planoSugerido: { not: null }, perguntaEixo1: { fatorRisco: { dimensaoId: fatorOk } } },
-        orderBy: { ordem: "asc" },
-        select: { planoSugerido: true },
-      })
-    : null;
+  // Situação do PGR (só se for do fator informado).
+  const situacao =
+    fatorOk && sp.situacao
+      ? await db.questaoEixo2.findFirst({
+          where: { perguntaEixo1Id: sp.situacao, perguntaEixo1: { fatorRisco: { dimensaoId: fatorOk } } },
+          select: { id: true, planoSugerido: true, perguntaEixo1: { select: { ordemGlobal: true, situacaoInvestigada: true } } },
+        })
+      : null;
+  // Sugestão de "o quê": tratativa do catálogo do Eixo 2 da situação, ou a
+  // primeira do fator.
+  const sugestao =
+    situacao ??
+    (fatorOk
+      ? await db.questaoEixo2.findFirst({
+          where: { planoSugerido: { not: null }, perguntaEixo1: { fatorRisco: { dimensaoId: fatorOk } } },
+          orderBy: { ordem: "asc" },
+          select: { planoSugerido: true },
+        })
+      : null);
   const primeiraSugestao = (sugestao?.planoSugerido ?? "").split("\n").map((l) => l.replace(/^-\s*/, "").trim()).find(Boolean) ?? "";
 
   return (
@@ -47,7 +59,9 @@ export default async function NovaAcaoPage({
         <FormularioAcao
           valores={{
             oque: primeiraSugestao,
-            porque: "",
+            porque: situacao
+              ? `PGR — situação ${situacao.perguntaEixo1.ordemGlobal}: ${situacao.perguntaEixo1.situacaoInvestigada}`
+              : "",
             como: "",
             responsavel: "",
             cargoResponsavel: "",
@@ -61,6 +75,7 @@ export default async function NovaAcaoPage({
           }}
           setores={setores}
           fatores={fatores}
+          questaoEixo2Id={situacao?.id}
         />
         <p className="mt-6">
           <Link href="/gestor/plano" className="text-sm text-zinc-500 hover:text-zinc-900">

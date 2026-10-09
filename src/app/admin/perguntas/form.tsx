@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/ui/field";
 
-type Pergunta = { id: string; texto: string; situacaoInvestigada: string; peso: number; ordemGlobal: number };
+type Pergunta = { id: string; texto: string; situacaoInvestigada: string; peso: number; ordemGlobal: number; vaiParaPgr?: boolean };
 type Dimensao = { id: string; nome: string; perguntas: Pergunta[] };
 type Bloco = { id: string; nome: string; dimensoes: Dimensao[] };
 
@@ -33,7 +33,23 @@ export function PesosForm({ blocos, eixo = 1 }: { blocos: Bloco[]; eixo?: 1 | 2 
                     >
                       <div className="flex-1 text-sm text-zinc-700">
                         <span className="text-zinc-400">{p.ordemGlobal}.</span> {p.texto}
+                        <span className="block text-xs text-zinc-400">Situação: {p.situacaoInvestigada}</span>
                       </div>
+                      {eixo === 1 && (
+                        <label
+                          className="flex items-center gap-1.5 text-xs text-zinc-600 cursor-pointer"
+                          title="Situação inerente à função: vai para o PGR quando o índice final dela no setor passar de 3,00"
+                        >
+                          <input
+                            type="checkbox"
+                            name={`pgr_${p.id}`}
+                            defaultChecked={p.vaiParaPgr}
+                            className="h-4 w-4 cursor-pointer"
+                            aria-label={`Vai para o PGR: ${p.situacaoInvestigada}`}
+                          />
+                          PGR
+                        </label>
+                      )}
                       <Input
                         type="number"
                         name={`peso_${p.id}`}
@@ -54,11 +70,11 @@ export function PesosForm({ blocos, eixo = 1 }: { blocos: Bloco[]; eixo?: 1 | 2 
       ))}
 
       {estado?.erro && <FieldError>{estado.erro}</FieldError>}
-      {estado?.sucesso && <p className="text-sm text-emerald-700">Pesos salvos.</p>}
+      {estado?.sucesso && <p className="text-sm text-emerald-700">{eixo === 1 ? "Pesos e situações do PGR salvos." : "Pesos salvos."}</p>}
 
       <div className="sticky bottom-4 flex justify-end">
         <Button type="submit" disabled={pendente}>
-          {pendente ? "Salvando..." : "Salvar pesos"}
+          {pendente ? "Salvando..." : eixo === 1 ? "Salvar pesos e PGR" : "Salvar pesos"}
         </Button>
       </div>
     </form>

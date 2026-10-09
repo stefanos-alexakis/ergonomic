@@ -496,12 +496,30 @@ export async function gerarDoEixo2(workspaceId: string, avaliacaoId: string, aut
 
 // ── Leituras para as telas ───────────────────────────────────────────
 
-/** Fatores que vão para o PGR (acima de 4,00) sem nenhuma ação ativa cobrindo setor × fator. */
-export function pendenciasDoPgr(painel: PainelFrprt, acoes: AcaoCompleta[]) {
-  const ativas = acoes.filter((a) => a.fase !== "CANCELADA");
-  return painel.fmea.pgr.filter(
-    (i) => !ativas.some((a) => a.dimensaoId === i.fator.id && a.setores.some((s) => s.setorId === i.setorId)),
-  );
+/**
+ * Situações do PGR (setor × situação) sem nenhuma ação ativa cobrindo. O
+ * painel já calcula quem cobre cada uma: ação gerada da própria questão do
+ * Eixo 2, ou ação manual (sem questão) do mesmo fator, no mesmo setor.
+ */
+export function pendenciasDoPgr(painel: PainelFrprt) {
+  return painel.fmea.pgr.filter((i) => i.acoes.length === 0);
+}
+
+/**
+ * Questão do Eixo 2 de origem de uma ação manual vinda do PGR — só vale se
+ * for da versão ativa e do mesmo fator escolhido no formulário (a pessoa
+ * pode ter trocado o fator antes de salvar).
+ */
+export async function questaoDaSituacao(questaoEixo2Id: string, dimensaoId: string | null): Promise<string | null> {
+  if (!questaoEixo2Id || !dimensaoId) return null;
+  const q = await db.questaoEixo2.findFirst({
+    where: {
+      id: questaoEixo2Id,
+      perguntaEixo1: { fatorRisco: { dimensaoId, dimensao: { bloco: { questionario: { ativo: true } } } } },
+    },
+    select: { id: true },
+  });
+  return q?.id ?? null;
 }
 
 /** Antes (índice quando a ação nasceu) × depois (painel atual), por setor. */

@@ -1,0 +1,13 @@
+{
+  "_comentario": "Situações (pela descrição em perguntas-v2.json) que vão para o PGR quando o índice final passa de 3,00 — pedido da consultoria, out/2026. Aplicado pelo seed só uma vez; depois, quem manda é a tela 'Pesos das perguntas' do admin.",
+  "situacoes": [
+    "Trabalho monótono: Repetitividade, estereotipia, padrão sonoro",
+    "Baixas demandas de trabalho / subutilização",
+    "Ritmo imposto por processo contínuo sem pausas",
+    "Sequência de execução e/ou modo operatório imposto",
+    "Contato habitual com pessoas em sofrimento (saúde, social, educação)",
+    "Exposição a eventos traumáticos (morte, violência, acidentes graves)",
+    "Exposição frequente ou contínua a situações com possibilidade de acidente grave ou dano à integridade física",
+    "Trabalho realizado de forma constante ou predominante em isolamento físico ou remoto"
+  ]
+}

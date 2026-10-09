@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { getActor } from "@/lib/tenant";
 
@@ -44,9 +45,11 @@ export async function atualizarPesosAction(_estadoAnterior: EstadoPesos, formDat
   try {
     await db.$transaction(async (tx) => {
       for (const a of atualizacoes) {
+        // "Vai para o PGR": caixa marcada chega como `pgr_<id>`; desmarcada
+        // não chega (por isso cada pergunta do formulário é gravada).
         const r = await tx.pergunta.updateMany({
           where: { id: a.id, ...doQuestionarioAtivo },
-          data: { peso: a.peso },
+          data: { peso: a.peso, vaiParaPgr: formData.has(`pgr_${a.id}`) },
         });
         if (r.count !== 1) throw new Error("PERGUNTA_FORA_DO_QUESTIONARIO_ATIVO");
       }
@@ -58,6 +61,9 @@ export async function atualizarPesosAction(_estadoAnterior: EstadoPesos, formDat
     throw err;
   }
 
+  // O React 19 recoloca os campos no valor padrão depois do envio: sem
+  // recarregar os dados, a caixa do PGR "voltaria" ao estado antigo na tela.
+  revalidatePath("/admin/perguntas");
   return { sucesso: true };
 }
 

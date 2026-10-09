@@ -230,7 +230,7 @@ export default async function PainelFrprtPage({
         )}
       </section>
 
-      {/* 3 — FMEA: prioridade de ação para o PGR */}
+      {/* 3 — FMEA: prioridade de ação (PGR por situação + fatores no plano de ação) */}
       <section className="mb-12" aria-label="Matriz FMEA">
         <TituloSecao
           numero={3}
@@ -247,8 +247,8 @@ export default async function PainelFrprtPage({
             <h3 className="text-sm font-semibold uppercase tracking-wide text-[#183b56] mb-3">Mapa S × O</h3>
             <MapaSO contagem={fmea.contagemSO} />
             <p className="text-xs text-zinc-500 mt-2 max-w-xs">
-              Quantidade de setor × fator acima de 3,00 em cada combinação. A cor é o nível base, antes do ajuste pela
-              detecção.
+              Quantidade de itens acima de 3,00 (situações do PGR e fatores do plano de ação) em cada combinação. A cor
+              é o nível base, antes do ajuste pela detecção.
             </p>
           </div>
           <div className="flex flex-col gap-3 text-sm text-zinc-700">
@@ -272,14 +272,14 @@ export default async function PainelFrprtPage({
         </div>
 
         <h3 className="text-sm font-semibold uppercase tracking-wide text-[#183b56] mb-3">
-          Acima de 4,00 — plano de ação no PGR
+          PGR — situações inerentes à função acima de 3,00
         </h3>
-        <TabelaFmea itens={fmea.pgr} vazio="Nenhum fator acima de 4,00." />
+        <TabelaFmea itens={fmea.pgr} vazio="Nenhuma situação do PGR acima de 3,00." />
 
         <h3 className="text-sm font-semibold uppercase tracking-wide text-[#183b56] mt-8 mb-3">
-          De 3,01 a 4,00 — acompanhamento
+          Fatores acima de 3,00 — plano de ação (fora do PGR)
         </h3>
-        <TabelaFmea itens={fmea.acompanhamento} vazio="Nenhum fator entre 3,01 e 4,00." />
+        <TabelaFmea itens={fmea.acompanhamento} vazio="Nenhum fator acima de 3,00." />
 
         <CriteriosFmea severidades={fmea.severidades} regrasPrazo={fmea.regrasPrazo} />
       </section>
@@ -332,7 +332,17 @@ export default async function PainelFrprtPage({
                           <td className="px-3 py-2">
                             <Badge tom={CONCLUSOES[c.conclusao!].tom}>{CONCLUSOES[c.conclusao!].rotulo}</Badge>
                           </td>
-                          <td className="px-3 py-2 text-zinc-600">{CONCLUSOES[c.conclusao!].encaminhamento}</td>
+                          <td className="px-3 py-2 text-zinc-600">
+                            {CONCLUSOES[c.conclusao!].encaminhamento}
+                            {(() => {
+                              const noPgr = pgr.filter((r) => r.setorId === l.setorId && r.fator.id === c.fatorId);
+                              return noPgr.length > 0 ? (
+                                <span className="block text-xs font-medium text-red-700">
+                                  PGR: situação {noPgr.map((r) => r.situacao.numero).sort((a, b) => a - b).join(", ")}
+                                </span>
+                              ) : null;
+                            })()}
+                          </td>
                         </tr>
                       );
                     }),
@@ -347,17 +357,23 @@ export default async function PainelFrprtPage({
       <section aria-label="Riscos para o PGR">
         <TituloSecao numero={5} titulo="Riscos existentes que vão para o PGR" />
         <p className="text-sm text-zinc-500 mb-3">
-          Apenas resultados finais acima de 4,00, na ordem de prioridade da FMEA — respeitando os filtros.
+          Só as situações inerentes à função (marcadas pelo administrador), com índice próprio no setor acima de 3,00 —
+          Eixo 1 da pergunta × Eixo 2 da questão × Eixo 3 da situação. Os demais fatores, mesmo com nota alta, vão para o
+          plano de ação. Na ordem de prioridade da FMEA, respeitando os filtros.
         </p>
         {pgr.length === 0 ? (
-          <p className="text-sm text-zinc-500">Nenhum fator acima de 4,00.</p>
+          <p className="text-sm text-zinc-500">Nenhuma situação do PGR acima de 3,00.</p>
         ) : (
           <div className="flex flex-col gap-4">
             {pgr.map((r) => (
-              <article key={`${r.setor}-${r.fator.id}`} className="rounded-lg border border-red-200 p-4">
+              <article
+                key={`${r.setorId}-${r.situacao.perguntaId}`}
+                className="rounded-lg border p-4"
+                style={{ borderColor: CONCLUSOES[r.celula.conclusao!].cor }}
+              >
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                   <h3 className="font-semibold text-zinc-900">
-                    {r.setor} · {r.fator.nome}
+                    {r.setor} · {r.situacao.numero}. {r.situacao.texto}
                   </h3>
                   <span className="flex items-center gap-2 text-sm">
                     {r.celula.fmea && <PilulaPrioridade prioridade={r.celula.fmea.prioridade} />}
@@ -370,7 +386,11 @@ export default async function PainelFrprtPage({
                     <PrazosOuAcoes prazos={r.prazos} acoes={r.acoes} />
                   </p>
                 )}
-                <p className="text-xs text-zinc-500 mb-3">Fator de risco PGR: {r.fator.fatorRisco}</p>
+                <p className="text-xs text-zinc-500 mb-3">
+                  {r.fator.nome} · Fator de risco PGR: {r.fator.fatorRisco} · Eixo 1 {formatarRisco(r.celula.eixo1!)} × Eixo 2{" "}
+                  {r.celula.fatorEixo2.toFixed(2).replace(".", ",")}
+                  {r.celula.semEixo2 ? "*" : ""} × Eixo 3 {r.celula.fatorEixo3.toFixed(2).replace(".", ",")}
+                </p>
                 <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-sm">
                   <div>
                     <dt className="text-xs font-medium text-zinc-500">Possíveis consequências</dt>

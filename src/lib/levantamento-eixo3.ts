@@ -249,6 +249,7 @@ export async function carregarMatriz(questionarioId: string) {
         select: {
           ordemGlobal: true,
           situacaoInvestigada: true,
+          vaiParaPgr: true,
           fatorRisco: {
             select: { nome: true, dimensao: { select: { id: true, nome: true, ordem: true, bloco: { select: { ordem: true } } } } },
           },

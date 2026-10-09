@@ -16,10 +16,19 @@ test("admin da plataforma salva pesos do questionário em uso (v2, 35 perguntas)
   const pesos = page.getByLabel(/^Peso da pergunta:/);
   await expect(pesos).toHaveCount(35);
 
+  // As 8 situações inerentes à função vêm marcadas para o PGR pelo seed.
+  const pgr = page.getByLabel(/^Vai para o PGR:/);
+  await expect(pgr).toHaveCount(35);
+  const marcadas = async () => (await pgr.evaluateAll((els) => els.filter((e) => (e as HTMLInputElement).checked).length));
+  expect(await marcadas()).toBe(8);
+  await expect(page.getByLabel("Vai para o PGR: Ritmo imposto por processo contínuo sem pausas")).toBeChecked();
+
   // Salva sem alterar valores: exercita a action de verdade (permissão +
-  // restrição ao questionário ativo) sem mudar o Score Base de ninguém.
-  await page.getByRole("button", { name: "Salvar pesos" }).click();
-  await expect(page.getByText("Pesos salvos.")).toBeVisible();
+  // restrição ao questionário ativo) sem mudar o Score Base nem o PGR de ninguém.
+  await page.getByRole("button", { name: "Salvar pesos e PGR" }).click();
+  await expect(page.getByText("Pesos e situações do PGR salvos.")).toBeVisible();
+  await page.reload();
+  expect(await marcadas()).toBe(8);
 });
 
 test("gestor de empresa não acessa a tela de pesos", async ({ page }) => {

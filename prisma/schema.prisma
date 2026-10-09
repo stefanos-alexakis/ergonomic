@@ -153,6 +153,10 @@ model Pergunta {
   // o dashboard recalcula ao vivo com o peso vigente (não é congelado por
   // pesquisa — ver review.md sobre a decisão do usuário).
   peso                Float      @default(1)
+  // Situação que vai para o PGR quando o índice final dela passar de 3,00
+  // (pedido da consultoria, out/2026: só as situações inerentes à função
+  // entram no PGR; os demais fatores vão para o plano de ação).
+  vaiParaPgr          Boolean    @default(false)
 
   fatorRisco    FatorRisco         @relation(fields: [fatorRiscoId], references: [id], onDelete: Cascade)
   respostaItens RespostaItem[]

@@ -151,14 +151,17 @@ O que aparece, nesta ordem:
 2. **Pontuação dos setores** — um cartão por setor.
 3. **Painel resumido por setor** — tabela com as barras de cada eixo e o score final.
 4. **Principais achados** — frases curtas, fatores mais apontados e tratativas sugeridas.
-5. **Matriz FMEA — prioridade de ação** — mapa Severidade × Ocorrência e duas listas: acima de 4,00
-   (plano de ação no PGR) e de 3,01 a 4,00 (acompanhamento). Cada item traz S, O, D, RPN, a
+5. **Matriz FMEA — prioridade de ação** — mapa Severidade × Ocorrência e duas listas: **PGR**
+   (situações inerentes à função acima de 3,00) e **fatores acima de 3,00 → plano de ação**. Cada item traz S, O, D, RPN, a
    prioridade (Alta, Média, Baixa) e as **datas** de plano, implantação e reavaliação, contadas a
    partir do dia em que o painel ou o relatório é emitido. Em "Critérios da classificação FMEA" estão
    a tabela de severidade e as regras.
-6. **Matriz de decisão** — cada fator de cada setor com conclusão e encaminhamento.
-7. **Riscos que vão para o PGR** — na ordem de prioridade da FMEA, com prazos, consequências
-   possíveis, CIDs compatíveis, observação técnica e plano de ação.
+6. **Matriz de decisão** — cada fator de cada setor com conclusão e encaminhamento, por setor e depois
+   por fator (1–13). Quando uma situação daquele fator vai para o PGR, aparece "PGR: situação N".
+7. **Riscos que vão para o PGR** — só as situações inerentes à função (marcadas "PGR" pelo
+   administrador em **Pesos das perguntas**) com índice próprio no setor acima de 3,00. Os demais
+   fatores, mesmo com nota alta, ficam fora do PGR e vão para o plano de ação. Na ordem da FMEA, com
+   prazos, consequências possíveis, CIDs compatíveis, observação técnica e plano de ação.
 
 **Baixar relatório (PDF)** gera o mesmo conteúdo para anexar ao PGR. Como ler os números: veja o
 [Guia rápido do Score](score-frprt.html). Onde o fator já tem ação no Plano de ação, o painel e o
@@ -172,8 +175,10 @@ Um plano contínuo da empresa, que atravessa os ciclos de pesquisa e avaliação
   em vários setores (por exemplo, "responder para todos") viram **uma** ação com vários setores.
   Gerar de novo não duplica nem apaga o que foi editado, e ações canceladas não voltam. A ação já
   nasce com a prioridade da FMEA e prazos sugeridos.
-- **Fatores que vão para o PGR sem ação** — lista em vermelho no topo, com **Criar ação** já
-  preenchida com setor, fator e uma tratativa sugerida.
+- **Situações que vão para o PGR sem ação** — lista em vermelho no topo, com **Criar ação** já
+  preenchida com setor, fator, situação (no "por quê") e uma tratativa sugerida. A ação criada por
+  ali fica ligada à situação. Uma situação conta como coberta por ação gerada da própria questão do
+  Eixo 2 ou por ação manual do mesmo fator.
 - **+ Nova ação** — ação manual.
 
 **5W2H** (todos editáveis, inclusive os prazos): o quê, por quê, onde (setores), quem (responsável e

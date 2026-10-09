@@ -13,6 +13,7 @@ import {
   gerarDoEixo2,
   lerDadosAcao,
   mudarFase,
+  questaoDaSituacao,
   verificarAcao,
   type Autor,
 } from "@/lib/plano-acao";
@@ -60,7 +61,10 @@ export async function criarAcaoAction(_e: EstadoForm, fd: FormData): Promise<Est
   if (!ctx) return SEM_ACESSO;
   const dados = lerDadosAcao(fd);
   if ("erro" in dados) return dados;
-  const r = await criarAcao(ctx.workspaceId, dados, ctx.autor);
+  // Vinda de uma situação do PGR: liga a ação à questão do Eixo 2 dela,
+  // para o painel reconhecer que a situação está coberta.
+  const questaoEixo2Id = await questaoDaSituacao(String(fd.get("questaoEixo2Id") ?? ""), dados.dimensaoId);
+  const r = await criarAcao(ctx.workspaceId, dados, ctx.autor, questaoEixo2Id ? { questaoEixo2Id } : {});
   if (!r.ok) return { erro: r.erro };
   revalidar();
   redirect(`/gestor/plano/${r.id}`);

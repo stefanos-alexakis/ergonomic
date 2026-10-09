@@ -3,8 +3,10 @@
  *
  *   Índice final = Eixo 1 (média 1–5, maior = pior) × Fator Eixo 2 × Fator Eixo 3
  *
- * Tudo — cor, faixa, conclusão e encaminhamento ao PGR — sai dos cortes da
- * metodologia (3,00 / 4,00) aplicados a esse índice. A antiga nota 100–1000
+ * Tudo — cor, faixa e conclusão — sai dos cortes da metodologia
+ * (3,00 / 4,00) aplicados a esse índice. O PGR é decidido à parte, por
+ * situação (ver painel-frprt.ts): só as situações inerentes à função,
+ * acima de 3,00. A antiga nota 100–1000
  * foi retirada do sistema (decisão do usuário): era só uma conversão do
  * índice para exibição e não entrava em nenhum cálculo.
  */
@@ -49,8 +51,8 @@ export const CONCLUSOES: Record<
   RISCO_EXISTENTE: {
     rotulo: "Risco existente",
     curto: "Alto risco",
-    descricao: "Risco psicossocial confirmado — exige plano de ação e inclusão no PGR.",
-    encaminhamento: "Plano de ação + inclusão no PGR",
+    descricao: "Risco psicossocial confirmado — exige plano de ação. Entra no PGR só pelas situações inerentes à função.",
+    encaminhamento: "Plano de ação",
     tom: "perigo",
     cor: "#B91C1C",
     fundo: "#FEE2E2",

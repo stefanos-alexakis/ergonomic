@@ -52,7 +52,14 @@ export default async function PerguntasPage({ searchParams }: { searchParams: Pr
           fator.perguntas.flatMap((p) => {
             if (eixo === 1) {
               return [
-                { id: p.id, texto: p.texto, situacaoInvestigada: p.situacaoInvestigada, peso: p.peso, ordemGlobal: p.ordemGlobal },
+                {
+                  id: p.id,
+                  texto: p.texto,
+                  situacaoInvestigada: p.situacaoInvestigada,
+                  peso: p.peso,
+                  ordemGlobal: p.ordemGlobal,
+                  vaiParaPgr: p.vaiParaPgr,
+                },
               ];
             }
             const q = p.questaoEixo2;

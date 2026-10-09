@@ -162,6 +162,7 @@ export async function carregarFormulario(avaliacaoId: string, questionarioId: st
       planoSugerido: string | null;
       perguntaColaborador: string;
       peso: number;
+      perguntaEixo1Id: string;
     }[];
   }[] = [];
 
@@ -174,6 +175,7 @@ export async function carregarFormulario(avaliacaoId: string, questionarioId: st
     }
     grupo.questoes.push({
       id: q.id,
+      perguntaEixo1Id: q.perguntaEixo1Id,
       ordem: q.ordem,
       texto: q.texto,
       planoSugerido: q.planoSugerido,
@@ -372,6 +374,8 @@ export async function calcularResultado(avaliacaoId: string, questionarioId: str
   const linhas = setores.map((setor) => {
     const todasDoSetor: { condicao: Condicao; peso: number }[] = [];
     const porDimensao: Record<string, number | null> = {};
+    // Fator de cada situação (pergunta do Eixo 1) — usado no PGR por situação.
+    const porPergunta: Record<string, number | null> = {};
     let respondidas = 0;
     let totalQuestoes = 0;
     for (const d of dimensoes) {
@@ -379,6 +383,7 @@ export async function calcularResultado(avaliacaoId: string, questionarioId: str
       for (const q of d.questoes) {
         totalQuestoes++;
         const r = respostas[`${q.id}:${setor.id}`];
+        porPergunta[q.perguntaEixo1Id] = r ? calcularFatorEixo2([{ condicao: r.condicao, peso: q.peso }]) : null;
         if (r) {
           respondidas++;
           itens.push({ condicao: r.condicao, peso: q.peso });
@@ -390,6 +395,7 @@ export async function calcularResultado(avaliacaoId: string, questionarioId: str
     return {
       setor,
       porDimensao,
+      porPergunta,
       geral: calcularFatorEixo2(todasDoSetor),
       completo: respondidas === totalQuestoes,
     };

@@ -96,7 +96,7 @@ export function Regua({ risco }: { risco: number }) {
           Médio risco
         </span>
         <span className="w-1/4 font-medium text-right" style={{ color: CONCLUSOES.RISCO_EXISTENTE.cor }}>
-          Alto risco → PGR
+          Alto risco → plano de ação
         </span>
       </div>
     </div>
@@ -142,7 +142,7 @@ export function CartaoGeral({ geral }: { geral: ResultadoGeral }) {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         <Numero valor={geral.setoresAvaliados} rotulo="setores avaliados" />
         <Numero valor={geral.setoresEmRisco} rotulo="setores em risco alto" />
-        <Numero valor={geral.fatoresPgr} rotulo="itens para o PGR" />
+        <Numero valor={geral.fatoresPgr} rotulo="situações no PGR" />
         <Numero
           valor={geral.participacao !== null ? `${Math.round(geral.participacao * 100)}%` : "—"}
           rotulo="participação"
@@ -174,7 +174,7 @@ export function CartoesSetores({ linhas, limite }: { linhas: LinhaSetorPainel[];
                 {c ? (
                   <p className="text-xs font-medium" style={{ color: c.cor }}>
                     {c.curto}
-                    {l.fatoresEmRisco > 0 ? ` · ${l.fatoresEmRisco} p/ PGR` : ""}
+                    {l.situacoesPgr > 0 ? ` · ${l.situacoesPgr} no PGR` : ""}
                   </p>
                 ) : (
                   <p className="text-xs text-zinc-500">

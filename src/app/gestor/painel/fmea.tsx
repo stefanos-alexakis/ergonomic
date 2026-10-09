@@ -16,7 +16,8 @@ import { CONCLUSOES, formatarRisco } from "@/lib/score-final";
 
 /**
  * Seção FMEA do Painel FRPRT: mapa S × O, as duas listas priorizadas
- * (acima de 4,00 → PGR; 3,01 a 4,00 → acompanhamento) e os critérios
+ * (PGR: situações inerentes à função acima de 3,00; fatores acima de 3,00:
+ * plano de ação) e os critérios
  * documentados (NR-1, item 1.5.4.4.2).
  */
 
@@ -135,7 +136,7 @@ export function TabelaFmea({ itens, vazio }: { itens: ItemFmea[]; vazio: string 
         <thead className="bg-zinc-50 text-xs text-zinc-500">
           <tr>
             <th className="px-3 py-2 text-left font-medium">Prioridade</th>
-            <th className="px-3 py-2 text-left font-medium">Setor · fator</th>
+            <th className="px-3 py-2 text-left font-medium">Setor · fator / situação</th>
             <th className="px-3 py-2 text-center font-medium">Índice</th>
             <th className="px-3 py-2 text-center font-medium" title="Severidade">S</th>
             <th className="px-3 py-2 text-center font-medium" title="Ocorrência (Eixo 1)">O</th>
@@ -148,14 +149,15 @@ export function TabelaFmea({ itens, vazio }: { itens: ItemFmea[]; vazio: string 
           {itens.map((i) => {
             const c = CONCLUSOES[i.celula.conclusao!];
             return (
-              <tr key={`${i.setorId}-${i.fator.id}`} className="border-t border-zinc-100 align-top">
+              <tr key={`${i.setorId}-${i.situacao?.perguntaId ?? i.fator.id}`} className="border-t border-zinc-100 align-top">
                 <td className="px-3 py-3">
                   <PilulaPrioridade prioridade={i.fmea.prioridade} />
                 </td>
                 <td className="px-3 py-3">
                   <p className="font-medium text-zinc-900">
-                    {i.setor} · {i.fator.nome}
+                    {i.setor} · {i.situacao ? `${i.situacao.numero}. ${i.situacao.texto}` : i.fator.nome}
                   </p>
+                  {i.situacao && <p className="text-xs text-zinc-500 mt-0.5">{i.fator.nome}</p>}
                   <p className="text-xs text-zinc-500 mt-0.5">
                     S-base {i.fmea.sBase}
                     {i.fmea.agravantes.map((a) => ` · +1 ${ROTULO_AGRAVANTE[a]}`).join("")}
