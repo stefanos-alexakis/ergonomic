@@ -135,7 +135,7 @@ O relatório PDF traz a página da Matriz FMEA e uma página com estes critério
 
 ## Anonimato (regras que valem para todos os cálculos)
 
-- Grupo (setor, departamento) com menos respostas que o limite da pesquisa (padrão **5**) não tem
+- Grupo (setor, departamento) com menos respostas que o limite da pesquisa (padrão **3**) não tem
   índice exibido: "amostra insuficiente". O % de expostos da FMEA só é calculado nesses mesmos
   setores com amostra suficiente.
 - Se só um grupo for suprimido, o segundo menor também é, para impedir a dedução por subtração.

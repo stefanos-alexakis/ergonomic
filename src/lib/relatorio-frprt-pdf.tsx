@@ -540,12 +540,13 @@ export async function gerarRelatorioFrprtPdf(params: {
           <Text style={{ width: "8%", paddingHorizontal: 3, textAlign: "center" }}>Final</Text>
           <Text style={{ width: "22%", paddingHorizontal: 3 }}>Conclusão / encaminhamento</Text>
         </View>
+        {/* Setor (A–Z), depois fator (1–13 — as células já vêm nessa ordem). */}
         {linhas
           .filter((l) => !l.suprimido)
+          .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"))
           .flatMap((l) =>
             l.celulas
               .filter((c) => c.final !== null)
-              .sort((a, b) => (b.final ?? 0) - (a.final ?? 0))
               .map((c) => (
                 <View key={`${l.setorId}-${c.fatorId}`} style={s.linha} wrap={false}>
                   <Text style={{ width: "14%", paddingHorizontal: 3 }}>{l.nome}</Text>

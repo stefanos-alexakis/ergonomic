@@ -167,3 +167,75 @@ export async function redefinirSenhaGestor(
   await db.user.update({ where: { id: gestorUserId }, data: { passwordHash: senhaHash } });
   return { ok: true };
 }
+
+/** O que some junto com a empresa — mostrado na tela antes de confirmar. */
+export async function resumoParaExcluir(workspaceId: string) {
+  const [pesquisas, respostas, avaliacoesEixo2, levantamentosEixo3, acoesPlano, gestores] = await Promise.all([
+    db.pesquisa.count({ where: { workspaceId } }),
+    db.resposta.count({ where: { codigoAcesso: { pesquisa: { workspaceId } } } }),
+    db.avaliacaoEixo2.count({ where: { workspaceId } }),
+    db.levantamentoEixo3.count({ where: { workspaceId } }),
+    db.acaoPlano.count({ where: { workspaceId } }),
+    usuariosSoDestaEmpresa(db, workspaceId),
+  ]);
+  return { pesquisas, respostas, avaliacoesEixo2, levantamentosEixo3, acoesPlano, gestores: gestores.length };
+}
+
+type Cliente = Pick<typeof db, "user">;
+
+/**
+ * Usuários que ficariam órfãos: vínculo (não temporário) só com esta
+ * empresa. Admin da plataforma nunca entra — nem quando está "acessando
+ * como gestor" (o vínculo dele é `impersonada` e some com a empresa).
+ */
+function usuariosSoDestaEmpresa(cliente: Cliente, workspaceId: string) {
+  return cliente.user.findMany({
+    where: {
+      isPlatformAdmin: false,
+      memberships: { some: { workspaceId }, every: { workspaceId } },
+    },
+    select: { id: true },
+  });
+}
+
+export type ExcluirEmpresaResultado = { ok: true; logoUrl: string | null } | { ok: false; erro: string };
+
+/**
+ * Exclusão definitiva, em cascata: pesquisas, códigos, respostas, Eixos 2
+ * e 3, plano de ação, setores — tudo pende de `Workspace` com
+ * `onDelete: Cascade` no schema (e um teste E2E confere que nada sobra). Os gestores que só pertenciam a esta
+ * empresa saem junto (senão viram login sem empresa). Só com a empresa
+ * INATIVA: duas etapas de propósito, contra clique errado. Quem chama
+ * apaga o arquivo do logo depois que a transação deu certo.
+ */
+export async function excluirEmpresa(workspaceId: string, confirmacao: string): Promise<ExcluirEmpresaResultado> {
+  const ws = await db.workspace.findUnique({ where: { id: workspaceId } });
+  if (!ws) return { ok: false, erro: "Empresa não encontrada." };
+  if (ws.isActive) return { ok: false, erro: "Inative a empresa antes de excluí-la." };
+  if (confirmacao.trim() !== ws.nome.trim()) {
+    return { ok: false, erro: "Digite o nome da empresa exatamente como aparece para confirmar." };
+  }
+
+  await db.$transaction(async (tx) => {
+    const orfaos = await usuariosSoDestaEmpresa(tx, workspaceId);
+    // Ordem explícita, não um único DELETE na empresa: apagando tudo de uma
+    // vez, o Postgres segue dois caminhos até a mesma resposta (setor →
+    // SET NULL e pesquisa → código → CASCADE) e acusa violação de chave em
+    // Resposta_codigoAcessoId_fkey (achado no E2E desta exclusão).
+    await tx.pesquisa.deleteMany({ where: { workspaceId } });
+    await tx.acaoPlano.deleteMany({ where: { workspaceId } });
+    await tx.avaliacaoEixo2.deleteMany({ where: { workspaceId } });
+    await tx.levantamentoEixo3.deleteMany({ where: { workspaceId } });
+    await tx.workspace.delete({ where: { id: workspaceId } });
+    if (orfaos.length) await tx.user.deleteMany({ where: { id: { in: orfaos.map((u) => u.id) } } });
+  });
+  return { ok: true, logoUrl: ws.logoUrl };
+}
+
+/**
+ * Ativa/inativa direto da lista de empresas. Recebe o estado desejado (não
+ * "inverte"): clique duplo ou duas abas abertas não desfazem a mudança.
+ */
+export async function definirStatusEmpresa(workspaceId: string, ativa: boolean): Promise<void> {
+  await db.workspace.updateMany({ where: { id: workspaceId }, data: { isActive: ativa } });
+}

@@ -239,7 +239,7 @@ model Pesquisa {
   dataInicio           DateTime
   dataFim              DateTime
   licencasSolicitadas  Int
-  limiteSupressaoGrupo Int            @default(5)
+  limiteSupressaoGrupo Int            @default(3)
   createdAt            DateTime       @default(now())
 
   workspace    Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)

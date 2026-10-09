@@ -7,7 +7,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
 import { Table, Thead, Th, Tr, Td } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { assumirVisaoGestorAction } from "./actions";
+import { assumirVisaoGestorAction, definirStatusEmpresaAction } from "./actions";
 
 // Depende de dados de banco em tempo real e de sessão autenticada —
 // nunca deve ser pré-renderizada estaticamente no build.
@@ -75,7 +75,18 @@ export default async function AdminHomePage() {
                 </Td>
                 <Td>{e._count.pesquisas}</Td>
                 <Td>
-                  <Badge tom={e.isActive ? "sucesso" : "neutro"}>{e.isActive ? "Ativa" : "Inativa"}</Badge>
+                  <span className="flex items-center gap-2">
+                    <Badge tom={e.isActive ? "sucesso" : "neutro"}>{e.isActive ? "Ativa" : "Inativa"}</Badge>
+                    <form action={definirStatusEmpresaAction.bind(null, e.id, !e.isActive)}>
+                      <button
+                        type="submit"
+                        aria-label={`${e.isActive ? "Inativar" : "Ativar"} ${e.nome}`}
+                        className="text-xs text-zinc-500 underline-offset-2 hover:text-zinc-900 hover:underline cursor-pointer"
+                      >
+                        {e.isActive ? "inativar" : "ativar"}
+                      </button>
+                    </form>
+                  </span>
                 </Td>
               </Tr>
             ))}

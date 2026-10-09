@@ -88,7 +88,11 @@ export async function PainelEixo3({
               <Th>Relacionadas</Th>
               <Th>Inconclusivas</Th>
               <Th>Dias</Th>
-              <Th>Por 100 colab.</Th>
+              <Th>
+                <span title="Ocorrências do setor ÷ nº de colaboradores × 100. Conta ocorrências, não pessoas: a planilha não identifica o trabalhador, então quem tem mais de um atestado conta mais de uma vez.">
+                  Ocorrência / Colab (%)
+                </span>
+              </Th>
               <Th>Fatores agravados</Th>
             </Tr>
           </Thead>
@@ -103,7 +107,7 @@ export async function PainelEixo3({
                   <Td className="tabular-nums">{s.relacionadas}</Td>
                   <Td className="tabular-nums">{s.inconclusivas}</Td>
                   <Td className="tabular-nums">{s.diasAfastados}</Td>
-                  <Td className="tabular-nums">{s.taxaPor100 !== null ? s.taxaPor100.toFixed(1).replace(".", ",") : "—"}</Td>
+                  <Td className="tabular-nums">{s.taxaPor100 !== null ? `${s.taxaPor100.toFixed(1).replace(".", ",")}%` : "—"}</Td>
                   <Td>{agravados > 0 ? <Badge tom="perigo">{`${agravados} de ${fatores.length}`}</Badge> : <Badge>Nenhum</Badge>}</Td>
                 </Tr>
               );
@@ -112,7 +116,7 @@ export async function PainelEixo3({
         </Table>
         {setores.some((s) => s.colaboradores === null) && (
           <p className="text-xs text-zinc-500 mt-2">
-            Para a taxa por 100 colaboradores, informe o nº de colaboradores em Setores e departamentos.
+            Para a coluna Ocorrência / Colab (%), informe o nº de colaboradores em Setores e departamentos.
           </p>
         )}
       </section>

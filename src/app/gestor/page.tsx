@@ -47,7 +47,7 @@ export default async function GestorHomePage() {
     >
       <PageHeader
         eyebrow={workspace.nome}
-        title="Pesquisas"
+        title="Eixo 1 · Pesquisa com os colaboradores"
         actions={
           <Link href="/gestor/pesquisas/nova">
             <Button>+ Nova pesquisa</Button>

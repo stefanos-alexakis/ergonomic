@@ -303,12 +303,13 @@ export default async function PainelFrprtPage({
               </tr>
             </thead>
             <tbody>
+              {/* Ordem pedida pela consultoria: setor (A–Z), depois fator (1–13). */}
               {linhas
                 .filter((l) => !l.suprimido)
+                .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"))
                 .flatMap((l) =>
-                  [...l.celulas]
+                  l.celulas
                     .filter((c) => c.final !== null)
-                    .sort((a, b) => (b.final ?? 0) - (a.final ?? 0))
                     .map((c) => {
                       const fator = fatores.find((f) => f.id === c.fatorId)!;
                       return (

@@ -9,7 +9,7 @@ export type ItemNav = {
 
 /** Menu da área do gestor — um lugar só, em vez de uma cópia por página. */
 export const NAV_GESTOR: ItemNav[] = [
-  { href: "/gestor", label: "Pesquisas", icone: "pesquisas", ativoEm: ["/gestor/pesquisas"] },
+  { href: "/gestor", label: "Eixo 1 · Pesquisa com os colaboradores", icone: "pesquisas", ativoEm: ["/gestor/pesquisas"] },
   { href: "/gestor/estrutura", label: "Setores e departamentos", icone: "estrutura" },
   { href: "/gestor/eixo2", label: "Eixo 2 · Medidas de controle", icone: "eixo2" },
   { href: "/gestor/eixo3", label: "Eixo 3 · Atestados CID-F", icone: "eixo3" },

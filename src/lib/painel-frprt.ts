@@ -140,7 +140,7 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
   if (!opcoes) return null;
   const { questionarioId, pesquisa, avaliacao, levantamento } = opcoes;
   const { fatores, matriz, situacoes } = await carregarMatriz(questionarioId);
-  const limite = pesquisa?.limiteSupressaoGrupo ?? 5;
+  const limite = pesquisa?.limiteSupressaoGrupo ?? 3;
 
   // ── Eixo 1 por setor × fator ────────────────────────────────────────
   const respostas = pesquisa

@@ -17,9 +17,14 @@ Acesso: **https://pesquisa.agtrade.com.br/login** (admin e gestor). O colaborado
   automaticamente, conforme o contraste.
 - **Gestor responsável** (nome, e-mail e senha inicial).
 
-### 1.2 Editar ou inativar uma empresa
-Clique no nome da empresa na lista. Dá para trocar nome, logo e cores, e inativar. O gestor de
-uma empresa inativa não consegue entrar.
+### 1.2 Editar, inativar ou excluir uma empresa
+Clique no nome da empresa na lista. Dá para trocar nome, logo e cores, e inativar. Na própria lista,
+ao lado do status, os botões **inativar** / **ativar** mudam o status direto. O gestor de uma empresa
+inativa não consegue entrar.
+
+**Excluir** fica no fim da tela de edição e só aparece com a empresa **inativa**. A tela mostra tudo o
+que será apagado (pesquisas e respostas, Eixos 2 e 3, plano de ação, setores, logo e os gestores que
+só pertencem a ela) e pede que você digite o nome da empresa. A exclusão é definitiva.
 
 ### 1.3 Redefinir a senha do gestor
 Na tela de edição da empresa, quadro **Redefinir senha do gestor**. Informe a nova senha e repasse ao gestor.
@@ -53,7 +58,7 @@ usuário. O histórico de cada ação registra o nome com a marca "(consultoria)
 
 ## 2. Gestor da empresa
 
-O menu do gestor tem: **Pesquisas · Setores e departamentos · Eixo 2 · Eixo 3 · Painel FRPRT**.
+O menu do gestor tem: **Eixo 1 · Pesquisa com os colaboradores · Setores e departamentos · Eixo 2 · Eixo 3 · Painel FRPRT**.
 A ordem recomendada de trabalho é a do menu.
 
 ### 2.1 Setores e departamentos
@@ -62,7 +67,7 @@ A ordem recomendada de trabalho é a do menu.
   pesquisa e a taxa de atestados no painel.
 
 ### 2.2 Criar uma pesquisa (Eixo 1)
-**Pesquisas → + Nova pesquisa**: nome, quantidade de licenças, data/hora de início e de
+**Eixo 1 · Pesquisa com os colaboradores → + Nova pesquisa**: nome, quantidade de licenças, data/hora de início e de
 encerramento.
 
 Na página da pesquisa:
@@ -87,7 +92,7 @@ Mostra o **índice geral do Eixo 1** (média de 1 a 5, quanto maior, mais exposi
 régua de cores do Painel FRPRT: até 3,00 baixo risco (verde), até 4,00 médio risco (amarelo), acima
 alto risco (vermelho). Também mostra participação, resultados
 por fator, por setor e por departamento, e **Baixar relatório (PDF)**.
-Setores ou departamentos com menos de 5 respostas aparecem como **amostra insuficiente**. Isso
+Setores ou departamentos com menos de 3 respostas aparecem como **amostra insuficiente**. Isso
 protege o anonimato e não pode ser desligado.
 
 ### 2.4 Eixo 2 · Medidas de controle
