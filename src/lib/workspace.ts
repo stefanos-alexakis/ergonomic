@@ -198,7 +198,9 @@ function usuariosSoDestaEmpresa(cliente: Cliente, workspaceId: string) {
   });
 }
 
-export type ExcluirEmpresaResultado = { ok: true; logoUrl: string | null } | { ok: false; erro: string };
+export type ExcluirEmpresaResultado =
+  | { ok: true; logoUrl: string | null; arquivosRelatorios: string[] }
+  | { ok: false; erro: string };
 
 /**
  * Exclusão definitiva, em cascata: pesquisas, códigos, respostas, Eixos 2
@@ -216,6 +218,9 @@ export async function excluirEmpresa(workspaceId: string, confirmacao: string): 
     return { ok: false, erro: "Digite o nome da empresa exatamente como aparece para confirmar." };
   }
 
+  const arquivosRelatorios = (
+    await db.relatorioEmitido.findMany({ where: { workspaceId }, select: { arquivo: true } })
+  ).map((r) => r.arquivo);
   await db.$transaction(async (tx) => {
     const orfaos = await usuariosSoDestaEmpresa(tx, workspaceId);
     // Ordem explícita, não um único DELETE na empresa: apagando tudo de uma
@@ -229,7 +234,7 @@ export async function excluirEmpresa(workspaceId: string, confirmacao: string): 
     await tx.workspace.delete({ where: { id: workspaceId } });
     if (orfaos.length) await tx.user.deleteMany({ where: { id: { in: orfaos.map((u) => u.id) } } });
   });
-  return { ok: true, logoUrl: ws.logoUrl };
+  return { ok: true, logoUrl: ws.logoUrl, arquivosRelatorios };
 }
 
 /**

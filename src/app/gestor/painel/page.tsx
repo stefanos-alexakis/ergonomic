@@ -83,9 +83,14 @@ export default async function PainelFrprtPage({
         logoUrl={workspace.logoUrl}
         periodo={periodo}
         acoes={
-          <a href={`/gestor/painel/relatorio${query ? `?${query}` : ""}`} className="self-center">
-            <Button>Baixar relatório (PDF)</Button>
-          </a>
+          <span className="flex flex-wrap items-center gap-2 self-center">
+            <a href={`/gestor/painel/relatorio${query ? `?${query}` : ""}`}>
+              <Button variant="secondary">Baixar relatório (PDF)</Button>
+            </a>
+            <Link href="/gestor/painel/relatorio-completo">
+              <Button>Relatório completo</Button>
+            </Link>
+          </span>
         }
       />
 

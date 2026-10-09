@@ -226,11 +226,20 @@ function TabelaFmeaPdf({ itens, vazio }: { itens: ItemFmea[]; vazio: string }) {
   );
 }
 
-export async function gerarRelatorioFrprtPdf(params: {
+export type ParamsFrprtPdf = {
   workspaceNome: string;
   painel: PainelFrprt;
   logo?: { buffer: Buffer; formato: "png" | "jpeg" };
-}): Promise<Buffer> {
+  /** Relatório completo: rodapé fixo (numeração) em cada página e marcador do sumário na primeira. */
+  rodape?: React.ReactNode;
+  inicio?: React.ReactNode;
+};
+
+/**
+ * As páginas do relatório FRPRT — usadas sozinhas (gerarRelatorioFrprtPdf)
+ * e dentro do relatório completo, para os dois nunca divergirem.
+ */
+export function PaginasFrprt(params: ParamsFrprtPdf) {
   const { workspaceNome, painel } = params;
   const { opcoes, fatores, linhas, principais, pgr, limite, geral, achados, fmea } = painel;
   const logo = params.logo ? `data:image/${params.logo.formato};base64,${params.logo.buffer.toString("base64")}` : undefined;
@@ -238,14 +247,20 @@ export async function gerarRelatorioFrprtPdf(params: {
     ? `${mes(opcoes.pesquisa.dataInicio)}–${mes(opcoes.pesquisa.dataFim)}/${opcoes.pesquisa.dataFim.getUTCFullYear()}`
     : null;
   const nomeFator = (id: string) => fatores.find((f) => f.id === id)?.nome ?? "";
-  const cab = <Cabecalho empresa={workspaceNome} periodo={periodo} logo={logo} />;
+  const cab = (
+    <>
+      <Cabecalho empresa={workspaceNome} periodo={periodo} logo={logo} />
+      {params.rodape}
+    </>
+  );
   const corAchado = { perigo: "#B91C1C", atencao: "#B45309", sucesso: "#047857", neutro: CINZA } as const;
 
-  const doc = (
-    <Document title={`Relatório FRPRT — ${workspaceNome}`}>
+  return (
+    <>
       {/* Página 1 — resultado geral e setores */}
       <Page size="A4" orientation="landscape" style={s.page}>
         {cab}
+        {params.inicio}
         {geral ? (
           <View style={{ flexDirection: "row" }}>
             {/* Resultado geral em destaque */}
@@ -728,8 +743,14 @@ export async function gerarRelatorioFrprtPdf(params: {
           </View>
         </View>
       </Page>
-    </Document>
+    </>
   );
+}
 
-  return renderToBuffer(doc);
+export async function gerarRelatorioFrprtPdf(params: ParamsFrprtPdf): Promise<Buffer> {
+  return renderToBuffer(
+    <Document title={`Relatório FRPRT — ${params.workspaceNome}`}>
+      <PaginasFrprt {...params} />
+    </Document>,
+  );
 }

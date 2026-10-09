@@ -4,7 +4,7 @@ import { redirect, notFound } from "next/navigation";
 import { getActor } from "@/lib/tenant";
 import { workspaceInputSchema } from "@/lib/validation";
 import { atualizarEmpresa, excluirEmpresa, getEmpresaParaEditar, redefinirSenhaGestor } from "@/lib/workspace";
-import { apagarUpload, salvarLogoWorkspace } from "@/lib/upload";
+import { apagarRelatorioPdf, apagarUpload, salvarLogoWorkspace } from "@/lib/upload";
 
 export type EstadoEditarEmpresa = { erro?: string } | undefined;
 
@@ -91,6 +91,7 @@ export async function excluirEmpresaAction(
   // Arquivo do logo só depois do banco: se a transação falhasse, a
   // empresa continuaria existindo e não poderia ficar sem o logo.
   await apagarUpload(resultado.logoUrl).catch(() => undefined);
+  for (const arquivo of resultado.arquivosRelatorios) await apagarRelatorioPdf(arquivo).catch(() => undefined);
   redirect("/admin");
 }
 

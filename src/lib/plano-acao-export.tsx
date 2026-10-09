@@ -100,12 +100,25 @@ const COLS = [
   { k: "pdca", t: "PDCA / situação", w: "9%" },
 ] as const;
 
-export async function gerarPlanoPdf(acoes: AcaoCompleta[], empresa: string, hoje: string): Promise<Buffer> {
+/** Página do plano de ação — sozinha (gerarPlanoPdf) ou dentro do relatório completo. */
+export function PaginaPlano({
+  acoes,
+  empresa,
+  hoje,
+  rodape,
+  inicio,
+}: {
+  acoes: AcaoCompleta[];
+  empresa: string;
+  hoje: string;
+  rodape?: React.ReactNode;
+  inicio?: React.ReactNode;
+}) {
   const linhas = acoes.map((a) => linha(a, hoje));
   const total = acoes.reduce((t, a) => t + (a.custoCentavos ?? 0), 0);
-  const doc = (
-    <Document title={`Plano de ação — ${empresa}`}>
+  return (
       <Page size="A4" orientation="landscape" style={s.page}>
+        {inicio}
         <Text style={s.titulo}>Plano de ação · 5W2H e PDCA</Text>
         <Text style={s.sub}>
           {paraPdf(empresa)} · emitido em {hoje.split("-").reverse().join("/")} · {acoes.length} ação(ões) · custo total{" "}
@@ -141,8 +154,15 @@ export async function gerarPlanoPdf(acoes: AcaoCompleta[], empresa: string, hoje
           PDCA: P planejar · D executar · C verificar a eficácia · A agir (padronizar ou ação corretiva). Prazos e
           responsáveis definidos pela empresa; a prioridade vem da Matriz FMEA do Painel FRPRT.
         </Text>
+        {rodape}
       </Page>
-    </Document>
   );
-  return renderToBuffer(doc);
+}
+
+export async function gerarPlanoPdf(acoes: AcaoCompleta[], empresa: string, hoje: string): Promise<Buffer> {
+  return renderToBuffer(
+    <Document title={`Plano de ação — ${empresa}`}>
+      <PaginaPlano acoes={acoes} empresa={empresa} hoje={hoje} />
+    </Document>,
+  );
 }

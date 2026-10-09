@@ -56,6 +56,17 @@ usuário. O histórico de cada ação registra o nome com a marca "(consultoria)
 
 ---
 
+
+### 1.8 Consultores e textos do relatório
+- **Consultores** — quem assina o relatório completo: nome, formação, registro profissional, cargo e
+  e-mail. Vale para todas as empresas. Relatórios já emitidos guardam uma cópia dos dados: editar ou
+  excluir o consultor não os altera.
+- **Textos do relatório** — o dossiê da legislação. Enquanto estiver vazio, o relatório mostra "em
+  elaboração". Linha em branco separa parágrafos; "# " vira subtítulo e "- " vira item de lista.
+- A **metodologia** do relatório é gerada pelo sistema com as regras vigentes (mínimo de respostas,
+  prazos, severidades e situações do PGR). O mesmo texto está em `docs/metodologia-final.md`
+  (gerado por `npx tsx scripts/gerar-metodologia.ts`).
+
 ## 2. Gestor da empresa
 
 O menu do gestor tem: **Eixo 1 · Pesquisa com os colaboradores · Setores e departamentos · Eixo 2 · Eixo 3 · Painel FRPRT**.
@@ -216,6 +227,20 @@ Se duas pessoas editarem a mesma ação ao mesmo tempo, a segunda recebe o aviso
 página — nada é sobrescrito sem ver.
 
 ---
+
+
+### 2.8 Relatório completo
+No Painel FRPRT, botão **Relatório completo**. O documento traz capa (empresa e logo), sumário, dossiê da
+legislação, metodologia e anonimato, Eixo 1 por setor e fator, Eixo 2 (fatores e planos registrados),
+Eixo 3 (indicadores por setor, sem identificação), as páginas do Painel FRPRT (índices, FMEA e PGR), o
+plano de ação, a conclusão do consultor e os responsáveis técnicos.
+
+- **Consultoria** (admin na visão de gestor): escolhe as fontes (mais recente, uma específica ou "não
+  considerar"), escreve a conclusão, marca quem assina, **salva o rascunho** e pode **pré-visualizar**.
+  **Emitir versão N** grava o PDF (os prazos da FMEA contam da data de emissão). Cada emissão é uma nova
+  versão; as anteriores continuam disponíveis. A assinatura digital é feita depois, sobre o PDF emitido.
+- **Gestor da empresa**: vê a lista de versões emitidas e baixa os PDFs.
+- O logo em WebP não aparece no PDF (formato não aceito pelo gerador): envie PNG ou JPG.
 
 ## 3. Colaborador
 

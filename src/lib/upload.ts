@@ -132,3 +132,38 @@ export async function apagarUpload(caminhoPublico: string | null | undefined): P
   if (!NOME_ARQUIVO.test(nome)) return;
   await rm(join(PASTA_UPLOADS, nome), { force: true });
 }
+
+// ── PDFs dos relatórios emitidos ──────────────────────────────────────
+// Mesma pasta persistente dos logos (volume em produção), numa subpasta.
+// NUNCA servidos direto: só pela rota de download, que confere a empresa.
+const PASTA_RELATORIOS = join(process.cwd(), "uploads", "relatorios");
+const NOME_RELATORIO = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.pdf$/;
+
+/** Grava o PDF e devolve o nome gerado (uuid.pdf). */
+export async function salvarRelatorioPdf(pdf: Buffer): Promise<string> {
+  const nome = `${randomUUID()}.pdf`;
+  await mkdir(PASTA_RELATORIOS, { recursive: true });
+  await writeFile(join(PASTA_RELATORIOS, nome), pdf);
+  return nome;
+}
+
+export async function lerRelatorioPdf(nome: string): Promise<Buffer | null> {
+  if (!NOME_RELATORIO.test(nome)) return null;
+  try {
+    return await readFile(join(PASTA_RELATORIOS, nome));
+  } catch {
+    return null;
+  }
+}
+
+export async function apagarRelatorioPdf(nome: string): Promise<void> {
+  if (!NOME_RELATORIO.test(nome)) return;
+  await rm(join(PASTA_RELATORIOS, nome), { force: true });
+}
+
+/** Logo da empresa no formato que o gerador de PDF lê (PNG/JPEG); WebP fica de fora. */
+export async function logoParaPdf(logoUrl: string | null | undefined): Promise<{ buffer: Buffer; formato: "png" | "jpeg" } | null> {
+  const u = await lerUpload(logoUrl);
+  if (!u || u.extensao === "webp") return null;
+  return { buffer: u.buffer, formato: u.extensao === "png" ? "png" : "jpeg" };
+}
