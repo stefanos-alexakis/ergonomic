@@ -21,12 +21,12 @@ services:
       SMTP_PASS: ${SMTP_PASS}
       SMTP_FROM: ${SMTP_FROM}
     volumes:
-      # src/lib/upload.ts grava em public/uploads/, não em /app/uploads —
-      # o volume tinha que estar montado no caminho de verdade, senão os
-      # logotipos enviados nunca sobreviveriam a um `docker compose up
-      # --build` (achado em produção: escrita falhava com EACCES antes
-      # disso ser notado, porque o caminho errado nem tinha permissão).
-      - pesquisa_uploads:/app/public/uploads
+      # src/lib/upload.ts grava em /app/uploads (fora de public/ — o Next
+      # só serve de public/ o que existia no boot, logo novo dava 404). O
+      # volume é o mesmo de antes, só montado no caminho novo: os logos já
+      # enviados continuam lá. Sem ele, nenhum logo sobreviveria a um
+      # `docker compose up --build`.
+      - pesquisa_uploads:/app/uploads
     depends_on:
       db:
         condition: service_healthy

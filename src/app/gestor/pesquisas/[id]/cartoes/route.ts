@@ -1,30 +1,20 @@
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
 import { NextResponse } from "next/server";
 import { getActor } from "@/lib/tenant";
 import { getWorkspaceDoGestor, resolvePesquisaDoWorkspace } from "@/lib/pesquisa";
 import { listarCodigos } from "@/lib/licenca";
 import { gerarCartoesPdf } from "@/lib/cartoes-pdf";
+import { lerUpload } from "@/lib/upload";
 
 /**
  * @react-pdf/renderer não decodifica WebP (só PNG/JPEG) e o arquivo pode
  * não existir nesse ambiente — degrada pra cabeçalho só com texto em vez
- * de quebrar o download inteiro. Só aceita caminho que comece com
- * "/uploads/" (o único formato que salvarLogoWorkspace gera) antes de
- * concatenar no disco, contra path traversal.
+ * de quebrar o download inteiro. `lerUpload` só aceita o nome que o
+ * upload gera (contra path traversal).
  */
 async function carregarLogo(logoUrl: string | null): Promise<{ buffer: Buffer; formato: "png" | "jpeg" } | null> {
-  if (!logoUrl || !logoUrl.startsWith("/uploads/")) return null;
-  const extensao = logoUrl.split(".").pop()?.toLowerCase();
-  const formato = extensao === "png" ? "png" : extensao === "jpg" || extensao === "jpeg" ? "jpeg" : null;
-  if (!formato) return null;
-
-  try {
-    const buffer = await readFile(join(process.cwd(), "public", logoUrl));
-    return { buffer, formato };
-  } catch {
-    return null;
-  }
+  const upload = await lerUpload(logoUrl);
+  if (!upload || upload.extensao === "webp") return null;
+  return { buffer: upload.buffer, formato: upload.extensao === "png" ? "png" : "jpeg" };
 }
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {

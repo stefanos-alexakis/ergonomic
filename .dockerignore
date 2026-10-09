@@ -14,3 +14,5 @@ specs
 *.xlsx
 .DS_Store
 Thumbs.db
+uploads
+public/uploads
