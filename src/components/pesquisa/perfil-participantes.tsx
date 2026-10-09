@@ -13,7 +13,7 @@ export function PerfilParticipantesSecao({ perfil }: { perfil: PerfilParticipant
       <h3 className="text-sm font-semibold text-zinc-900">Perfil dos participantes (pré-pesquisa)</h3>
       <p className="text-xs text-zinc-500 mb-4">
         Totais da pesquisa inteira, sem filtro e sem ligação com as respostas do questionário. {perfil.responderam} de{" "}
-        {perfil.concluidas} participante(s) responderam à pré-pesquisa (era opcional).
+        {perfil.concluidas} participante(s) responderam à pré-pesquisa.
       </p>
       {!perfil.suficiente ? (
         <p className="text-sm text-zinc-500">

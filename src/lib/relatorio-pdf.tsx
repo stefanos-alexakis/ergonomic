@@ -118,7 +118,7 @@ export async function gerarRelatorioPdf(params: {
           <Text style={styles.titulo}>Perfil dos participantes (pré-pesquisa)</Text>
           <Text style={styles.subtitulo}>
             Totais da pesquisa inteira, sem ligação com as respostas do questionário. {perfil.responderam} de{" "}
-            {perfil.concluidas} participante(s) responderam (etapa opcional).
+            {perfil.concluidas} participante(s) responderam.
           </Text>
           {!perfil.suficiente ? (
             <Text>Menos de {perfil.limite} pré-pesquisas respondidas: perfil oculto para proteger o anonimato.</Text>

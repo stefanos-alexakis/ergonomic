@@ -37,7 +37,19 @@ async function responderQuestionario(page: Page) {
   throw new Error("questionário não terminou");
 }
 
-test("vídeo + texto de orientação e pré-pesquisa: colaborador responde ou pula; gestor vê só o total; admin vê o cruzamento", async ({
+/** Responde todas as perguntas da pré-pesquisa (obrigatória): a 1ª opção de cada uma, menos as indicadas. */
+async function responderPrePesquisa(page: Page, escolhas: Record<string, string> = {}) {
+  const grupos = page.getByRole("group");
+  for (let i = 0; i < (await grupos.count()); i++) {
+    const grupo = grupos.nth(i);
+    const nome = (await grupo.locator("legend").innerText()).toLowerCase();
+    const escolha = Object.entries(escolhas).find(([trecho]) => nome.includes(trecho.toLowerCase()));
+    if (escolha) await grupo.getByLabel(escolha[1], { exact: true }).check();
+    else await grupo.getByRole("radio").first().check();
+  }
+}
+
+test("vídeo + texto de orientação e pré-pesquisa obrigatória: gestor vê só o total; admin vê o cruzamento", async ({
   browser,
 }) => {
   test.setTimeout(180_000);
@@ -111,8 +123,14 @@ test("vídeo + texto de orientação e pré-pesquisa: colaborador responde ou pu
   await c1.getByLabel("Departamento").selectOption({ label: "Depto Pre E2E" });
   await c1.getByRole("button", { name: "Continuar para o questionário" }).click();
   await expect(c1.getByRole("heading", { name: /Pra gente conhecer/ })).toBeVisible();
+  // Obrigatória: sem botão de pular; só a pergunta sobre sexo tem "Prefiro não responder".
+  await expect(c1.getByRole("button", { name: /pular/i })).toHaveCount(0);
+  await expect(c1.getByLabel("Prefiro não responder")).toHaveCount(1);
+  // Faltando resposta, o navegador não deixa enviar (campos obrigatórios).
   await c1.getByRole("group", { name: /Sexo/ }).getByLabel("Feminino").check();
-  await c1.getByRole("group", { name: /bebidas alcoólicas/ }).getByLabel("Raramente").check();
+  await c1.getByRole("button", { name: "Continuar para o questionário" }).click();
+  await expect(c1.getByRole("heading", { name: /Pra gente conhecer/ })).toBeVisible();
+  await responderPrePesquisa(c1, { sexo: "Feminino", "bebidas alcoólicas": "Raramente" });
   await c1.getByRole("button", { name: "Continuar para o questionário" }).click();
   await expect(c1.getByText(/Página 1 de/)).toBeVisible();
   // Voltar ao link do fluxo não reabre a pré-pesquisa.
@@ -121,14 +139,16 @@ test("vídeo + texto de orientação e pré-pesquisa: colaborador responde ou pu
   await responderQuestionario(c1);
   await expect(c1.getByRole("heading", { name: "Obrigado por participar!" })).toBeVisible();
 
-  // Colaborador 2: pula a pré-pesquisa.
+  // Colaborador 2: prefere não informar o sexo.
   const c2 = await (await browser.newContext()).newPage();
   await c2.goto(`${url}?codigo=${codigo2}`);
   await expect(c2.getByRole("heading", { name: "Onde você trabalha" })).toBeVisible({ timeout: 15_000 });
   await c2.getByLabel("Setor").selectOption({ label: "Setor Pre E2E" });
   await c2.getByLabel("Departamento").selectOption({ label: "Depto Pre E2E" });
   await c2.getByRole("button", { name: "Continuar para o questionário" }).click();
-  await c2.getByRole("button", { name: "Prefiro pular esta etapa" }).click();
+  await expect(c2.getByRole("heading", { name: /Pra gente conhecer/ })).toBeVisible();
+  await responderPrePesquisa(c2, { sexo: "Prefiro não responder" });
+  await c2.getByRole("button", { name: "Continuar para o questionário" }).click();
   await expect(c2.getByText(/Página 1 de/)).toBeVisible();
   await responderQuestionario(c2);
   await expect(c2.getByRole("heading", { name: "Obrigado por participar!" })).toBeVisible();
@@ -136,15 +156,18 @@ test("vídeo + texto de orientação e pré-pesquisa: colaborador responde ou pu
   const pesquisa = await db.pesquisa.findFirstOrThrow({ where: { nome: nomePesquisa, workspace: { nome: nomeEmpresa } } });
   expect(pesquisa.videoYoutubeId).toBe(VIDEO);
   const gravadas = await db.respostaPrePesquisa.findMany({ where: { pesquisaId: pesquisa.id } });
-  expect(gravadas).toHaveLength(1);
-  expect(gravadas[0]).toMatchObject({ sexo: "FEMININO", alcool: "RARAMENTE", faixaIdade: null });
+  expect(gravadas).toHaveLength(2);
+  expect(gravadas.find((g) => g.sexo === "FEMININO")).toMatchObject({ alcool: "RARAMENTE", faixaIdade: "ATE_24" });
+  expect(gravadas.find((g) => g.sexo === "PREFIRO_NAO")).toBeTruthy();
+  expect(gravadas.every((g) => Object.values(g).every((v) => v !== null))).toBe(true);
   expect(await db.resposta.count({ where: { codigoAcesso: { pesquisaId: pesquisa.id }, prePesquisaVista: true } })).toBe(2);
 
-  // Gestor: com só 1 pré-pesquisa, perfil oculto (mínimo de 3).
+  // Gestor: com só 2 pré-pesquisas, perfil oculto (mínimo de 3).
   await g.goto(`/gestor/pesquisas/${pesquisa.id}/dashboard`);
   await expect(g.getByText(/Menos de 3 pré-pesquisas respondidas/)).toBeVisible();
 
   // Mais 2 respostas concluídas com pré-pesquisa, direto no banco.
+  const resto = { tempoEmpresa: "1_3", faixaIdade: "25_34", faixaPeso: "61_70", faixaAltura: "156_165", outraRenda: "NAO", apostas: "NAO" };
   const setor = await db.setorOrg.findFirstOrThrow({ where: { workspace: { nome: nomeEmpresa } } });
   const perguntas = await db.pergunta.findMany({
     where: { fatorRisco: { dimensao: { bloco: { questionarioId: pesquisa.questionarioId } } } },
@@ -163,15 +186,15 @@ test("vídeo + texto de orientação e pré-pesquisa: colaborador responde ou pu
         concluidoEm: new Date(),
         prePesquisaVista: true,
         itens: { create: perguntas.map((p) => ({ perguntaId: p.id, valor: 4 })) },
-        prePesquisa: { create: { pesquisaId: pesquisa.id, sexo: "FEMININO", alcool: "SEMANA" } },
+        prePesquisa: { create: { pesquisaId: pesquisa.id, sexo: "FEMININO", alcool: "SEMANA", ...resto } },
       },
     });
   }
 
   await g.reload();
   const perfil = g.getByRole("region", { name: "Perfil dos participantes" });
-  await expect(perfil.getByText(/3 de 4 participante\(s\) responderam/)).toBeVisible();
-  await expect(perfil.locator("li", { hasText: "Feminino" })).toContainText("3 · 100%");
+  await expect(perfil.getByText(/4 de 4 participante\(s\) responderam/)).toBeVisible();
+  await expect(perfil.locator("li", { hasText: "Feminino" })).toContainText("3 · 75%");
   // Gestor não vê setor no perfil, nem a tela de cruzamento.
   await expect(perfil.getByText("Setor Pre E2E")).toHaveCount(0);
   await g.goto("/admin/pre-pesquisa");
@@ -193,6 +216,7 @@ test("vídeo + texto de orientação e pré-pesquisa: colaborador responde ou pu
   await expect(sexo.getByRole("columnheader", { name: "Setor Pre E2E" })).toBeVisible();
   const linhaFeminino = sexo.locator("tr", { hasText: "Feminino" });
   await expect(linhaFeminino.locator("td").nth(1)).toHaveText("3");
+  await expect(sexo.locator("tr", { hasText: "Prefiro não responder" }).locator("td").nth(1)).toHaveText("1");
   await expect(linhaFeminino).toContainText(/\d,\d\d · (Baixo|Médio|Alto) risco/);
   // Grupo com menos de 3 não mostra índice.
   const alcool = a.getByRole("region", { name: "Bebidas alcoólicas" });

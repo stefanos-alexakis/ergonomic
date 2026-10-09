@@ -46,7 +46,7 @@ export function CamposOrientacao({ valores }: { valores?: Partial<ValoresOrienta
         />
       </Field>
       <CheckboxLabel name="exibirPrePesquisa" defaultChecked={valores?.exibirPrePesquisa ?? false}>
-        Exibir a pré-pesquisa de perfil (o colaborador pode pular)
+        Exibir a pré-pesquisa de perfil (obrigatória para o colaborador)
       </CheckboxLabel>
     </fieldset>
   );

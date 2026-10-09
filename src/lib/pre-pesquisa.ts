@@ -2,10 +2,12 @@
  * Pré-pesquisa "Pra gente conhecer um pouquinho melhor quem está
  * respondendo" (pedido do cliente, out/2026). Catálogo fixo, em código.
  *
- * LGPD: idade, peso e altura são perguntados em FAIXAS (nunca o número
- * exato) e toda pergunta pode ficar sem resposta ou ter "Prefiro não
- * responder" — com o mínimo de 3 respostas por grupo, números exatos
- * cruzados com o setor identificariam pessoas. Funções puras.
+ * Quando a pesquisa exibe a pré-pesquisa, ela é OBRIGATÓRIA (decisão do
+ * cliente, out/2026): sem botão de pular, todas as perguntas exigem
+ * resposta, e só a pergunta sobre sexo tem "Prefiro não responder".
+ * LGPD: idade, peso e altura continuam em FAIXAS (nunca o número exato) —
+ * com o mínimo de 3 respostas por grupo, números exatos cruzados com o
+ * setor identificariam pessoas. Funções puras.
  */
 
 export type ChavePrePesquisa =
@@ -34,7 +36,7 @@ const PREFIRO_NAO = { valor: "PREFIRO_NAO", rotulo: "Prefiro não responder" };
 export const PRE_PESQUISA = {
   titulo: "Pra gente conhecer um pouquinho melhor quem está respondendo 😊",
   aviso:
-    "Fique tranquilo(a): não é investigação! Essas informações ajudam apenas a entender melhor o perfil dos participantes e serão analisadas de forma conjunta. Todas as perguntas são opcionais.",
+    "Fique tranquilo(a): não é investigação! Essas informações ajudam apenas a entender melhor o perfil dos participantes e serão analisadas de forma conjunta.",
 };
 
 export const PERGUNTAS_PRE_PESQUISA: PerguntaPrePesquisa[] = [
@@ -62,7 +64,6 @@ export const PERGUNTAS_PRE_PESQUISA: PerguntaPrePesquisa[] = [
       { valor: "35_44", rotulo: "De 35 a 44 anos" },
       { valor: "45_54", rotulo: "De 45 a 54 anos" },
       { valor: "55_MAIS", rotulo: "55 anos ou mais" },
-      PREFIRO_NAO,
     ],
   },
   {
@@ -84,7 +85,6 @@ export const PERGUNTAS_PRE_PESQUISA: PerguntaPrePesquisa[] = [
       { valor: "81_90", rotulo: "De 81 a 90 kg" },
       { valor: "91_100", rotulo: "De 91 a 100 kg" },
       { valor: "MAIS_100", rotulo: "Mais de 100 kg" },
-      PREFIRO_NAO,
     ],
   },
   {
@@ -98,7 +98,6 @@ export const PERGUNTAS_PRE_PESQUISA: PerguntaPrePesquisa[] = [
       { valor: "166_175", rotulo: "De 1,66 a 1,75 m" },
       { valor: "176_185", rotulo: "De 1,76 a 1,85 m" },
       { valor: "MAIS_185", rotulo: "Mais de 1,85 m" },
-      PREFIRO_NAO,
     ],
   },
   {
@@ -113,7 +112,6 @@ export const PERGUNTAS_PRE_PESQUISA: PerguntaPrePesquisa[] = [
       { valor: "MES", rotulo: "Algumas vezes no mês" },
       { valor: "SEMANA", rotulo: "Algumas vezes na semana" },
       { valor: "DIARIO", rotulo: "Diariamente ou quase diariamente" },
-      PREFIRO_NAO,
     ],
   },
   {
@@ -126,7 +124,6 @@ export const PERGUNTAS_PRE_PESQUISA: PerguntaPrePesquisa[] = [
       { valor: "NAO", rotulo: "Não" },
       { valor: "AS_VEZES", rotulo: "Sim, de vez em quando" },
       { valor: "REGULAR", rotulo: "Sim, regularmente" },
-      PREFIRO_NAO,
     ],
   },
   {
@@ -141,7 +138,6 @@ export const PERGUNTAS_PRE_PESQUISA: PerguntaPrePesquisa[] = [
       { valor: "MES", rotulo: "Algumas vezes no mês" },
       { valor: "SEMANA", rotulo: "Algumas vezes na semana" },
       { valor: "DIARIO", rotulo: "Diariamente ou quase diariamente" },
-      PREFIRO_NAO,
     ],
   },
 ];
@@ -149,16 +145,20 @@ export const PERGUNTAS_PRE_PESQUISA: PerguntaPrePesquisa[] = [
 export type RespostasPrePesquisa = Record<ChavePrePesquisa, string | null>;
 
 /**
- * Lê o formulário: só aceita valores do catálogo (qualquer outra coisa
- * vira "não respondeu"). `vazia` = nenhuma pergunta respondida.
+ * Lê o formulário: só aceita valores do catálogo. Obrigatória — se faltar
+ * alguma pergunta (ou vier valor fora do catálogo), devolve quais faltam.
  */
-export function lerPrePesquisa(formData: FormData): { respostas: RespostasPrePesquisa; vazia: boolean } {
-  const respostas = {} as RespostasPrePesquisa;
+export function lerPrePesquisa(
+  formData: FormData,
+): { ok: true; respostas: Record<ChavePrePesquisa, string> } | { ok: false; faltando: number[] } {
+  const respostas = {} as Record<ChavePrePesquisa, string>;
+  const faltando: number[] = [];
   for (const p of PERGUNTAS_PRE_PESQUISA) {
     const v = String(formData.get(p.chave) ?? "");
-    respostas[p.chave] = p.opcoes.some((o) => o.valor === v) ? v : null;
+    if (p.opcoes.some((o) => o.valor === v)) respostas[p.chave] = v;
+    else faltando.push(p.numero);
   }
-  return { respostas, vazia: Object.values(respostas).every((v) => v === null) };
+  return faltando.length ? { ok: false, faltando } : { ok: true, respostas };
 }
 
 export type DistribuicaoPergunta = {

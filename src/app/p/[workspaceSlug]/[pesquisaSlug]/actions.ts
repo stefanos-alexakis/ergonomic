@@ -14,7 +14,7 @@ import {
 } from "@/lib/resposta";
 import { lerPrePesquisa } from "@/lib/pre-pesquisa";
 
-export type EstadoFormulario = { erro?: string } | undefined;
+export type EstadoFormulario = { erro?: string; valores?: Record<string, string> } | undefined;
 
 function caminhoBase(workspaceSlug: string, pesquisaSlug: string) {
   return `/p/${workspaceSlug}/${pesquisaSlug}`;
@@ -84,9 +84,9 @@ export async function salvarOrganizacaoAction(
 }
 
 /**
- * Pré-pesquisa: a resposta é achada pelo cookie (como na página), não por
- * um id vindo do formulário, e só grava se a jornada estiver mesmo nessa
- * etapa. "Pular" (ou enviar tudo em branco) só marca como vista.
+ * Pré-pesquisa (obrigatória quando a pesquisa a exibe): a resposta é
+ * achada pelo cookie (como na página), não por um id vindo do formulário,
+ * e só grava se a jornada estiver mesmo nessa etapa e tudo foi respondido.
  */
 export async function salvarPrePesquisaAction(
   workspaceSlug: string,
@@ -101,9 +101,14 @@ export async function salvarPrePesquisaAction(
 
   const estado = await carregarEstadoJornada(pesquisa.id, codigoAcessoId);
   if (estado.tipo === "pre_pesquisa") {
-    const { respostas, vazia } = lerPrePesquisa(formData);
-    const pulou = formData.get("acao") === "pular" || vazia;
-    await salvarPrePesquisa(estado.respostaId, pesquisa.id, pulou ? null : respostas);
+    const lido = lerPrePesquisa(formData);
+    if (!lido.ok) {
+      return {
+        erro: `Responda todas as perguntas para continuar (falta: ${lido.faltando.join(", ")}).`,
+        valores: Object.fromEntries([...formData.entries()].map(([k, v]) => [k, String(v)])),
+      };
+    }
+    await salvarPrePesquisa(estado.respostaId, pesquisa.id, lido.respostas);
   }
   redirect(`${caminho}?pagina=1`);
 }

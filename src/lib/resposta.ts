@@ -154,21 +154,20 @@ export async function salvarOrganizacao(
 }
 
 /**
- * Grava a pré-pesquisa (ou só marca que a pessoa pulou). Idempotente: só
- * a primeira gravação vale — um reenvio (voltar do navegador, clique
- * duplo) não sobrescreve nada.
+ * Grava a pré-pesquisa. Idempotente: só a primeira gravação vale — um
+ * reenvio (voltar do navegador, clique duplo) não sobrescreve nada.
  */
 export async function salvarPrePesquisa(
   respostaId: string,
   pesquisaId: string,
-  respostas: RespostasPrePesquisa | null,
+  respostas: RespostasPrePesquisa,
 ): Promise<void> {
   await db.$transaction(async (tx) => {
     const { count } = await tx.resposta.updateMany({
       where: { id: respostaId, prePesquisaVista: false },
       data: { prePesquisaVista: true },
     });
-    if (count === 0 || !respostas) return;
+    if (count === 0) return;
     await tx.respostaPrePesquisa.create({ data: { respostaId, pesquisaId, ...respostas } });
   });
 }

@@ -9,30 +9,42 @@ describe("catálogo da pré-pesquisa", () => {
     }
   });
 
-  it("idade, peso e altura são faixas e têm 'Prefiro não responder' (LGPD)", () => {
+  it("só a pergunta sobre sexo tem 'Prefiro não responder' (pedido do cliente)", () => {
+    const comPrefiro = PERGUNTAS_PRE_PESQUISA.filter((p) => p.opcoes.some((o) => o.valor === "PREFIRO_NAO")).map((p) => p.chave);
+    expect(comPrefiro).toEqual(["sexo"]);
+  });
+
+  it("idade, peso e altura continuam em faixas (LGPD)", () => {
     for (const chave of ["faixaIdade", "faixaPeso", "faixaAltura"] as const) {
       const p = PERGUNTAS_PRE_PESQUISA.find((x) => x.chave === chave)!;
-      expect(p.opcoes.some((o) => o.valor === "PREFIRO_NAO")).toBe(true);
+      expect(p.opcoes.every((o) => /até|de |ou mais|mais de/i.test(o.rotulo))).toBe(true);
     }
   });
 });
 
-describe("lerPrePesquisa", () => {
-  it("aceita só valores do catálogo; o resto vira 'não respondeu'", () => {
+describe("lerPrePesquisa (obrigatória)", () => {
+  const completo = () => {
     const f = new FormData();
-    f.set("tempoEmpresa", "1_3");
-    f.set("sexo", "OUTRO_INVENTADO");
-    f.set("faixaIdade", "<script>");
-    const { respostas, vazia } = lerPrePesquisa(f);
-    expect(vazia).toBe(false);
-    expect(respostas.tempoEmpresa).toBe("1_3");
-    expect(respostas.sexo).toBeNull();
-    expect(respostas.faixaIdade).toBeNull();
-    expect(respostas.apostas).toBeNull();
+    for (const p of PERGUNTAS_PRE_PESQUISA) f.set(p.chave, p.opcoes[0]!.valor);
+    return f;
+  };
+
+  it("tudo respondido → ok com as 8 respostas", () => {
+    const r = lerPrePesquisa(completo());
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(Object.keys(r.respostas)).toHaveLength(8);
   });
 
-  it("nada marcado → vazia", () => {
-    expect(lerPrePesquisa(new FormData()).vazia).toBe(true);
+  it("valor fora do catálogo conta como não respondido", () => {
+    const f = completo();
+    f.set("sexo", "OUTRO_INVENTADO");
+    f.set("faixaIdade", "<script>");
+    f.set("alcool", "PREFIRO_NAO"); // não existe mais fora da pergunta sobre sexo
+    expect(lerPrePesquisa(f)).toEqual({ ok: false, faltando: [2, 3, 6] });
+  });
+
+  it("nada marcado → falta tudo", () => {
+    expect(lerPrePesquisa(new FormData())).toEqual({ ok: false, faltando: [1, 2, 3, 4, 5, 6, 7, 8] });
   });
 });
 

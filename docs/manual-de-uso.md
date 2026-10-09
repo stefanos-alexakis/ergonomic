@@ -97,8 +97,10 @@ Na criação da pesquisa (ou depois, em **Editar orientação e pré-pesquisa**,
 - Vídeo e texto aparecem no topo da tela **Onde você trabalha**, que todo colaborador vê uma vez antes do
   questionário.
 - **Exibir a pré-pesquisa:** 8 perguntas de perfil (tempo de empresa, idade, sexo, peso, altura, bebidas,
-  outra atividade remunerada, apostas), todas opcionais e com botão **Pular**. Idade, peso e altura são
-  perguntados em faixas. Se for ligada com a coleta em andamento, quem já começou o questionário não a vê.
+  outra atividade remunerada, apostas). Quando ligada, é **obrigatória**: não há botão de pular e todas
+  as perguntas precisam de resposta; só a pergunta sobre sexo tem "Prefiro não responder". Idade, peso e
+  altura são perguntados em faixas. Se for ligada com a coleta em andamento, quem já começou o
+  questionário não a vê.
 - **Resultado:** no painel da pesquisa e no relatório PDF, o quadro **Perfil dos participantes** mostra só os
   totais da pesquisa inteira, separados do questionário, e fica oculto com menos de 3 pré-pesquisas. O
   cruzamento com setor e com o índice do Eixo 1 existe só na área do administrador
