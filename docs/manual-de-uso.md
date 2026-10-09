@@ -114,6 +114,13 @@ por fator, por setor e por departamento, e **Baixar relatório (PDF)**.
 Setores ou departamentos com menos de 3 respostas aparecem como **amostra insuficiente**. Isso
 protege o anonimato e não pode ser desligado.
 
+
+**Distribuição das respostas (pergunta a pergunta)** — botão no painel da pesquisa. Mostra, para cada
+uma das 35 perguntas, agrupadas pelos 13 fatores, quantas pessoas marcaram cada opção (Nunca a Sempre)
+e o % de expostos, com o índice do fator ao lado. Filtro por setor ("Todos os setores" por padrão);
+setores abaixo do mínimo de respostas não aparecem separados. Em vermelho, as perguntas em que 50% ou
+mais marcaram Frequentemente ou Sempre (definição de exposto da metodologia). **Baixar Excel** gera
+uma aba "Todos" e uma aba por setor.
 ### 2.4 Eixo 2 · Medidas de controle
 **Eixo 2 → + Nova avaliação**
 1. **Confirme os setores** avaliados.
