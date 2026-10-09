@@ -240,11 +240,18 @@ model Pesquisa {
   dataFim              DateTime
   licencasSolicitadas  Int
   limiteSupressaoGrupo Int            @default(3)
+  // Orientação ao colaborador (topo da tela "Onde você trabalha"): só o
+  // código do vídeo do YouTube (11 caracteres), nunca uma URL livre.
+  videoYoutubeId       String?
+  textoOrientacao      String?
+  // Pré-pesquisa de perfil (opcional para o colaborador, que pode pular).
+  exibirPrePesquisa    Boolean        @default(false)
   createdAt            DateTime       @default(now())
 
-  workspace    Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  questionario Questionario   @relation(fields: [questionarioId], references: [id])
+  workspace    Workspace             @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  questionario Questionario          @relation(fields: [questionarioId], references: [id])
   codigos      CodigoAcesso[]
+  prePesquisas RespostaPrePesquisa[]
 
   @@unique([workspaceId, slug])
   @@index([workspaceId])
@@ -287,6 +294,9 @@ model Resposta {
   funcaoId       String?
   iniciadoEm     DateTime  @default(now())
   concluidoEm    DateTime?
+  // Passou pela pré-pesquisa (respondeu ou pulou) — para não mostrar de
+  // novo. Sim/não, sem data/hora (nada que ajude a identificar alguém).
+  prePesquisaVista Boolean  @default(false)
 
   codigoAcesso CodigoAcesso   @relation(fields: [codigoAcessoId], references: [id], onDelete: Cascade)
   setor        SetorOrg?      @relation(fields: [setorId], references: [id])
@@ -294,11 +304,37 @@ model Resposta {
   segmento     Segmento?      @relation(fields: [segmentoId], references: [id])
   funcao       Funcao?        @relation(fields: [funcaoId], references: [id])
   itens        RespostaItem[]
+  prePesquisa  RespostaPrePesquisa?
 
   @@index([setorId])
   @@index([departamentoId])
   @@index([segmentoId])
   @@index([funcaoId])
+}
+
+// Pré-pesquisa de perfil (idade, sexo, peso, altura em FAIXAS; hábitos).
+// Dado pessoal sensível (LGPD): o vínculo com a resposta do Eixo 1 só é
+// usado no cruzamento da área do ADMIN da plataforma, sempre agregado e
+// com o mínimo de respostas. O gestor da empresa só vê totais separados.
+// Os valores são as chaves de src/lib/pre-pesquisa.ts; nulo = não
+// respondeu aquela pergunta. Sem data/hora de propósito.
+model RespostaPrePesquisa {
+  id           String  @id @default(cuid())
+  pesquisaId   String
+  respostaId   String  @unique
+  tempoEmpresa String?
+  faixaIdade   String?
+  sexo         String?
+  faixaPeso    String?
+  faixaAltura  String?
+  alcool       String?
+  outraRenda   String?
+  apostas      String?
+
+  pesquisa Pesquisa @relation(fields: [pesquisaId], references: [id], onDelete: Cascade)
+  resposta Resposta @relation(fields: [respostaId], references: [id], onDelete: Cascade)
+
+  @@index([pesquisaId])
 }
 
 model RespostaItem {

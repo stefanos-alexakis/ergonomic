@@ -5,6 +5,7 @@ import { salvarOrganizacaoAction, type EstadoFormulario } from "./actions";
 import { Field, FieldError } from "@/components/ui/field";
 import { Select } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Orientacao } from "./orientacao";
 
 type Item = { id: string; nome: string };
 
@@ -14,12 +15,16 @@ export function FormularioOrganizacao({
   respostaId,
   setores,
   departamentos,
+  videoYoutubeId = null,
+  textoOrientacao = null,
 }: {
   workspaceSlug: string;
   pesquisaSlug: string;
   respostaId: string;
   setores: Item[];
   departamentos: Item[];
+  videoYoutubeId?: string | null;
+  textoOrientacao?: string | null;
 }) {
   // useMemo evita recriar a action a cada render — ver nota em
   // questionario.tsx sobre o bug que isso causa com useActionState.
@@ -30,7 +35,8 @@ export function FormularioOrganizacao({
   const [estado, formAction, pendente] = useActionState<EstadoFormulario, FormData>(acao, undefined);
 
   return (
-    <main className="max-w-lg mx-auto mt-14 px-5">
+    <main className="max-w-lg mx-auto mt-14 mb-16 px-5">
+      <Orientacao videoYoutubeId={videoYoutubeId} texto={textoOrientacao} />
       <h1 className="text-xl font-semibold text-zinc-900 mb-1">Onde você trabalha</h1>
       <p className="text-sm text-zinc-500 mb-6">
         Essas informações são usadas só em análises por grupo — nunca para identificar você.

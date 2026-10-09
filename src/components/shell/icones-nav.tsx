@@ -43,6 +43,13 @@ const CAMINHOS: Record<NonNullable<ItemNav["icone"]>, ReactNode> = {
       <path d="M12 9v4l3 2M9 2h6" />
     </>
   ),
+  // pessoas
+  perfil: (
+    <>
+      <circle cx="9" cy="8" r="3" />
+      <path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16 5a3 3 0 0 1 0 6M18 14c2 .8 3 3 3 6" />
+    </>
+  ),
   // balança
   pesos: <path d="M12 4v16M6 20h12M5 8h14M5 8l-2 6a3 3 0 0 0 4 0L5 8zM19 8l-2 6a3 3 0 0 0 4 0l-2-6z" />,
 };

@@ -55,6 +55,15 @@ export default async function PesquisaDetalhePage({
         actions={<BadgeStatusPesquisa pesquisa={pesquisa} codigosGerados={codigos.length > 0} />}
       />
 
+      <div className="mb-6 flex flex-wrap items-center gap-x-4 gap-y-1 rounded-lg border border-zinc-200 px-4 py-3 text-sm text-zinc-600">
+        <span>Vídeo: {pesquisa.videoYoutubeId ? "sim" : "não"}</span>
+        <span>Texto de orientação: {pesquisa.textoOrientacao ? "sim" : "não"}</span>
+        <span>Pré-pesquisa: {pesquisa.exibirPrePesquisa ? "exibida" : "não exibida"}</span>
+        <Link href={`/gestor/pesquisas/${pesquisa.id}/editar`} className="ml-auto font-medium text-zinc-900 hover:underline">
+          Editar orientação e pré-pesquisa
+        </Link>
+      </div>
+
       {codigos.length === 0 ? (
         <GerarLicencasButton pesquisaId={pesquisa.id} />
       ) : (

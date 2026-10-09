@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { normalizarCodigo } from "@/lib/codigo";
 import { pesquisaAceitaAcesso } from "@/lib/vigencia-pesquisa";
 import { montarPaginas } from "@/lib/paginacao-questionario";
+import type { RespostasPrePesquisa } from "@/lib/pre-pesquisa";
 
 /**
  * Resolve pesquisa por slug composto (workspace + pesquisa) — a única
@@ -74,6 +75,7 @@ export type EstadoJornada =
   | { tipo: "encerrada" }
   | { tipo: "concluido" }
   | { tipo: "selecionar_organizacao"; respostaId: string }
+  | { tipo: "pre_pesquisa"; respostaId: string }
   | { tipo: "questionario"; respostaId: string };
 
 /**
@@ -88,7 +90,7 @@ export async function carregarEstadoJornada(
 ): Promise<EstadoJornada> {
   const codigoAcesso = await db.codigoAcesso.findFirst({
     where: { id: codigoAcessoId, pesquisaId },
-    include: { resposta: true, pesquisa: true },
+    include: { resposta: { include: { _count: { select: { itens: true } } } }, pesquisa: true },
   });
   if (!codigoAcesso || !codigoAcesso.resposta) return { tipo: "invalido" };
 
@@ -102,6 +104,17 @@ export async function carregarEstadoJornada(
 
   if (!codigoAcesso.resposta.setorId || !codigoAcesso.resposta.departamentoId) {
     return { tipo: "selecionar_organizacao", respostaId: codigoAcesso.resposta.id };
+  }
+
+  // Pré-pesquisa: uma vez só, antes da primeira pergunta. Se a opção for
+  // ligada com a coleta em andamento, quem já começou o questionário não
+  // é interrompido no meio.
+  if (
+    codigoAcesso.pesquisa.exibirPrePesquisa &&
+    !codigoAcesso.resposta.prePesquisaVista &&
+    codigoAcesso.resposta._count.itens === 0
+  ) {
+    return { tipo: "pre_pesquisa", respostaId: codigoAcesso.resposta.id };
   }
 
   return { tipo: "questionario", respostaId: codigoAcesso.resposta.id };
@@ -138,6 +151,26 @@ export async function salvarOrganizacao(
     data: { setorId: setor.id, departamentoId: departamento.id },
   });
   return { ok: true };
+}
+
+/**
+ * Grava a pré-pesquisa (ou só marca que a pessoa pulou). Idempotente: só
+ * a primeira gravação vale — um reenvio (voltar do navegador, clique
+ * duplo) não sobrescreve nada.
+ */
+export async function salvarPrePesquisa(
+  respostaId: string,
+  pesquisaId: string,
+  respostas: RespostasPrePesquisa | null,
+): Promise<void> {
+  await db.$transaction(async (tx) => {
+    const { count } = await tx.resposta.updateMany({
+      where: { id: respostaId, prePesquisaVista: false },
+      data: { prePesquisaVista: true },
+    });
+    if (count === 0 || !respostas) return;
+    await tx.respostaPrePesquisa.create({ data: { respostaId, pesquisaId, ...respostas } });
+  });
 }
 
 export async function carregarPaginasQuestionario(questionarioId: string, tamanhoPagina?: number) {

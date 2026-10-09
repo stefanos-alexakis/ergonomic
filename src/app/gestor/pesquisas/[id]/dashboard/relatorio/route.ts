@@ -3,6 +3,7 @@ import { getActor } from "@/lib/tenant";
 import { getWorkspaceDoGestor, resolvePesquisaDoWorkspace } from "@/lib/pesquisa";
 import { calcularDashboard } from "@/lib/dashboard";
 import { gerarRelatorioPdf } from "@/lib/relatorio-pdf";
+import { perfilParticipantes } from "@/lib/perfil-participantes";
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -15,11 +16,12 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   const pesquisa = await resolvePesquisaDoWorkspace(id, workspace.id);
   if (!pesquisa) return new NextResponse("Pesquisa não encontrada.", { status: 404 });
 
-  const dashboard = await calcularDashboard(pesquisa.id);
+  const [dashboard, perfil] = await Promise.all([calcularDashboard(pesquisa.id), perfilParticipantes(pesquisa.id)]);
   const pdf = await gerarRelatorioPdf({
     pesquisaNome: pesquisa.nome,
     workspaceNome: workspace.nome,
     dashboard,
+    perfil,
   });
 
   return new NextResponse(pdf, {

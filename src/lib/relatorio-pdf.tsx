@@ -1,5 +1,6 @@
 import { Document, Page, View, Text, StyleSheet, renderToBuffer } from "@react-pdf/renderer";
 import { calcularNivelRisco, type DashboardPesquisa } from "@/lib/dashboard";
+import type { PerfilParticipantes } from "@/lib/perfil-participantes";
 
 const styles = StyleSheet.create({
   page: { padding: 32, fontSize: 10 },
@@ -26,8 +27,9 @@ export async function gerarRelatorioPdf(params: {
   pesquisaNome: string;
   workspaceNome: string;
   dashboard: DashboardPesquisa;
+  perfil?: PerfilParticipantes | null;
 }): Promise<Buffer> {
-  const { pesquisaNome, workspaceNome, dashboard } = params;
+  const { pesquisaNome, workspaceNome, dashboard, perfil } = params;
 
   const doc = (
     <Document>
@@ -109,6 +111,36 @@ export async function gerarRelatorioPdf(params: {
           </>
         )}
       </Page>
+
+      {/* Pré-pesquisa: página própria, sempre separada do Eixo 1 (decisão do cliente). */}
+      {perfil && (
+        <Page size="A4" style={styles.page}>
+          <Text style={styles.titulo}>Perfil dos participantes (pré-pesquisa)</Text>
+          <Text style={styles.subtitulo}>
+            Totais da pesquisa inteira, sem ligação com as respostas do questionário. {perfil.responderam} de{" "}
+            {perfil.concluidas} participante(s) responderam (etapa opcional).
+          </Text>
+          {!perfil.suficiente ? (
+            <Text>Menos de {perfil.limite} pré-pesquisas respondidas: perfil oculto para proteger o anonimato.</Text>
+          ) : (
+            perfil.distribuicao.map((d) => (
+              <View key={d.pergunta.chave} wrap={false}>
+                <Text style={styles.h2}>
+                  {d.pergunta.rotuloCurto} ({d.respondentes} resposta(s){d.semResposta ? `, ${d.semResposta} em branco` : ""})
+                </Text>
+                {d.opcoes.map((o) => (
+                  <View key={o.valor} style={styles.linha}>
+                    <Text style={styles.colNome}>{o.rotulo}</Text>
+                    <Text style={styles.colValor}>
+                      {o.quantidade} · {Math.round(o.percentual * 100)}%
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            ))
+          )}
+        </Page>
+      )}
     </Document>
   );
 

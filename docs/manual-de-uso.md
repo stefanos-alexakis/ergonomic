@@ -87,6 +87,23 @@ Regras de acesso do colaborador:
   para terminar.
 - Código concluído não pode ser respondido de novo.
 
+
+### 2.2.1 Vídeo, texto de orientação e pré-pesquisa
+Na criação da pesquisa (ou depois, em **Editar orientação e pré-pesquisa**, na página da pesquisa):
+
+- **Vídeo orientativo:** cole o link do YouTube (qualquer formato: `youtube.com/watch?v=…`, `youtu.be/…`,
+  `shorts/…`). Outros sites são recusados. O vídeo é exibido no modo de privacidade do YouTube.
+- **Texto de orientação:** texto simples, até 3.000 caracteres.
+- Vídeo e texto aparecem no topo da tela **Onde você trabalha**, que todo colaborador vê uma vez antes do
+  questionário.
+- **Exibir a pré-pesquisa:** 8 perguntas de perfil (tempo de empresa, idade, sexo, peso, altura, bebidas,
+  outra atividade remunerada, apostas), todas opcionais e com botão **Pular**. Idade, peso e altura são
+  perguntados em faixas. Se for ligada com a coleta em andamento, quem já começou o questionário não a vê.
+- **Resultado:** no painel da pesquisa e no relatório PDF, o quadro **Perfil dos participantes** mostra só os
+  totais da pesquisa inteira, separados do questionário, e fica oculto com menos de 3 pré-pesquisas. O
+  cruzamento com setor e com o índice do Eixo 1 existe só na área do administrador
+  (**Pré-pesquisa (cruzamentos)**).
+
 ### 2.3 Painel e relatório da pesquisa
 Mostra o **índice geral do Eixo 1** (média de 1 a 5, quanto maior, mais exposição), com a mesma
 régua de cores do Painel FRPRT: até 3,00 baixo risco (verde), até 4,00 médio risco (amarelo), acima

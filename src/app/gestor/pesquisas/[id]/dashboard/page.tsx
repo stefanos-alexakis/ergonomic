@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { perfilParticipantes } from "@/lib/perfil-participantes";
+import { PerfilParticipantesSecao } from "@/components/pesquisa/perfil-participantes";
 import { getActor } from "@/lib/tenant";
 import { getWorkspaceDoGestor, resolvePesquisaDoWorkspace } from "@/lib/pesquisa";
 import { listarCatalogoOrganizacional } from "@/lib/estrutura";
@@ -140,9 +142,10 @@ export default async function DashboardPage({
   const pesquisa = await resolvePesquisaDoWorkspace(id, workspace.id);
   if (!pesquisa) notFound();
 
-  const [dashboard, catalogo] = await Promise.all([
+  const [dashboard, catalogo, perfil] = await Promise.all([
     calcularDashboard(pesquisa.id, filtros),
     listarCatalogoOrganizacional(workspace.id),
+    perfilParticipantes(pesquisa.id),
   ]);
 
   const filtroAtivo = Boolean(filtros.setorId || filtros.departamentoId);
@@ -295,6 +298,8 @@ export default async function DashboardPage({
           )}
         </>
       )}
+
+      {perfil && <PerfilParticipantesSecao perfil={perfil} />}
 
       <p className="mt-8">
         <Link href={`/gestor/pesquisas/${pesquisa.id}`} className="text-sm text-zinc-500 hover:text-zinc-900">
