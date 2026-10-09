@@ -3,6 +3,11 @@
  *
  *   Índice final = Eixo 1 (média 1–5, maior = pior) × Fator Eixo 2 × Fator Eixo 3
  *
+ * Terminologia (cliente, out/2026): antes da matriz FMEA fala-se em
+ * ÍNDICE (índice baixo/médio/alto, índice final); "risco" só depois da
+ * classificação FMEA e no PGR, e nas conclusões da metodologia ("Sem risco
+ * indicado", "Risco existente").
+ *
  * Tudo — cor, faixa e conclusão — sai dos cortes da metodologia
  * (3,00 / 4,00) aplicados a esse índice. O PGR é decidido à parte, por
  * situação (ver painel-frprt.ts): só as situações inerentes à função,
@@ -32,7 +37,7 @@ export const CONCLUSOES: Record<
 > = {
   SEM_RISCO: {
     rotulo: "Sem risco indicado",
-    curto: "Baixo risco",
+    curto: "Índice baixo",
     descricao: "Percepções e controles dentro do esperado — manter o monitoramento.",
     encaminhamento: "Sem inclusão automática",
     tom: "sucesso",
@@ -41,7 +46,7 @@ export const CONCLUSOES: Record<
   },
   CONTROLE: {
     rotulo: "Percepção de perigos com controle existente",
-    curto: "Médio risco",
+    curto: "Índice médio",
     descricao: "Perigos percebidos, com medidas de controle existentes — acompanhar e manter os controles.",
     encaminhamento: "Acompanhar e manter controle",
     tom: "atencao",
@@ -50,7 +55,7 @@ export const CONCLUSOES: Record<
   },
   RISCO_EXISTENTE: {
     rotulo: "Risco existente",
-    curto: "Alto risco",
+    curto: "Índice alto",
     descricao: "Risco psicossocial confirmado — exige plano de ação. Entra no PGR só pelas situações inerentes à função.",
     encaminhamento: "Plano de ação",
     tom: "perigo",

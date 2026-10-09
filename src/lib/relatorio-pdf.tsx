@@ -64,8 +64,8 @@ export async function gerarRelatorioPdf(params: {
               <Text style={{ color: COR_POR_TOM[calcularNivelRisco(dashboard.mediaGeral!).tom], fontWeight: 700 }}>
                 {dashboard.mediaGeral!.toFixed(2).replace(".", ",")} · {calcularNivelRisco(dashboard.mediaGeral!).rotulo}
               </Text>{" "}
-              (escala 1–5, quanto maior, mais exposição). Mesma régua do Painel FRPRT: verde baixo risco (até 3,00) ·
-              amarelo médio risco (3,01 a 4,00) · vermelho alto risco (acima de 4,00).
+              (escala 1–5, quanto maior, mais exposição). Mesma régua do Painel FRPRT: verde índice baixo (até 3,00) ·
+              amarelo índice médio (3,01 a 4,00) · vermelho índice alto (acima de 4,00).
             </Text>
 
             <Text style={styles.h2}>Por dimensão</Text>

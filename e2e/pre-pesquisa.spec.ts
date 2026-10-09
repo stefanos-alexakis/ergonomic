@@ -217,7 +217,7 @@ test("vídeo + texto de orientação e pré-pesquisa obrigatória: gestor vê s�
   const linhaFeminino = sexo.locator("tr", { hasText: "Feminino" });
   await expect(linhaFeminino.locator("td").nth(1)).toHaveText("3");
   await expect(sexo.locator("tr", { hasText: "Prefiro não responder" }).locator("td").nth(1)).toHaveText("1");
-  await expect(linhaFeminino).toContainText(/\d,\d\d · (Baixo|Médio|Alto) risco/);
+  await expect(linhaFeminino).toContainText(/\d,\d\d · Índice (baixo|médio|alto)/);
   // Grupo com menos de 3 não mostra índice.
   const alcool = a.getByRole("region", { name: "Bebidas alcoólicas" });
   await expect(alcool.locator("tr", { hasText: "Algumas vezes na semana" })).toContainText("< mín.");

@@ -33,8 +33,8 @@ O questionário v1 (42 perguntas) fica inativo e não entra no Painel FRPRT.
 
 ### Índice do Eixo 1 (painel da pesquisa)
 O painel da pesquisa mostra a própria média de 1 a 5 como **índice**, com a **mesma régua do Painel
-FRPRT** (função `concluir`): até 3,00 baixo risco (verde) · 3,01 a 4,00 médio risco (amarelo) ·
-acima de 4,00 alto risco (vermelho).
+FRPRT** (função `concluir`): até 3,00 índice baixo (verde) · 3,01 a 4,00 índice médio (amarelo) ·
+acima de 4,00 índice alto (vermelho).
 
 > A antiga escala de notas 100–1000 ("Score Base") foi retirada do sistema em outubro de 2026: era
 > só uma conversão do índice e não entrava em nenhum cálculo.
@@ -73,11 +73,16 @@ relação ao trabalho = **Sim**, no setor, com CID compatível com o fator. Caso
 
 | Índice final | Faixa | Conclusão | Encaminhamento |
 |---|---|---|---|
-| até 3,00 | Baixo risco (verde) | Sem risco indicado | Sem inclusão automática |
-| 3,01 a 4,00 | Médio risco (amarelo) | Perigo com controle existente | Acompanhar e manter controle |
-| acima de 4,00 | Alto risco (vermelho) | Risco existente | Plano de ação |
+| até 3,00 | Índice baixo (verde) | Sem risco indicado | Sem inclusão automática |
+| 3,01 a 4,00 | Índice médio (amarelo) | Perigo com controle existente | Acompanhar e manter controle |
+| acima de 4,00 | Índice alto (vermelho) | Risco existente | Plano de ação |
 
 A comparação é feita em centésimos (3,00 calculado nunca "escorrega" para a faixa seguinte).
+
+**Terminologia (cliente, out/2026):** antes da matriz FMEA fala-se em **índice** (índice baixo,
+médio ou alto; índice final). "Risco" aparece depois da classificação FMEA e no PGR (títulos como
+"Riscos existentes que vão para o PGR"), e nas conclusões da metodologia ("Sem risco indicado",
+"Risco existente"). A FMEA continua classificando por **prioridade** (Alta, Média, Baixa).
 
 ## O que vai para o PGR (decisão da consultoria, out/2026)
 
@@ -178,8 +183,8 @@ O relatório PDF traz a página da Matriz FMEA e uma página com estes critério
 
 Produção · Horários e jornada: Eixo 1 = 3,70; sem medida de controle (×1,00); um atestado F51.2
 relacionado ao trabalho (×1,10).
-3,70 × 1,00 × 1,10 = **4,07** → **alto risco**, vai para o **plano de ação** (Horários e jornada
-não é situação do PGR). Sem o atestado, ficaria em 3,70 (médio risco).
+3,70 × 1,00 × 1,10 = **4,07** → **índice alto**, vai para o **plano de ação** (Horários e jornada
+não é situação do PGR). Sem o atestado, ficaria em 3,70 (índice médio).
 
 FMEA desse item: severidade-base 4 + 1 (atestado relacionado) = **S 5**; média 3,70 → **O 4**;
 sem controle → **D 5**. Matriz S5 × O4 = Alta; D 5 mantém Alta → **prioridade Alta**, RPN 100:

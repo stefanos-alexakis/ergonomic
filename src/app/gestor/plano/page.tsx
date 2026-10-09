@@ -167,8 +167,8 @@ export default async function PlanoPage({ searchParams }: { searchParams: Promis
       </div>
 
       {pendencias.length > 0 && (
-        <section className="mb-6 rounded-lg border border-red-200 bg-red-50/40 p-4" aria-label="Situações do PGR sem ação">
-          <h2 className="text-sm font-semibold text-red-800 mb-2">Situações que vão para o PGR sem ação ({pendencias.length})</h2>
+        <section className="mb-6 rounded-lg border border-red-200 bg-red-50/40 p-4" aria-label="Riscos do PGR sem ação">
+          <h2 className="text-sm font-semibold text-red-800 mb-2">Riscos do PGR sem ação — situações ({pendencias.length})</h2>
           <ul className="flex flex-col gap-2">
             {pendencias.map((p) => (
               <li key={`${p.setorId}-${p.situacao!.perguntaId}`} className="flex flex-wrap items-center justify-between gap-2 text-sm">

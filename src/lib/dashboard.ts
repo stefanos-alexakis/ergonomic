@@ -37,9 +37,9 @@ export function calcularMedia(itens: { valor: number; polaridade: Polaridade; pe
 /**
  * Faixa de uma média 1–5 do Eixo 1 — a MESMA régua do Painel FRPRT: os
  * cortes da metodologia (3,00 / 4,00) pela mesma função `concluir`.
- *   média ≤ 3,00 → Baixo risco (verde)
- *   média ≤ 4,00 → Médio risco (amarelo)
- *   acima        → Alto risco (vermelho)
+ *   média ≤ 3,00 → Índice baixo (verde)
+ *   média ≤ 4,00 → Índice médio (amarelo)
+ *   acima        → Índice alto (vermelho)
  */
 export function calcularNivelRisco(media: number): { rotulo: string; tom: "perigo" | "atencao" | "sucesso" } {
   const c = CONCLUSOES[concluir(media)];

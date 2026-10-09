@@ -32,7 +32,7 @@ A avaliação de cada empresa combina **três eixos**, sempre por **setor** e po
 | 3 · Atestados CID-F | RH/DP da empresa | O que já aconteceu | Agrava 10% (×1,10) quando há caso ligado ao trabalho |
 
 ```
-Risco final (1–5) = Eixo 1 × Fator Eixo 2 × Fator Eixo 3
+Índice final (1–5) = Eixo 1 × Fator Eixo 2 × Fator Eixo 3
   até 3,00  → sem risco
   3,01–4,00 → atenção (perigo com controle existente)
   acima 4,00 → risco existente → plano de ação

@@ -25,12 +25,12 @@ export const dynamic = "force-dynamic";
 
 const NAV = NAV_GESTOR;
 
-/** Cor da faixa de risco de uma média 1–5 — mesmos cortes e cores do Painel FRPRT. */
+/** Cor da faixa do índice de uma média 1–5 — mesmos cortes e cores do Painel FRPRT. */
 function corDaMedia(media: number) {
   return CONCLUSOES[concluir(media)];
 }
 
-/** Média em pílula colorida: verde baixo, amarelo médio, vermelho alto risco. */
+/** Média em pílula colorida: verde índice baixo, amarelo médio, vermelho alto. */
 function PilulaMedia({ media }: { media: number }) {
   const c = corDaMedia(media);
   return (
@@ -236,7 +236,7 @@ export default async function DashboardPage({
                 </Badge>
                 <span className="text-sm text-zinc-700">
                   Índice geral do Eixo 1 (percepção dos colaboradores), de 1 a 5 — quanto maior, mais exposição. Mesma
-                  régua do Painel FRPRT: até 3,00 baixo risco · até 4,00 médio risco · acima disso alto risco. O
+                  régua do Painel FRPRT: até 3,00 índice baixo · até 4,00 índice médio · acima disso índice alto. O
                   resultado final, com os Eixos 2 e 3, está no{" "}
                   <Link href="/gestor/painel" className="underline hover:no-underline">
                     Painel FRPRT

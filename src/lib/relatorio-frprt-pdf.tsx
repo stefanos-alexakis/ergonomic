@@ -269,7 +269,7 @@ export async function gerarRelatorioFrprtPdf(params: {
                   <Text style={{ fontSize: 13, fontWeight: 700, color: CONCLUSOES[geral.conclusao].cor }}>
                     {CONCLUSOES[geral.conclusao].rotulo}
                   </Text>
-                  <Text>{CONCLUSOES[geral.conclusao].curto} · índice de 1 a 5</Text>
+                  <Text>{CONCLUSOES[geral.conclusao].curto} · escala de 1 a 5</Text>
                 </View>
               </View>
               <Text style={{ marginTop: 4 }}>{CONCLUSOES[geral.conclusao].descricao}</Text>
@@ -293,10 +293,10 @@ export async function gerarRelatorioFrprtPdf(params: {
                   }}
                 />
                 <View style={{ flexDirection: "row", marginTop: 3 }}>
-                  <Text style={{ width: "50%", fontSize: 7, color: CONCLUSOES.SEM_RISCO.cor }}>1 · Baixo risco</Text>
-                  <Text style={{ width: "25%", fontSize: 7, color: CONCLUSOES.CONTROLE.cor }}>3 · Médio risco</Text>
+                  <Text style={{ width: "50%", fontSize: 7, color: CONCLUSOES.SEM_RISCO.cor }}>1 · Índice baixo</Text>
+                  <Text style={{ width: "25%", fontSize: 7, color: CONCLUSOES.CONTROLE.cor }}>3 · Índice médio</Text>
                   <Text style={{ width: "25%", fontSize: 7, color: CONCLUSOES.RISCO_EXISTENTE.cor, textAlign: "right" }}>
-                    4 · Alto risco · 5
+                    4 · Índice alto · 5
                   </Text>
                 </View>
               </View>
@@ -304,7 +304,7 @@ export async function gerarRelatorioFrprtPdf(params: {
               <View style={{ flexDirection: "row", marginTop: 10 }}>
                 {[
                   [geral.setoresAvaliados, "setores avaliados"],
-                  [geral.setoresEmRisco, "setores em risco alto"],
+                  [geral.setoresEmRisco, "setores com índice alto"],
                   [geral.fatoresPgr, "situações no PGR"],
                   [geral.participacao !== null ? `${Math.round(geral.participacao * 100)}%` : "—", "participação"],
                 ].map(([v, r]) => (
@@ -415,7 +415,7 @@ export async function gerarRelatorioFrprtPdf(params: {
           </View>
         ))}
         <Text style={[s.pequeno, { marginTop: 4 }]}>
-          Risco final = Eixo 1 × Eixo 2 × Eixo 3 (1–5, quanto maior, pior). Eixos 2 e 3 em pontos: quanto moveram o
+          Índice final = Eixo 1 × Eixo 2 × Eixo 3 (1–5, quanto maior, pior). Eixos 2 e 3 em pontos: quanto moveram o
           Eixo 1. Até 3,00 sem risco · 3,01 a 4,00 com controle existente · acima de 4,00 risco existente (plano de ação). O PGR
           recebe só as situações inerentes à função acima de 3,00 (seção 5).
         </Text>
@@ -521,10 +521,10 @@ export async function gerarRelatorioFrprtPdf(params: {
             <Text style={s.pequeno}>Prazos contados da emissão deste relatório: {dataLocal(fmea.emitidoEm)}.</Text>
           </View>
         </View>
-        <Text style={{ fontWeight: 700, color: AZUL, marginBottom: 4 }}>PGR — SITUAÇÕES INERENTES À FUNÇÃO ACIMA DE 3,00</Text>
+        <Text style={{ fontWeight: 700, color: AZUL, marginBottom: 4 }}>RISCOS DO PGR — SITUAÇÕES INERENTES À FUNÇÃO ACIMA DE 3,00</Text>
         <TabelaFmeaPdf itens={fmea.pgr} vazio="Nenhuma situação do PGR acima de 3,00." />
         <Text style={{ fontWeight: 700, color: AZUL, marginTop: 6, marginBottom: 4 }}>
-          FATORES ACIMA DE 3,00 — PLANO DE AÇÃO (FORA DO PGR)
+          RISCOS PARA O PLANO DE AÇÃO — FATORES ACIMA DE 3,00 (FORA DO PGR)
         </Text>
         <TabelaFmeaPdf itens={fmea.acompanhamento} vazio="Nenhum fator acima de 3,00." />
       </Page>
@@ -655,7 +655,7 @@ export async function gerarRelatorioFrprtPdf(params: {
         </View>
         <View style={s.caixa}>
           <Text>
-            Risco final = Eixo 1 (média 1–5 por fator e setor) × Fator do Eixo 2 (0,80 eficaz/N.A. · 0,90 precisa
+            Índice final = Eixo 1 (média 1–5 por fator e setor) × Fator do Eixo 2 (0,80 eficaz/N.A. · 0,90 precisa
             melhorar · 1,00 inexistente) × Fator do Eixo 3 (×1,10 quando há CID-F relacionado ao trabalho e compatível
             com o fator pela matriz Fatores × CID F). Resultado geral = média dos
             setores avaliados. Setores com menos de {limite} respostas no Eixo 1 não têm score, para proteger o

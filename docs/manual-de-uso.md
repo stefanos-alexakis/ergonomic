@@ -108,8 +108,8 @@ Na criação da pesquisa (ou depois, em **Editar orientação e pré-pesquisa**,
 
 ### 2.3 Painel e relatório da pesquisa
 Mostra o **índice geral do Eixo 1** (média de 1 a 5, quanto maior, mais exposição), com a mesma
-régua de cores do Painel FRPRT: até 3,00 baixo risco (verde), até 4,00 médio risco (amarelo), acima
-alto risco (vermelho). Também mostra participação, resultados
+régua de cores do Painel FRPRT: até 3,00 índice baixo (verde), até 4,00 índice médio (amarelo), acima
+índice alto (vermelho). Também mostra participação, resultados
 por fator, por setor e por departamento, e **Baixar relatório (PDF)**.
 Setores ou departamentos com menos de 3 respostas aparecem como **amostra insuficiente**. Isso
 protege o anonimato e não pode ser desligado.

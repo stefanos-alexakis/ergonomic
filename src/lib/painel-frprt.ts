@@ -668,7 +668,7 @@ export function gerarAchados(params: {
     texto:
       comScore.length > 1
         ? `${critico.nome} é o setor mais crítico (${virgula(critico.final!)})${critico.situacoesPgr ? `, com ${critico.situacoesPgr} situação(ões) no PGR` : ""}.`
-        : `${critico.nome}: risco final ${virgula(critico.final!)}${critico.situacoesPgr ? `, com ${critico.situacoesPgr} situação(ões) no PGR` : ""}.`,
+        : `${critico.nome}: índice final ${virgula(critico.final!)}${critico.situacoesPgr ? `, com ${critico.situacoesPgr} situação(ões) no PGR` : ""}.`,
   });
 
   const fatorCritico = principais[0] ?? null;
@@ -693,8 +693,8 @@ export function gerarAchados(params: {
       tom: geral.efeitoEixo2 <= -0.5 ? "sucesso" : geral.efeitoEixo2 < 0 ? "atencao" : "perigo",
       texto:
         geral.efeitoEixo2 < 0
-          ? `As medidas de controle da empresa (Eixo 2) reduziram o risco em ${virgula(Math.abs(geral.efeitoEixo2))} ponto(s) em média.`
-          : "As medidas de controle (Eixo 2) não atenuaram o risco — medidas inexistentes ou a melhorar.",
+          ? `As medidas de controle da empresa (Eixo 2) reduziram o índice em ${virgula(Math.abs(geral.efeitoEixo2))} ponto(s) em média.`
+          : "As medidas de controle (Eixo 2) não atenuaram o índice — medidas inexistentes ou a melhorar.",
     });
   } else {
     achados.push({ tom: "neutro", texto: "Eixo 2 não considerado: as medidas de controle ainda não foram avaliadas." });

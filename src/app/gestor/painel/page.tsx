@@ -194,7 +194,7 @@ export default async function PainelFrprtPage({
         <TituloSecao
           numero={1}
           titulo="Painel resumido por setor"
-          sub="Risco final = Eixo 1 × Eixo 2 × Eixo 3 (escala 1–5, quanto maior, pior). Eixos 2 e 3 em pontos: quanto moveram o Eixo 1."
+          sub="Índice final = Eixo 1 × Eixo 2 × Eixo 3 (escala 1–5, quanto maior, pior). Eixos 2 e 3 em pontos: quanto moveram o Eixo 1."
         />
         <TabelaSetores linhas={linhas} limite={limite} />
         <div className="flex flex-wrap gap-2 mt-3 text-xs">
@@ -234,7 +234,7 @@ export default async function PainelFrprtPage({
       <section className="mb-12" aria-label="Matriz FMEA">
         <TituloSecao
           numero={3}
-          titulo="Matriz FMEA — prioridade de ação"
+          titulo="Matriz FMEA — classificação dos riscos e prioridade de ação"
           sub={`Severidade × Ocorrência × Detecção, com prazos contados da emissão (${fmea.emitidoEm.toLocaleDateString("pt-BR")})`}
         />
         {fmea.severidadeIncompleta && (
@@ -272,12 +272,12 @@ export default async function PainelFrprtPage({
         </div>
 
         <h3 className="text-sm font-semibold uppercase tracking-wide text-[#183b56] mb-3">
-          PGR — situações inerentes à função acima de 3,00
+          Riscos do PGR — situações inerentes à função acima de 3,00
         </h3>
         <TabelaFmea itens={fmea.pgr} vazio="Nenhuma situação do PGR acima de 3,00." />
 
         <h3 className="text-sm font-semibold uppercase tracking-wide text-[#183b56] mt-8 mb-3">
-          Fatores acima de 3,00 — plano de ação (fora do PGR)
+          Riscos para o plano de ação — fatores acima de 3,00 (fora do PGR)
         </h3>
         <TabelaFmea itens={fmea.acompanhamento} vazio="Nenhum fator acima de 3,00." />
 

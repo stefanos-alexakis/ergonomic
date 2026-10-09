@@ -177,7 +177,7 @@ test("Eixo 3 publicado e Painel FRPRT com o cruzamento dos três eixos", async (
   const geral = page.getByRole("region", { name: "Resultado geral da empresa" });
   await expect(geral.getByText("4,10", { exact: true })).toBeVisible();
   await expect(geral.getByText("Risco existente", { exact: true })).toBeVisible();
-  await expect(geral).toContainText("Alto risco · índice de 1 a 5");
+  await expect(geral).toContainText("Índice alto · escala de 1 a 5");
   await expect(geral).toContainText("exige plano de ação. Entra no PGR só pelas situações inerentes à função");
   const cartoesSetores = page.getByRole("region", { name: "Pontuação dos setores" });
   await expect(cartoesSetores).toContainText("Produção");
@@ -240,7 +240,7 @@ test("Eixo 3 publicado e Painel FRPRT com o cruzamento dos três eixos", async (
 
   // ── Plano de ação (5W2H + PDCA) ────────────────────────────────────
   await page.getByRole("link", { name: "Plano de ação" }).click();
-  const pendencias = page.getByRole("region", { name: "Situações do PGR sem ação" });
+  const pendencias = page.getByRole("region", { name: "Riscos do PGR sem ação" });
   await expect(pendencias.locator("li")).toHaveCount(8);
   await expect(pendencias).toContainText("Produção · 13. Ritmo imposto por processo contínuo sem pausas");
   await page.getByRole("button", { name: "Gerar ações a partir do Eixo 2" }).click();
@@ -277,7 +277,7 @@ test("Eixo 3 publicado e Painel FRPRT com o cruzamento dos três eixos", async (
   // "Criar ação" a partir de uma situação do PGR: já vem ligada a ela e some das pendências.
   await page.getByRole("link", { name: "Plano de ação" }).click();
   await page
-    .getByRole("region", { name: "Situações do PGR sem ação" })
+    .getByRole("region", { name: "Riscos do PGR sem ação" })
     .locator("li", { hasText: "13. Ritmo imposto" })
     .getByRole("link", { name: "Criar ação" })
     .click();
@@ -285,8 +285,8 @@ test("Eixo 3 publicado e Painel FRPRT com o cruzamento dos três eixos", async (
   await page.getByRole("button", { name: "Criar ação" }).click();
   await expect(page).toHaveURL(/\/gestor\/plano\/(?!nova)[^/]+$/);
   await page.getByRole("link", { name: "Plano de ação" }).click();
-  await expect(page.getByRole("region", { name: "Situações do PGR sem ação" }).locator("li")).toHaveCount(7);
-  await expect(page.getByRole("region", { name: "Situações do PGR sem ação" })).not.toContainText("13. Ritmo imposto");
+  await expect(page.getByRole("region", { name: "Riscos do PGR sem ação" }).locator("li")).toHaveCount(7);
+  await expect(page.getByRole("region", { name: "Riscos do PGR sem ação" })).not.toContainText("13. Ritmo imposto");
 
   // O painel passa a mostrar a ação no lugar do prazo sugerido.
   await page.getByRole("link", { name: "Painel FRPRT" }).click();
