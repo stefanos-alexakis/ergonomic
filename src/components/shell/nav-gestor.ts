@@ -2,7 +2,7 @@ export type ItemNav = {
   href: string;
   label: string;
   /** Ícone do botão (src/components/shell/icones-nav.tsx). */
-  icone?: "pesquisas" | "estrutura" | "eixo2" | "eixo3" | "painel" | "empresas" | "pesos" | "severidade" | "plano" | "prazos" | "perfil";
+  icone?: "pesquisas" | "estrutura" | "eixo2" | "eixo3" | "painel" | "empresas" | "pesos" | "severidade" | "plano" | "prazos" | "perfil" | "consultores" | "textos";
   /** Outros prefixos de rota em que o botão aparece como ativo. */
   ativoEm?: string[];
 };
@@ -24,6 +24,8 @@ export const NAV_ADMIN: ItemNav[] = [
   { href: "/admin/severidade", label: "Severidade dos fatores (FMEA)", icone: "severidade" },
   { href: "/admin/prazos", label: "Prazos padrão", icone: "prazos" },
   { href: "/admin/pre-pesquisa", label: "Pré-pesquisa (cruzamentos)", icone: "perfil" },
+  { href: "/admin/consultores", label: "Consultores", icone: "consultores" },
+  { href: "/admin/textos", label: "Textos do relatório", icone: "textos" },
 ];
 
 /** O botão está ativo na própria rota, nas filhas dela e nas de `ativoEm`. */

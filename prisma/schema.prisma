@@ -29,6 +29,8 @@ model Workspace {
   avaliacoesEixo2    AvaliacaoEixo2[]
   levantamentosEixo3 LevantamentoEixo3[]
   acoesPlano         AcaoPlano[]
+  relatorioRascunho  RelatorioRascunho?
+  relatoriosEmitidos RelatorioEmitido[]
 
   @@index([slug])
 }
@@ -646,4 +648,65 @@ model PrazoPrioridade {
   reavaliacaoMeses Int
   atualizadoEm     DateTime @updatedAt
   atualizadoPorId  String?
+}
+
+// ── Relatório completo (pedido do cliente, out/2026) ─────────────────
+
+// Consultores que assinam os relatórios — cadastro da plataforma (admin),
+// reutilizado entre empresas. O relatório emitido guarda uma CÓPIA dos
+// dados: editar ou excluir aqui não altera documento já emitido.
+model Consultor {
+  id           String   @id @default(cuid())
+  nome         String
+  formacao     String?
+  registro     String? // registro profissional (CRP, CREA, MTE…)
+  cargo        String?
+  email        String?
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+}
+
+// Textos fixos do relatório mantidos pelo admin (ex.: "LEGISLACAO" — o
+// dossiê da legislação, ainda em elaboração pela consultoria).
+model TextoRelatorio {
+  chave        String   @id
+  conteudo     String
+  atualizadoEm DateTime @updatedAt
+  atualizadoPor String?
+}
+
+// Rascunho do relatório completo de uma empresa (um por empresa): fontes,
+// conclusão do consultor e quem assina.
+model RelatorioRascunho {
+  workspaceId    String   @id
+  pesquisaId     String?
+  avaliacaoId    String?
+  levantamentoId String?
+  conclusao      String?
+  consultorIds   String[]
+  atualizadoEm   DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+// Versão emitida (imutável): o PDF fica gravado em uploads/relatorios/
+// (fora de public/, baixado por rota com checagem de empresa).
+model RelatorioEmitido {
+  id             String   @id @default(cuid())
+  workspaceId    String
+  versao         Int
+  emitidoEm      DateTime @default(now())
+  emitidoPorId   String?
+  emitidoPorNome String
+  arquivo        String // nome do arquivo em uploads/relatorios/
+  tamanhoBytes   Int
+  // Retrato do que foi usado: nomes das fontes e consultores no momento.
+  fontes         Json
+  consultores    Json
+  conclusao      String?
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, versao])
+  @@index([workspaceId])
 }

@@ -50,6 +50,21 @@ const CAMINHOS: Record<NonNullable<ItemNav["icone"]>, ReactNode> = {
       <path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16 5a3 3 0 0 1 0 6M18 14c2 .8 3 3 3 6" />
     </>
   ),
+  // crachá
+  consultores: (
+    <>
+      <rect x="4" y="5" width="16" height="15" rx="2" />
+      <circle cx="12" cy="11" r="2.5" />
+      <path d="M8 17c.8-1.8 2.2-2.5 4-2.5s3.2.7 4 2.5M10 5V3h4v2" />
+    </>
+  ),
+  // documento com linhas
+  textos: (
+    <>
+      <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5z" />
+      <path d="M14 3v5h5M9 13h6M9 17h6" />
+    </>
+  ),
   // balança
   pesos: <path d="M12 4v16M6 20h12M5 8h14M5 8l-2 6a3 3 0 0 0 4 0L5 8zM19 8l-2 6a3 3 0 0 0 4 0l-2-6z" />,
 };
