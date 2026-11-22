@@ -292,6 +292,15 @@ export default async function DashboardPage({
 
               <p className="text-sm mb-2">
                 <Link
+                  href={`/gestor/pesquisas/${pesquisa.id}/dashboard/sugestoes`}
+                  className="font-medium text-zinc-900 hover:underline"
+                >
+                  Sugestões de melhoria dos colaboradores →
+                </Link>
+              </p>
+
+              <p className="text-sm mb-2">
+                <Link
                   href={`/gestor/pesquisas/${pesquisa.id}/dashboard/respostas${queryRespostas ? `?${queryRespostas}` : ""}`}
                   className="font-medium text-zinc-900 hover:underline"
                 >

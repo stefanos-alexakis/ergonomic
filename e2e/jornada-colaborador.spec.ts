@@ -7,6 +7,8 @@ function paraDatetimeLocal(d: Date): string {
   return d.toISOString().slice(0, 16);
 }
 
+const SUGESTAO_E2E = 'Mais pausas na linha de produção e um revezamento melhor entre os turnos.';
+
 async function responderTodasAsPaginas(page: Page): Promise<{ viuExemplo: boolean }> {
   let viuExemplo = false;
   // Responde a primeira opção em cada pergunta da página atual e avança.
@@ -28,6 +30,8 @@ async function responderTodasAsPaginas(page: Page): Promise<{ viuExemplo: boolea
 
     const botaoConcluir = page.getByRole("button", { name: "Concluir a pesquisa" });
     if (await botaoConcluir.isVisible()) {
+      // Última página: a pergunta aberta (opcional) — aqui a pessoa escreve.
+      await page.getByLabel(/o que a empresa poderia fazer/).fill(SUGESTAO_E2E);
       await botaoConcluir.click();
       return { viuExemplo };
     }
@@ -146,6 +150,23 @@ test("jornada completa do colaborador: código → organização → questionár
   const { viuExemplo } = await responderTodasAsPaginas(page);
   expect(viuExemplo).toBe(true); // perguntas da v2 com "Exemplo:" abaixo do texto
   await expect(page.getByRole("heading", { name: "Obrigado por participar!" })).toBeVisible();
+
+  // O gestor consulta a sugestão, ligada ao setor de quem escreveu.
+  const contextoConsulta = await browser.newContext();
+  const consulta = await contextoConsulta.newPage();
+  await consulta.goto("/login");
+  await consulta.getByLabel("E-mail").fill(gestorEmail);
+  await consulta.getByLabel("Senha").fill(gestorSenha);
+  await consulta.getByRole("button", { name: "Entrar" }).click();
+  await expect(consulta).toHaveURL(/\/gestor$/);
+  await consulta.getByRole("link", { name: "Pesquisa Jornada E2E" }).click();
+  await consulta.waitForURL(/\/gestor\/pesquisas\/[^/]+$/);
+  await consulta.goto(`${new URL(consulta.url()).pathname}/dashboard/sugestoes`);
+  await expect(consulta.getByRole("heading", { name: "Sugestões de melhoria" })).toBeVisible();
+  const cartao = consulta.locator("li", { hasText: SUGESTAO_E2E });
+  await expect(cartao).toContainText("Setor Jornada E2E");
+  await expect(consulta.getByTestId("total-sugestoes")).toContainText("1 sugestão exibida");
+  await contextoConsulta.close();
 
   // O link "nu" (sem ?pagina=) SEMPRE volta a pedir o código — mesmo
   // para quem acabou de concluir — porque é o mesmo link para todo

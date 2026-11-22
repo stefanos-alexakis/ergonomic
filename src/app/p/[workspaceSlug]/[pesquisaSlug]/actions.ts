@@ -10,9 +10,11 @@ import {
   concluirResposta,
   carregarPaginasQuestionario,
   carregarEstadoJornada,
+  carregarRespostasSalvas,
   salvarPrePesquisa,
 } from "@/lib/resposta";
 import { lerPrePesquisa } from "@/lib/pre-pesquisa";
+import { normalizarSugestao, primeiraPaginaPendente } from "@/lib/sugestao-melhoria";
 
 export type EstadoFormulario = { erro?: string; valores?: Record<string, string> } | undefined;
 
@@ -135,13 +137,41 @@ export async function salvarPaginaAction(
   if (!resultado.ok) return { erro: resultado.erro };
 
   const caminho = caminhoBase(workspaceSlug, pesquisaSlug);
-  const proximaPagina = paginas.find((p) => p.numeroPagina === paginaAtual + 1);
 
-  // Sem tela de revisão (a pedido do cliente, ver review.md): a última
-  // página já conclui a pesquisa direto, sem etapa intermediária.
-  if (!proximaPagina) {
-    await concluirResposta(respostaId);
-    redirect(`${caminho}?pagina=1`);
-  }
-  redirect(`${caminho}?pagina=${proximaPagina.numeroPagina}`);
+  // A última página de escala segue para a pergunta aberta (opcional), que é
+  // quem conclui a pesquisa — ver salvarSugestaoAction.
+  redirect(`${caminho}?pagina=${paginaAtual + 1}`);
+}
+
+/**
+ * Pergunta aberta final: grava a sugestão (opcional) e conclui a pesquisa.
+ * A resposta é achada pelo cookie, não por id vindo do formulário, e só
+ * conclui se todas as perguntas de escala foram respondidas (quem abre direto
+ * o link desta página volta para a primeira página incompleta).
+ */
+export async function salvarSugestaoAction(
+  workspaceSlug: string,
+  pesquisaSlug: string,
+  _estadoAnterior: EstadoFormulario,
+  formData: FormData,
+): Promise<EstadoFormulario> {
+  const pesquisa = await resolverOuNotFound(workspaceSlug, pesquisaSlug);
+  const caminho = caminhoBase(workspaceSlug, pesquisaSlug);
+  const codigoAcessoId = (await cookies()).get("codigoAcessoId")?.value;
+  if (!codigoAcessoId) redirect(caminho);
+
+  const estado = await carregarEstadoJornada(pesquisa.id, codigoAcessoId);
+  if (estado.tipo !== "questionario") redirect(`${caminho}?pagina=1`);
+
+  const paginas = await carregarPaginasQuestionario(pesquisa.questionarioId);
+  const pendente = primeiraPaginaPendente(paginas, await carregarRespostasSalvas(estado.respostaId));
+  if (pendente !== null) redirect(`${caminho}?pagina=${pendente}`);
+
+  const texto = String(formData.get("sugestao") ?? "");
+  const lido = normalizarSugestao(texto);
+  // O React 19 limpa o formulário depois do envio: devolve o texto digitado.
+  if (!lido.ok) return { erro: lido.erro, valores: { sugestao: texto } };
+
+  await concluirResposta(estado.respostaId, lido.texto);
+  redirect(`${caminho}?pagina=1`);
 }
