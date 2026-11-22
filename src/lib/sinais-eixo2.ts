@@ -1,6 +1,7 @@
 import ExcelJS from "exceljs";
 import { db } from "@/lib/db";
 import { resolverAvaliacao, type Resultado } from "@/lib/avaliacao-eixo2";
+import { seguroParaPlanilha } from "@/lib/plano-acao-util";
 import {
   PERGUNTA_SINAIS,
   VALOR_DESTAQUE_SINAL,
@@ -119,11 +120,12 @@ export async function gerarSinaisExcel(
   const r = await calcularResultadoSinais(avaliacaoId, setores);
   const wb = new ExcelJS.Workbook();
   const ws = wb.addWorksheet("Sinais de exposição");
-  ws.addRow([titulo]).font = { bold: true, size: 13 };
+  // Nome da avaliação e dos setores vêm do usuário: mesma proteção contra fórmula dos outros Excel.
+  ws.addRow([seguroParaPlanilha(titulo)]).font = { bold: true, size: 13 };
   ws.addRow([PERGUNTA_SINAIS]);
   if (!r.revisado) ws.addRow(["Etapa ainda não revisada: \"Nunca\" é apenas o valor padrão."]);
   ws.addRow([]);
-  const cab = ws.addRow(["Sinal", ...r.setores.map((s) => s.nome)]);
+  const cab = ws.addRow(["Sinal", ...r.setores.map((s) => seguroParaPlanilha(s.nome))]);
   cab.font = { bold: true };
   ws.getColumn(1).width = 70;
   r.setores.forEach((_, i) => (ws.getColumn(i + 2).width = 18));

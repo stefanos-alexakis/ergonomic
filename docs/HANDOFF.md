@@ -152,6 +152,15 @@ Documentação: `docs/README.md` (índice), `manual-de-uso.md`, `metodologia.md`
 
 ## 7. Pendências em aberto
 
+- **Deploy pendente (nov/2026), revisado antes de publicar:** merge `--no-ff` na ordem `melhorias-nov2026` →
+  `eixo2-sinais-iso45003` → `gestao-pesquisas-eixo3` → `eixo3-cids-z` → `responsaveis-relatorio` →
+  `relatorios-eixo1` → `relatorios-eixo2`. Schema só aditivo (5 colunas opcionais/com padrão, 3 tabelas:
+  `SinalEixo2`, `RespostaSinalEixo2`, `ResponsavelRelatorio`), sem env nova. Na VPS: backup do banco →
+  `git pull` → `docker compose up -d --build` → **seed obrigatório** `docker compose exec -T app npx prisma db seed`
+  (cria os 9 sinais ISO 45003 e atualiza o texto da pergunta 4; preserva pesos, severidade e PGR) → provar com grep
+  em `/app/.next` (ex.: "Relatórios Eixo 2") → `/api/health` → hard refresh. Avisar o cliente: rascunhos do Eixo 2
+  só concluem depois de confirmar a etapa ISO 45003; o painel passa a abrir com a avaliação concluída mais recente.
+
 - **CIDs do capítulo Z no Eixo 3** — implementados no branch `eixo3-cids-z` conforme a proposta (`docs/Inclusao-CIDs-Z-Eixo3.docx`), **ainda sem validação formal do cliente** (pontos da seção 7 do documento: Z73.0/Z73.3, uso de substâncias, agentes físicos, ocultar sensíveis na lista, nome do eixo). Tabela em `src/lib/cids-z.ts`; ajustar lá se o cliente mudar algo.
 - **Dossiê da legislação** — cliente elaborando; preencher em Admin → Textos do relatório.
 - **Consultores reais** — cadastrar em produção (Admin → Consultores) antes do primeiro relatório completo.
