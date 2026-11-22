@@ -77,6 +77,11 @@ Documentação: `docs/README.md` (índice), `manual-de-uso.md`, `metodologia.md`
 
 ## 4. Decisões do cliente — não reverter sem pedido novo
 
+- **Pesquisas do Eixo 1 (nov/2026):** só o encerramento é editável (prorrogar); depois de respostas, não antecipa. Abas Abertas ·
+  Concluídas (pelo encerramento) · Arquivadas (manual). Arquivada não recebe respostas e some dos seletores. Exclusão direta se nenhum
+  código de participante foi usado; senão, pedido por escrito → arquivada 30 dias → exclusão definitiva com 2ª confirmação (nada apaga
+  sozinho). Relatórios emitidos ficam. Só gestor e admin.
+
 - **Índice final** = Eixo 1 (média 1–5) × fator do Eixo 2 (0,80–1,00) × fator do Eixo 3 (×1,10 com atestado
   "Sim" compatível). Faixas: até 3,00 / até 4,00 / acima.
 - **PGR por situação (opção B):** só as situações com `Pergunta.vaiParaPgr` (hoje 8: perguntas 8, 10, 12, 13, 31,

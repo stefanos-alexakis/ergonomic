@@ -6,6 +6,9 @@ Acesso: **https://pesquisa.agtrade.com.br/login** (admin e gestor). O colaborado
 
 ## 1. Administrador da plataforma
 
+**Buscar empresa.** Na lista de **Empresas**, o campo de busca filtra pelo nome: digite uma parte (sem se preocupar com
+maiúsculas ou acentos) e só as empresas que contêm o trecho aparecem; **Limpar** volta à lista inteira.
+
 ### 1.1 Cadastrar uma empresa
 **Empresas → + Nova empresa**
 - **Nome** da empresa.
@@ -92,6 +95,19 @@ Na página da pesquisa:
 
 O **status** da pesquisa é atualizado sozinho: *Rascunho* (licenças ainda não geradas), *Agendada*
 (antes do início), *Aberta* (dentro do período) e *Encerrada* (depois do encerramento).
+
+**Lista de pesquisas.** Na tela do Eixo 1 há as abas **Abertas** (em operação: rascunho, agendada ou em andamento),
+**Concluídas** (o encerramento já passou) e **Arquivadas**, além de **Todas**, cada uma com a contagem.
+
+**Prorrogar, arquivar ou excluir** (link na página da pesquisa):
+- **Encerramento** — dá para prorrogar mesmo depois de emitir os cartões; a pesquisa reabre e os códigos ainda não
+  usados voltam a funcionar. Depois que houver respostas, só é possível prorrogar, não antecipar.
+- **Arquivar** — a pesquisa para de receber respostas e sai da lista de trabalho, do Painel FRPRT e do relatório
+  completo; os dados continuam consultáveis. Dá para desarquivar.
+- **Excluir** — se nenhum código de participante foi usado (os de teste não contam), exclui direto, com uma confirmação.
+  Se já foi iniciada, o pedido exige digitar o nome da pesquisa e **não exclui na hora**: ela fica arquivada por 30 dias
+  (dá para cancelar o pedido) e só depois libera a **exclusão definitiva**, com nova confirmação por escrito. A exclusão
+  apaga códigos, respostas e pré-pesquisa; os relatórios já emitidos continuam arquivados.
 
 Regras de acesso do colaborador:
 - Antes do início, o código não funciona.
