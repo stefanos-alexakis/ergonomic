@@ -68,9 +68,14 @@ export default async function GestorHomePage({ searchParams }: { searchParams: P
         eyebrow={workspace.nome}
         title="Eixo 1 · Pesquisa com os colaboradores"
         actions={
-          <Link href="/gestor/pesquisas/nova">
-            <Button>+ Nova pesquisa</Button>
-          </Link>
+          <div className="flex flex-wrap items-center gap-3">
+            <Link href="/gestor/relatorios-eixo1" className="text-sm text-zinc-600 underline underline-offset-2 hover:text-zinc-900">
+              Ver todos os relatórios
+            </Link>
+            <Link href="/gestor/pesquisas/nova">
+              <Button>+ Nova pesquisa</Button>
+            </Link>
+          </div>
         }
       />
 
