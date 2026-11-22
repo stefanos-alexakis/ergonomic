@@ -137,7 +137,8 @@ export async function opcoesPainel(workspaceId: string, selecao: SelecaoPainel) 
     }),
     db.avaliacaoEixo2.findMany({
       where: { workspaceId, questionarioId: questionario.id },
-      orderBy: [{ status: "asc" }, { createdAt: "desc" }], // CONCLUIDA antes de RASCUNHO
+      // RASCUNHO vem antes de CONCLUIDA na declaração do enum: "desc" põe a concluída (mais recente) primeiro.
+      orderBy: [{ status: "desc" }, { createdAt: "desc" }],
       select: { id: true, nome: true, status: true, concluidaEm: true },
     }),
     db.levantamentoEixo3.findMany({
