@@ -70,7 +70,7 @@ const SECOES = [
   ["metodologia", "2. Metodologia, pontuação e anonimato"],
   ["eixo1", "3. Eixo 1 — Percepção dos colaboradores"],
   ["eixo2", "4. Eixo 2 — Medidas de controle"],
-  ["eixo3", "5. Eixo 3 — Atestados e afastamentos CID-F"],
+  ["eixo3", "5. Eixo 3 — Atestados e afastamentos (CID F e Z)"],
   ["painel", "6. Painel FRPRT — índices, FMEA e PGR"],
   ["plano", "7. Plano de ação"],
   ["conclusao", "8. Conclusão do consultor"],

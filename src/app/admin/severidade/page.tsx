@@ -37,7 +37,7 @@ export default async function SeveridadePage() {
       <div className="mb-6 max-w-3xl flex flex-col gap-2 text-sm text-zinc-600">
         <p>
           Severidade-base de cada fator (1 a 5), pela gravidade do dano típico à saúde. Vale para todas as empresas e
-          entra na classificação FMEA do Painel FRPRT. No setor, ela é agravada (+1 cada, até 5) por atestado CID-F
+          entra na classificação FMEA do Painel FRPRT. No setor, ela é agravada (+1 cada, até 5) por atestado CID F ou Z
           relacionado ao trabalho, afastamento acima de 15 dias e 50% ou mais dos respondentes expostos.
         </p>
         <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-amber-900">

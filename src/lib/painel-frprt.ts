@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { calcularMedia } from "@/lib/dashboard";
 import { calcularResultado } from "@/lib/avaliacao-eixo2";
 import { calcularEixo3Setor, montarMatrizPorFator } from "@/lib/eixo3";
+import { cidsZQueAgravam, numeroDoFator } from "@/lib/cids-z";
 import { carregarMatriz } from "@/lib/levantamento-eixo3";
 import { carregarRegrasPrazo } from "@/lib/prazos";
 import { calcularRiscoFinal, concluir, type Conclusao } from "@/lib/score-final";
@@ -402,6 +403,8 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
     if (!atual.consequencias.includes(s.consequencias)) atual.consequencias.push(s.consequencias);
     if (!atual.observacoes.includes(s.observacaoTecnica)) atual.observacoes.push(s.observacaoTecnica);
     for (const c of s.cids) if (!atual.cids.includes(c)) atual.cids.push(c);
+    // CIDs Z do grupo A ligados ao fator também são "compatíveis".
+    for (const c of cidsZQueAgravam(numeroDoFator(s.perguntaEixo1.fatorRisco.dimensao.nome))) if (!atual.cids.includes(c)) atual.cids.push(c);
     apoioPorFator.set(id, atual);
   }
 
@@ -489,7 +492,12 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
   // Eixo 3 por situação: mesma regra de correspondência de CID dos fatores,
   // com a situação no lugar do fator (o "Não específico" nunca agrava).
   const matrizPorSituacao = montarMatrizPorFator(
-    situacoes.map((x) => ({ fatorId: x.perguntaEixo1Id, cids: x.cids, naoEspecifico: x.naoEspecifico })),
+    situacoes.map((x) => ({
+      fatorId: x.perguntaEixo1Id,
+      cids: x.cids,
+      naoEspecifico: x.naoEspecifico,
+      ordemFator: numeroDoFator(x.perguntaEixo1.fatorRisco.dimensao.nome),
+    })),
   );
   const questaoPorPergunta = new Map(questoesEixo2.map((q) => [q.perguntaEixo1Id, q]));
   const fmeaPgr: ItemFmea[] = [];
@@ -571,7 +579,7 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
         fator,
         situacao,
         celula,
-        apoio: { consequencias: [sit.consequencias], observacoes: [sit.observacaoTecnica], cids: sit.cids },
+        apoio: { consequencias: [sit.consequencias], observacoes: [sit.observacaoTecnica], cids: [...sit.cids, ...(sit.naoEspecifico ? [] : cidsZQueAgravam(numeroDoFator(sit.perguntaEixo1.fatorRisco.dimensao.nome)))] },
         planos,
         planosSugeridos: (questao?.planoSugerido ?? "")
           .split("\n")
@@ -711,9 +719,9 @@ export function gerarAchados(params: {
       ocorr > 0
         ? {
             tom: "perigo",
-            texto: `${ocorr} colaborador(es) com atestado CID-F relacionado ao trabalho agravaram fatores em ${setoresAgravados.length} setor(es): ${setoresAgravados.map((l) => l.nome).join(", ")}.`,
+            texto: `${ocorr} colaborador(es) com atestado (CID F ou Z) relacionado ao trabalho agravaram fatores em ${setoresAgravados.length} setor(es): ${setoresAgravados.map((l) => l.nome).join(", ")}.`,
           }
-        : { tom: "sucesso", texto: "Nenhum colaborador com atestado CID-F relacionado ao trabalho nos setores avaliados (Eixo 3)." },
+        : { tom: "sucesso", texto: "Nenhum colaborador com atestado (CID F ou Z) relacionado ao trabalho nos setores avaliados (Eixo 3)." },
     );
   } else {
     achados.push({ tom: "neutro", texto: "Eixo 3 não considerado: nenhum levantamento de atestados publicado." });

@@ -15,6 +15,8 @@
  *  - "Não específico" nunca é alvo de agravamento automático.
  */
 
+import { cidsZQueAgravam, ehZReconhecidoSemAgravo } from "@/lib/cids-z";
+
 export const FATOR_AGRAVAMENTO = 1.1;
 
 /** Texto do modelo do Eixo 3 da cliente ("Declaração de veracidade das informações"). */
@@ -32,13 +34,16 @@ export const ROTULO_RELACAO: Record<Relacao, string> = {
   INCONCLUSIVO: "Inconclusivo",
 };
 
-/** "f41.1", "F 41.1", "F411", "F41.1 - Ansiedade" → "F41.1"; não-F ou inválido → null. */
+/**
+ * "f41.1", "F 41.1", "F411", "F41.1 - Ansiedade" → "F41.1"; "z73.0" → "Z73.0".
+ * Aceita os capítulos F e Z; outro capítulo ou formato inválido → null.
+ */
 export function normalizarCid(bruto: unknown): string | null {
   if (bruto === null || bruto === undefined) return null;
   // Código no início; o que vier depois (descrição colada) é ignorado.
-  const m = /^\s*F\s*(\d{2})\s*\.?\s*(\d)?(?!\d)/.exec(String(bruto).toUpperCase());
+  const m = /^\s*([FZ])\s*(\d{2})\s*\.?\s*(\d)?(?!\d)/.exec(String(bruto).toUpperCase());
   if (!m) return null;
-  return m[2] ? `F${m[1]}.${m[2]}` : `F${m[1]}`;
+  return m[3] ? `${m[1]}${m[2]}.${m[3]}` : `${m[1]}${m[2]}`;
 }
 
 function semAcento(s: string) {
@@ -57,12 +62,16 @@ export type MatrizPorFator = Map<string, Set<string>>;
 
 /** Junta os CIDs das situações de cada fator (união da aba 2 por fator). */
 export function montarMatrizPorFator(
-  situacoes: { fatorId: string; cids: string[]; naoEspecifico: boolean }[],
+  situacoes: { fatorId: string; cids: string[]; naoEspecifico: boolean; ordemFator?: number }[],
 ): MatrizPorFator {
   const matriz: MatrizPorFator = new Map();
   for (const s of situacoes) {
     const conjunto = matriz.get(s.fatorId) ?? new Set<string>();
-    if (!s.naoEspecifico) for (const c of s.cids) conjunto.add(c);
+    if (!s.naoEspecifico) {
+      for (const c of s.cids) conjunto.add(c);
+      // CIDs Z do grupo A, ligados ao fator (1–13) — mesma regra dos CIDs F.
+      if (s.ordemFator !== undefined) for (const c of cidsZQueAgravam(s.ordemFator)) conjunto.add(c);
+    }
     matriz.set(s.fatorId, conjunto);
   }
   return matriz;
@@ -156,7 +165,8 @@ export function calcularEixo3Setor(
     if (o.relacao === "SIM") pessoasRelacionadas.add(pessoa);
     if (o.relacao === "INCONCLUSIVO") pessoasInconclusivas.add(pessoa);
     const fatores = fatoresCompativeis(o.cid, matriz);
-    if (fatores.length === 0) semCorrespondencia.add(o.cid);
+    // Z dos grupos B e C é reconhecido (indicador/alerta): não é "sem correspondência".
+    if (fatores.length === 0 && !ehZReconhecidoSemAgravo(o.cid)) semCorrespondencia.add(o.cid);
     if (o.relacao === "INCONCLUSIVO") inconclusivas++;
     if (o.relacao !== "SIM") continue; // só "Sim" agrava (decisão do usuário)
     relacionadas++;

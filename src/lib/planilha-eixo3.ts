@@ -3,7 +3,7 @@ import { normalizarCid, normalizarMatricula, normalizarRelacao, type Relacao } f
 
 /**
  * Lê a planilha de ocorrências do Eixo 3 no padrão da aba "Ocorrências" da
- * cliente: Setor ou GHE · CID-F · Descrição do CID · Data de início · Total
+ * cliente: Setor ou GHE · CID (F ou Z) · Descrição do CID · Data de início · Total
  * de dias afastados · Relação com o trabalho? · Justificativa / Observação.
  *
  * Colunas reconhecidas pelo NOME (ordem livre). Linha sem setor e sem CID é
@@ -41,7 +41,7 @@ type Campo = "setor" | "cid" | "descricao" | "data" | "dias" | "relacao" | "just
 
 const ROTULO_CAMPO: Record<Campo, string> = {
   setor: "Setor ou GHE",
-  cid: "CID-F",
+  cid: "CID (F ou Z)",
   descricao: "Descrição do CID",
   data: "Data de início",
   dias: "Total de dias afastados",
@@ -197,8 +197,8 @@ export async function parsePlanilhaOcorrencias(buffer: Buffer): Promise<Resultad
       erro(
         "cid",
         cidBruto === null
-          ? "CID-F em branco."
-          : `CID "${texto(cidBruto, 30)}" inválido — o Eixo 3 aceita só CID do capítulo F, no formato F41 ou F41.1.`,
+          ? "CID em branco."
+          : `CID "${texto(cidBruto, 30)}" inválido — o Eixo 3 aceita CID dos capítulos F e Z, no formato F41, F41.1 ou Z73.0.`,
       );
     }
 

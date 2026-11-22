@@ -56,7 +56,7 @@ export function secoesMetodologia(p: ParametrosMetodologia): SecaoTexto[] {
           linhas: [
             ["1 · Percepção", "Colaboradores, de forma anônima", "Como o trabalho é percebido", "Base de 1 a 5"],
             ["2 · Medidas de controle", "Empresa (gestor/consultoria)", "O que a empresa já faz", "Reduz até 20% (×0,80 a ×1,00)"],
-            ["3 · Atestados CID-F", "RH/DP da empresa", "O que já aconteceu", `Agrava ${agravo}% (×${v2(FATOR_AGRAVAMENTO)}) com caso ligado ao trabalho`],
+            ["3 · Atestados CID F e Z", "RH/DP da empresa", "O que já aconteceu", `Agrava ${agravo}% (×${v2(FATOR_AGRAVAMENTO)}) com caso ligado ao trabalho`],
           ],
         },
       ],
@@ -95,11 +95,11 @@ export function secoesMetodologia(p: ParametrosMetodologia): SecaoTexto[] {
       ],
     },
     {
-      titulo: "Eixo 3 — Atestados e afastamentos CID-F",
+      titulo: "Eixo 3 — Atestados e afastamentos (CID F e Z)",
       blocos: [
         {
           tipo: "p",
-          texto: `O RH/DP publica os atestados CID-F do período, com a relação com o trabalho (Sim, Não ou Inconclusivo) e, opcionalmente, a matrícula do colaborador, que serve só para contar colaboradores (e não apenas atestados) e identificar reincidência. Se houve no setor ao menos uma ocorrência com relação "Sim" e CID compatível com o fator (matriz Fatores × CID F), o fator recebe ×${v2(FATOR_AGRAVAMENTO)}; senão, ×1,00. A quantidade de ocorrências não gradua o agravamento.`,
+          texto: `O RH/DP publica os atestados com CID F ou Z do período, com a relação com o trabalho (Sim, Não ou Inconclusivo) e, opcionalmente, a matrícula do colaborador, que serve só para contar colaboradores (e não apenas atestados) e identificar reincidência. Se houve no setor ao menos uma ocorrência com relação "Sim" e CID compatível com o fator (matriz Fatores × CID, capítulos F e Z), o fator recebe ×${v2(FATOR_AGRAVAMENTO)}; senão, ×1,00. A quantidade de ocorrências não gradua o agravamento.`,
         },
         {
           tipo: "lista",

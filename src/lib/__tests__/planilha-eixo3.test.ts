@@ -47,7 +47,7 @@ describe("parsePlanilhaOcorrencias", () => {
     const r = await parsePlanilhaOcorrencias(buf);
     expect(r.linhas).toEqual([]);
     expect(r.erros.map((e) => [e.linha, e.coluna])).toEqual([
-      [2, "CID-F"],
+      [2, "CID (F ou Z)"],
       [3, "Relação com o trabalho?"],
       [3, "Total de dias afastados"],
       [4, "Setor ou GHE"],

@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { db } from "@/lib/db";
 import { adicionarItemCatalogo } from "@/lib/estrutura";
 import { parsePlanilhaOcorrencias, type ProblemaPlanilha } from "@/lib/planilha-eixo3";
+import { numeroDoFator } from "@/lib/cids-z";
 import { calcularEixo3Setor, chaveColaborador, montarMatrizPorFator, type MatrizPorFator, type Relacao } from "@/lib/eixo3";
 
 /**
@@ -267,7 +268,12 @@ export async function carregarMatriz(questionarioId: string) {
   }
 
   const matriz: MatrizPorFator = montarMatrizPorFator(
-    situacoes.map((s) => ({ fatorId: s.perguntaEixo1.fatorRisco.dimensao.id, cids: s.cids, naoEspecifico: s.naoEspecifico })),
+    situacoes.map((s) => ({
+      fatorId: s.perguntaEixo1.fatorRisco.dimensao.id,
+      cids: s.cids,
+      naoEspecifico: s.naoEspecifico,
+      ordemFator: numeroDoFator(s.perguntaEixo1.fatorRisco.dimensao.nome),
+    })),
   );
 
   return { fatores, matriz, situacoes };

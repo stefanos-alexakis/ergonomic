@@ -1,5 +1,6 @@
 import { calcularPainelEixo3 } from "@/lib/levantamento-eixo3";
 import { ROTULO_RELACAO, chaveColaborador, type Relacao } from "@/lib/eixo3";
+import { TEXTO_ALERTA, alertaDoCid, capituloDoCid, ehCidSensivel, type TipoAlerta } from "@/lib/cids-z";
 import { Badge } from "@/components/ui/badge";
 import { Select } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -46,6 +47,19 @@ export async function PainelEixo3({
   const dias = setores.reduce((a, s) => a + s.diasAfastados, 0);
   const semMatricula = ocorrencias.filter((o) => !o.matricula).length;
 
+  // CID F × CID Z: contagem por capítulo (colaborador = matrícula dentro do setor, como no restante).
+  const porCapitulo = { F: { atestados: 0, pessoas: new Set<string>() }, Z: { atestados: 0, pessoas: new Set<string>() } };
+  const alertas = new Map<TipoAlerta, number>();
+  for (const [i, o] of ocorrencias.entries()) {
+    const cap = porCapitulo[capituloDoCid(o.cid)];
+    cap.atestados++;
+    cap.pessoas.add(`${o.setorId ?? o.setor}|${chaveColaborador(o.matricula, i)}`);
+    const alerta = alertaDoCid(o.cid);
+    if (alerta) alertas.set(alerta, (alertas.get(alerta) ?? 0) + 1);
+  }
+  // LGPD: CIDs Z especialmente sensíveis entram só nos números agregados, nunca na lista individual.
+  const ocultas = ocorrencias.filter((o) => ehCidSensivel(o.cid)).length;
+
   // Reincidência: mesma matrícula com 2 ou mais atestados (por setor, como na contagem).
   const porPessoa = new Map<string, { matricula: string; setor: string; setorId: string | null; itens: typeof ocorrencias }>();
   for (const [i, o] of ocorrencias.entries()) {
@@ -56,22 +70,23 @@ export async function PainelEixo3({
     porPessoa.set(chave, atual);
   }
   const reincidencias = [...porPessoa.values()]
+    .map((p) => ({ ...p, itens: p.itens.filter((o) => !ehCidSensivel(o.cid)) }))
     .filter((p) => p.itens.length >= 2)
     .sort((a, b) => b.itens.length - a.itens.length || a.setor.localeCompare(b.setor, "pt-BR"));
   const semCorrespondencia = [...new Set(setores.flatMap((s) => s.cidsSemCorrespondencia))];
   const comF431 = ocorrencias.filter((o) => o.cid === "F43.1").length;
 
   const filtradas = ocorrencias.filter(
-    (o) => (!filtroSetor || o.setorId === filtroSetor) && (!filtroRelacao || o.relacao === filtroRelacao),
+    (o) => !ehCidSensivel(o.cid) && (!filtroSetor || o.setorId === filtroSetor) && (!filtroRelacao || o.relacao === filtroRelacao),
   );
 
   return (
     <div className="flex flex-col gap-10">
       <div className="flex flex-wrap gap-10">
-        <Kpi valor={colaboradores} rotulo="colaboradores com atestado CID-F" />
+        <Kpi valor={colaboradores} rotulo="colaboradores com atestado (CID F e Z)" />
         <Kpi valor={colabRelacionados} rotulo="com atestado relacionado ao trabalho" />
         <Kpi valor={reincidentes} rotulo="com reincidência (2+ atestados)" />
-        <Kpi valor={total} rotulo="atestados CID-F" />
+        <Kpi valor={total} rotulo="atestados (CID F e Z)" />
         <Kpi valor={dias} rotulo="dias de afastamento" />
       </div>
       <p className="-mt-6 text-xs text-zinc-500 max-w-3xl">
@@ -80,8 +95,14 @@ export async function PainelEixo3({
         {semMatricula > 0 &&
           ` ${semMatricula} atestado(s) sem matrícula: cada um conta como um colaborador diferente.`}
       </p>
+      {porCapitulo.Z.atestados > 0 && (
+        <p data-testid="resumo-capitulos" className="-mt-6 text-sm text-zinc-700">
+          <strong>CID F:</strong> {porCapitulo.F.atestados} atestado(s) · {porCapitulo.F.pessoas.size} colaborador(es) &nbsp;|&nbsp;{" "}
+          <strong>CID Z:</strong> {porCapitulo.Z.atestados} atestado(s) · {porCapitulo.Z.pessoas.size} colaborador(es)
+        </p>
+      )}
 
-      {(inconclusivas > 0 || comF431 > 0 || semCorrespondencia.length > 0) && (
+      {(inconclusivas > 0 || comF431 > 0 || semCorrespondencia.length > 0 || alertas.size > 0) && (
         <section className="flex flex-col gap-2">
           <h2 className="text-sm font-semibold text-zinc-900">Pontos de atenção</h2>
           {inconclusivas > 0 && (
@@ -96,10 +117,19 @@ export async function PainelEixo3({
               compatível e avaliação clínica — não é sinônimo de estresse ocupacional.
             </p>
           )}
+          {[...alertas.entries()].map(([tipo, n]) => (
+            <p
+              key={tipo}
+              data-testid={`alerta-${tipo}`}
+              className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900"
+            >
+              <strong>{n} ocorrência(s)</strong> — {TEXTO_ALERTA[tipo]}
+            </p>
+          ))}
           {semCorrespondencia.length > 0 && (
             <p className="rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-700">
-              CID(s) sem correspondência na matriz Fatores × CID F: <strong>{semCorrespondencia.join(", ")}</strong>.
-              Entram nos indicadores, mas não agravam nenhum fator (a matriz não força um CID F).
+              CID(s) sem correspondência na matriz Fatores × CID: <strong>{semCorrespondencia.join(", ")}</strong>.
+              Entram nos indicadores, mas não agravam nenhum fator (a matriz não força um CID).
             </p>
           )}
         </section>
@@ -166,7 +196,7 @@ export async function PainelEixo3({
           <h2 className="text-sm font-semibold text-zinc-900 mb-1">Agravamento por fator de risco (×1,10)</h2>
           <p className="text-xs text-zinc-500 mb-2">
             Só ocorrências <strong>relacionadas ao trabalho</strong> agravam, e só os fatores compatíveis com o CID
-            (matriz Fatores × CID F). Passe o mouse para ver o CID.
+            (matriz Fatores × CID, capítulos F e Z). Passe o mouse para ver o CID.
           </p>
           <div className="overflow-x-auto rounded-lg border border-zinc-200">
             <table className="w-full text-sm">
@@ -228,7 +258,7 @@ export async function PainelEixo3({
         <section aria-label="Reincidência">
           <h2 className="text-sm font-semibold text-zinc-900 mb-1">Reincidência ({reincidencias.length})</h2>
           <p className="text-xs text-zinc-500 mb-2 max-w-3xl">
-            Colaboradores (por matrícula) com 2 ou mais atestados CID-F. Visível só nesta tela — a matrícula não vai para
+            Colaboradores (por matrícula) com 2 ou mais atestados (CID F e Z, exceto os de natureza sensível). Visível só nesta tela — a matrícula não vai para
             relatórios nem planilhas.
           </p>
           <Table>
@@ -258,6 +288,13 @@ export async function PainelEixo3({
 
       <section>
         <h2 className="text-sm font-semibold text-zinc-900 mb-2">Ocorrências ({filtradas.length})</h2>
+        {ocultas > 0 && (
+          <p data-testid="aviso-ocultas" className="text-xs text-zinc-500 mb-2 max-w-3xl">
+            {ocultas} ocorrência(s) de CID Z de natureza sensível (uso de substâncias, histórico de lesão autoprovocada,
+            exame após violência sexual) não são listadas individualmente, por proteção de dados (LGPD); entram nos
+            indicadores, nos alertas e nas contagens.
+          </p>
+        )}
         <form method="get" action={caminhoBase} className="flex flex-wrap items-end gap-3 mb-3">
           <Select name="setor" defaultValue={filtroSetor ?? ""} className="w-56" aria-label="Filtrar por setor">
             <option value="">Todos os setores</option>
@@ -286,7 +323,7 @@ export async function PainelEixo3({
             <Tr>
               <Th>Setor</Th>
               <Th>Matrícula</Th>
-              <Th>CID-F</Th>
+              <Th>CID</Th>
               <Th>Início</Th>
               <Th>Dias</Th>
               <Th>Relação</Th>

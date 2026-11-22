@@ -237,7 +237,7 @@ export function TabelaSetores({ linhas, limite }: { linhas: LinhaSetorPainel[]; 
               Score Eixo 02<span className="block font-normal">Ponderante · medidas de controle</span>
             </th>
             <th className="bg-[#fde3c8] text-[#7c2d12] px-3 py-3 font-semibold">
-              Score Eixo 03<span className="block font-normal">Agravante · atestados CID-F</span>
+              Score Eixo 03<span className="block font-normal">Agravante · atestados CID F e Z</span>
             </th>
             <th className="bg-[#183b56] text-white px-3 py-3 text-center font-semibold">Score final FRPRT</th>
           </tr>

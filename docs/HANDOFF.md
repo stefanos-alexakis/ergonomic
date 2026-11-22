@@ -148,7 +148,7 @@ Documentação: `docs/README.md` (índice), `manual-de-uso.md`, `metodologia.md`
 
 ## 7. Pendências em aberto
 
-- **CIDs do capítulo Z no Eixo 3** — proposta enviada (`docs/Inclusao-CIDs-Z-Eixo3.docx`); aguardando o cliente.
+- **CIDs do capítulo Z no Eixo 3** — implementados no branch `eixo3-cids-z` conforme a proposta (`docs/Inclusao-CIDs-Z-Eixo3.docx`), **ainda sem validação formal do cliente** (pontos da seção 7 do documento: Z73.0/Z73.3, uso de substâncias, agentes físicos, ocultar sensíveis na lista, nome do eixo). Tabela em `src/lib/cids-z.ts`; ajustar lá se o cliente mudar algo.
 - **Dossiê da legislação** — cliente elaborando; preencher em Admin → Textos do relatório.
 - **Consultores reais** — cadastrar em produção (Admin → Consultores) antes do primeiro relatório completo.
 - **Visão do gestor na pré-pesquisa** — opções com menos de 3 pessoas aparecem com a contagem (ex.: "1"); foi

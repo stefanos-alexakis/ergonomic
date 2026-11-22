@@ -50,19 +50,28 @@ acima de 4,00 índice alto (vermelho).
 **Fator Eixo 2 (setor × fator)** = média ponderada das medidas daquele fator no setor.
 Setor sem avaliação → ×1,00.
 
-## Eixo 3 — Atestados CID-F
+## Eixo 3 — Atestados CID F e Z
 
 **Fator Eixo 3 (setor × fator)** = **×1,10** se houve no período **pelo menos uma** ocorrência com
 relação ao trabalho = **Sim**, no setor, com CID compatível com o fator. Caso contrário, **×1,00**.
 
 - Quantidade, dias de afastamento e casos inconclusivos não mudam o índice. Aparecem como
   indicadores (os dias de afastamento entram na severidade da FMEA).
-- **Correspondência do CID** com a matriz "Fatores × CID F":
+- **Correspondência do CID** com a matriz "Fatores × CID" (capítulos F e Z):
   - CIDs listados explicitamente na matriz com subcódigo (F43.1, F48.0, F48.8, F51.2) casam **só**
     com os fatores que os listam. Ex.: F43.1 agrava apenas Violência e Situações extremas.
   - Os demais casam pela categoria de 3 caracteres (F41.1 → F41; F43.2 → F43).
   - CIDs sem correspondência (ex.: F20, F31, F10, F51.0) não agravam nada e são sinalizados.
   - A situação "Não específico" nunca é alvo de agravamento automático.
+- **CIDs do capítulo Z** (36 códigos, `src/lib/cids-z.ts`), em três grupos:
+  - **A · agrava fatores** (Z04.4, Z56.0–Z56.5, Z60.5, Z73.0, Z73.3): ligados a fatores específicos, com a mesma
+    regra dos CID F (relação = Sim → ×1,10 no fator e FMEA). Ex.: Z73.0 agrava Demandas, Ritmo, Horários e Equilíbrio.
+  - **B · indicador**: contado nos indicadores, não agrava (exames, inespecíficos, uso de substâncias, histórico,
+    aspectos individuais). Uso de substâncias e Z91.5 geram alerta.
+  - **C · fora do escopo psicossocial** (Z57.0/.7/.8/.9, Z58.0/.7): agentes físicos/ambientais; alerta para tratar no
+    PGR de riscos físicos.
+  - Z fora da lista é aceito, mas sem correspondência. Códigos Z especialmente sensíveis (Z04.4, Z91.5, uso de
+    substâncias) entram só nos números agregados, nunca na lista individual (LGPD).
 - O CID **não comprova nexo causal** sozinho: é um indicador agravante coletivo do setor.
 
 ## Índice final e conclusão
@@ -134,7 +143,7 @@ D do Eixo 2 da questão) e **fatores acima de 3,00 → plano de ação** (fora d
 e fontes: [proposta-fmea.html](proposta-fmea.html).
 
 **S · Severidade (1–5)** = severidade-base do fator + agravantes no setor (+1 cada, até 5):
-- atestado CID-F com relação ao trabalho = **Sim** e compatível com o fator;
+- atestado CID F ou Z com relação ao trabalho = **Sim** e compatível com o fator;
 - um desses afastamentos com **mais de 15 dias** (sem relação com o trabalho não conta);
 - **50% ou mais** dos respondentes do setor com média individual **4 ou mais** no fator.
 
