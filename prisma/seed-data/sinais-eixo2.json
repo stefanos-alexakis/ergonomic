@@ -1,0 +1,15 @@
+{
+  "referencia": "ABNT ISO 45003, item 8.1.2.5 — sinais de exposição a riscos psicossociais identificados pelo líder do setor",
+  "pergunta": "Você, como líder de setor, identifica os seguintes sinais de exposição a riscos psicossociais nos colaboradores?",
+  "sinais": [
+    "Mudanças de comportamento",
+    "Isolamento ou retraimento social, recusa de ofertas de ajuda ou negligência das necessidades de bem-estar pessoal",
+    "Aumento do afastamento do trabalho ou comparecimento ao trabalho doente",
+    "Falta de engajamento",
+    "Energia reduzida",
+    "Alta rotatividade de pessoas",
+    "Desempenho de baixa qualidade ou falha em concluir tarefas/atribuições no prazo",
+    "Baixo desejo de trabalhar com outras pessoas",
+    "Conflitos, falta de vontade de cooperar e intimidações"
+  ]
+}

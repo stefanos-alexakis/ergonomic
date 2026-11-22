@@ -183,6 +183,7 @@ model SetorOrg {
   respostas        Resposta[]
   avaliacoesEixo2  AvaliacaoEixo2Setor[]
   respostasEixo2   RespostaEixo2[]
+  sinaisEixo2    RespostaSinalEixo2[]
   ocorrenciasEixo3 OcorrenciaEixo3[]
   acoesPlano       AcaoPlanoSetor[]
 
@@ -410,11 +411,16 @@ model AvaliacaoEixo2 {
   observacaoFinal String?
   createdAt       DateTime        @default(now())
   concluidaEm     DateTime?
+  // Etapa dos sinais de exposição (ISO 45003): o padrão é "Nunca" em todos os
+  // setores, então só vale como avaliada depois que o consultor confirma a
+  // revisão. Nula = não revisada (avaliações antigas ficam assim).
+  sinaisRevisadosEm DateTime?
 
   workspace    Workspace             @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   questionario Questionario          @relation(fields: [questionarioId], references: [id])
   setores      AvaliacaoEixo2Setor[]
   respostas    RespostaEixo2[]
+  sinais       RespostaSinalEixo2[]
   praticas     PraticaAdicional[]
   acoesPlano   AcaoPlano[]
 
@@ -450,6 +456,35 @@ model RespostaEixo2 {
   setor     SetorOrg       @relation(fields: [setorId], references: [id], onDelete: Cascade)
 
   @@unique([avaliacaoId, questaoId, setorId])
+  @@index([setorId])
+}
+
+// Sinais de exposição a riscos psicossociais (ISO 45003, item 8.1.2.5), que o
+// líder de cada setor identifica nos colaboradores. Catálogo fixo (seed).
+model SinalEixo2 {
+  id    String @id
+  ordem Int    @unique
+  texto String
+
+  respostas RespostaSinalEixo2[]
+}
+
+// Só guarda o que foi IDENTIFICADO (valor 2 a 5 da escala do Eixo 1): a
+// ausência de linha significa "Nunca" (1), o padrão. Independente do fator do
+// Eixo 2 e do índice final — é um indicador à parte, sem entrar na conta.
+model RespostaSinalEixo2 {
+  id          String   @id @default(cuid())
+  avaliacaoId String
+  sinalId     String
+  setorId     String
+  valor       Int
+  updatedAt   DateTime @updatedAt
+
+  avaliacao AvaliacaoEixo2 @relation(fields: [avaliacaoId], references: [id], onDelete: Cascade)
+  sinal     SinalEixo2     @relation(fields: [sinalId], references: [id], onDelete: Cascade)
+  setor     SetorOrg       @relation(fields: [setorId], references: [id], onDelete: Cascade)
+
+  @@unique([avaliacaoId, sinalId, setorId])
   @@index([setorId])
 }
 

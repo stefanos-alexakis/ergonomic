@@ -120,6 +120,12 @@ export async function definirSetores(
   }
 
   await db.$transaction([
+    // Setor novo entra com "Nunca" nos sinais sem ninguém ter avaliado: a revisão
+    // da etapa dos sinais (ISO 45003) precisa ser confirmada de novo.
+    ...(entram.length > 0
+      ? [db.avaliacaoEixo2.update({ where: { id: avaliacaoId }, data: { sinaisRevisadosEm: null } })]
+      : []),
+    db.respostaSinalEixo2.deleteMany({ where: { avaliacaoId, setorId: { in: saem } } }),
     db.respostaEixo2.deleteMany({ where: { avaliacaoId, setorId: { in: saem } } }),
     db.avaliacaoEixo2Setor.deleteMany({ where: { avaliacaoId, setorId: { in: saem } } }),
     db.avaliacaoEixo2Setor.createMany({ data: entram.map((setorId) => ({ avaliacaoId, setorId })) }),
@@ -343,6 +349,9 @@ export async function concluirAvaliacao(avaliacaoId: string, workspaceId: string
   const { total, completas } = await calcularProgresso(avaliacao.id, avaliacao.questionarioId);
   if (completas < total) {
     return { ok: false, erro: `Faltam ${total - completas} pergunta(s) sem resposta em algum setor.` };
+  }
+  if (!avaliacao.sinaisRevisadosEm) {
+    return { ok: false, erro: "Falta confirmar a revisão dos sinais de exposição (etapa da ISO 45003)." };
   }
   await db.avaliacaoEixo2.update({
     where: { id: avaliacao.id },

@@ -84,6 +84,24 @@ test("Eixo 2: confirma setores, responde para todos, abre exceção por setor, p
   }
   await expect(page.getByText("35 de 35 perguntas respondidas")).toBeVisible();
 
+  // Sem confirmar a revisão dos sinais (ISO 45003) não dá para concluir.
+  await expect(page.getByText("Falta confirmar a revisão dos sinais de exposição.")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Concluir avaliação" })).toHaveCount(0);
+
+  // Etapa 14 — sinais de exposição: padrão "Nunca"; só o setor que identifica abre a escala.
+  await page.getByRole("link", { name: "Próxima etapa: sinais (ISO 45003) →" }).click();
+  await expect(page.getByRole("heading", { name: "Sinais de exposição (ISO 45003)" })).toBeVisible();
+  const primeiroSinal = page.locator("article").first();
+  await expect(primeiroSinal.getByRole("radio")).toHaveCount(0); // nada aberto por padrão
+  const sinalSetorB = primeiroSinal.locator("li", { hasText: "Setor B E2E" });
+  await sinalSetorB.getByLabel(/Sinal identificado/).check();
+  await sinalSetorB.getByText("Frequentemente", { exact: true }).click();
+  await expect(page.getByText("Salvo", { exact: true })).toBeVisible();
+  // Setor A segue em "Nunca": sem escala aberta.
+  await expect(primeiroSinal.locator("li", { hasText: "Setor A E2E" }).getByRole("radio")).toHaveCount(0);
+  await page.getByRole("button", { name: "Confirmo a revisão dos sinais" }).click();
+  await expect(page.getByTestId("sinais-revisados")).toBeVisible();
+
   await page.getByRole("link", { name: "Revisar e concluir →" }).click();
   await page.getByLabel("Responsável pela entrevista / avaliação").fill("Consultora E2E");
   await page.getByRole("button", { name: "Concluir avaliação" }).click();
@@ -94,6 +112,12 @@ test("Eixo 2: confirma setores, responde para todos, abre exceção por setor, p
   await expect(linhaInstrucao.getByText("×0,87")).toHaveCount(1);
   await expect(linhaInstrucao.getByText("×0,80")).toHaveCount(2);
   await expect(page.getByText("- Revisar em 30 dias")).toBeVisible();
+
+  // Sinais de exposição no resultado: Setor B com "Frequentemente" no 1º sinal; fora do índice.
+  const matriz = page.getByTestId("matriz-sinais");
+  await expect(matriz.locator('td[data-valor="4"]')).toHaveCount(1);
+  await expect(matriz.locator("tfoot")).toContainText("1 de 9");
+  await expect(page.getByTestId("sinais-nao-revisados")).toHaveCount(0);
 
   // Reabrir para corrigir e concluir já da 1ª etapa, sem percorrer as 13
   // (sugestão do usuário depois de testar).

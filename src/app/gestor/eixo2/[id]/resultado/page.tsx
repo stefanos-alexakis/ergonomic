@@ -13,6 +13,13 @@ import { Badge } from "@/components/ui/badge";
 import { Select } from "@/components/ui/input";
 import { Table, Thead, Th, Tr, Td } from "@/components/ui/table";
 import { contextoAvaliacao } from "../../contexto";
+import {
+  PERGUNTA_SINAIS,
+  VALOR_DESTAQUE_SINAL,
+  VALOR_PADRAO_SINAL,
+  calcularResultadoSinais,
+  rotuloSinal,
+} from "@/lib/sinais-eixo2";
 
 export const dynamic = "force-dynamic";
 
@@ -50,6 +57,8 @@ export default async function ResultadoEixo2Page({
   const { dimensoes, linhas, planos } = await calcularResultado(avaliacao.id, avaliacao.questionarioId, visiveis);
   const parcial = linhas.some((l) => !l.completo);
   const nomeFiltro = setores.find((s) => s.id === setorFiltro)?.nome;
+  const sinais = await calcularResultadoSinais(avaliacao.id, visiveis);
+  const algumSinal = Object.values(sinais.identificadosPorSetor).some((n) => n > 0);
   const planosVisiveis = nomeFiltro ? planos.filter((p) => p.setor === nomeFiltro) : planos;
 
   return (
@@ -156,6 +165,80 @@ export default async function ResultadoEixo2Page({
             </tbody>
           </table>
         </div>
+      </section>
+
+      <section className="mb-10" aria-label="Sinais de exposição (ISO 45003)">
+        <h2 className="text-sm font-semibold text-zinc-900 mb-1">Sinais de exposição a riscos psicossociais (ISO 45003)</h2>
+        <p className="text-xs text-zinc-500 mb-3 max-w-3xl">
+          {PERGUNTA_SINAIS} Indicador à parte, identificado pelo líder de cada setor: <strong>não entra</strong> no fator do
+          Eixo 2 nem no índice final. Em destaque, Frequentemente e Sempre.
+        </p>
+        {!sinais.revisado && (
+          <p className="mb-3 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900" data-testid="sinais-nao-revisados">
+            {algumSinal
+              ? "A revisão desta etapa ainda não foi confirmada — o “Nunca” é apenas o valor padrão."
+              : "Esta avaliação não passou pela etapa dos sinais de exposição (ISO 45003): nada foi avaliado, e o “Nunca” abaixo é só o valor padrão."}
+          </p>
+        )}
+        {(sinais.revisado || algumSinal) && (
+          <>
+            <div className="overflow-x-auto rounded-lg border border-zinc-200">
+              <table className="w-full text-sm" data-testid="matriz-sinais">
+                <thead className="bg-zinc-50 text-xs text-zinc-500">
+                  <tr>
+                    <th className="sticky left-0 bg-zinc-50 px-3 py-2 text-left font-medium">Sinal</th>
+                    {sinais.setores.map((st) => (
+                      <th key={st.id} className="px-3 py-2 text-center font-medium whitespace-nowrap">
+                        {st.nome}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {sinais.sinais.map((sinal) => (
+                    <tr key={sinal.id} className="border-t border-zinc-100">
+                      <td className="sticky left-0 bg-white px-3 py-2 text-zinc-700 min-w-72">
+                        <span className="text-zinc-400">{sinal.ordem}.</span> {sinal.texto}
+                      </td>
+                      {sinais.setores.map((st) => {
+                        const v = sinais.valores[`${sinal.id}:${st.id}`] ?? VALOR_PADRAO_SINAL;
+                        const cor =
+                          v >= VALOR_DESTAQUE_SINAL
+                            ? "bg-red-50 font-semibold text-red-800"
+                            : v > VALOR_PADRAO_SINAL
+                              ? "bg-amber-50 text-amber-800"
+                              : "text-zinc-400";
+                        return (
+                          <td key={st.id} className={`px-3 py-2 text-center whitespace-nowrap ${cor}`} data-valor={v}>
+                            {rotuloSinal(v)}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr className="border-t border-zinc-200 bg-zinc-50 text-xs text-zinc-600">
+                    <td className="px-3 py-2 font-medium">Sinais identificados no setor</td>
+                    {sinais.setores.map((st) => (
+                      <td key={st.id} className="px-3 py-2 text-center tabular-nums">
+                        {sinais.identificadosPorSetor[st.id] ?? 0} de {sinais.sinais.length}
+                      </td>
+                    ))}
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+            <p className="mt-2 text-sm">
+              <a
+                href={`/gestor/eixo2/${avaliacao.id}/resultado/sinais-excel`}
+                className="font-medium text-zinc-900 underline underline-offset-2 hover:no-underline"
+              >
+                Baixar Excel dos sinais
+              </a>
+            </p>
+          </>
+        )}
       </section>
 
       <section>
