@@ -4,6 +4,7 @@ import { calcularResultado } from "@/lib/avaliacao-eixo2";
 import { calcularPainelEixo3 } from "@/lib/levantamento-eixo3";
 import { listarAcoes, type AcaoCompleta } from "@/lib/plano-acao";
 import { consultoresPorIds, type ConsultorAssinante } from "@/lib/consultores";
+import { responsaveisParaRelatorio, type ResponsavelAssinante } from "@/lib/responsaveis-relatorio";
 import { lerTexto } from "@/lib/textos-relatorio";
 import { carregarParametrosMetodologia } from "@/lib/relatorio/parametros";
 import type { ParametrosMetodologia } from "@/lib/relatorio/metodologia";
@@ -61,6 +62,8 @@ export type DadosRelatorio = {
   legislacao: string | null;
   conclusao: string | null;
   consultores: ConsultorAssinante[];
+  /** Responsáveis da empresa (sem login) marcados para assinar, na ordem definida. */
+  responsaveis: ResponsavelAssinante[];
 };
 
 export async function montarDadosRelatorio(
@@ -81,7 +84,7 @@ export async function montarDadosRelatorio(
   if (!painel) return null;
   const { avaliacao, levantamento, questionarioId } = painel.opcoes;
 
-  const [eixo2, eixo3, acoes, metodologia, legislacao, consultores, logo] = await Promise.all([
+  const [eixo2, eixo3, acoes, metodologia, legislacao, consultores, responsaveis, logo] = await Promise.all([
     avaliacao
       ? (async () => {
           const setores = await db.avaliacaoEixo2Setor.findMany({
@@ -101,6 +104,7 @@ export async function montarDadosRelatorio(
     carregarParametrosMetodologia(painel.limite),
     lerTexto("LEGISLACAO"),
     consultoresPorIds(rascunho.consultorIds),
+    responsaveisParaRelatorio(workspace.id),
     logoParaPdf(workspace.logoUrl),
   ]);
 
@@ -118,6 +122,7 @@ export async function montarDadosRelatorio(
     legislacao,
     conclusao: rascunho.conclusao?.trim() ? rascunho.conclusao : null,
     consultores,
+    responsaveis,
   };
 }
 
@@ -215,6 +220,7 @@ export async function emitirRelatorio(
           tamanhoBytes: pdf.length,
           fontes,
           consultores: dados.consultores,
+          responsaveis: dados.responsaveis,
           conclusao: dados.conclusao,
         },
       });

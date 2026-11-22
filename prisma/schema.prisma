@@ -20,17 +20,18 @@ model Workspace {
   deletedAt     DateTime?
   createdAt     DateTime  @default(now())
 
-  memberships        Membership[]
-  setores            SetorOrg[]
-  departamentos      Departamento[]
-  segmentos          Segmento[]
-  funcoes            Funcao[]
-  pesquisas          Pesquisa[]
-  avaliacoesEixo2    AvaliacaoEixo2[]
-  levantamentosEixo3 LevantamentoEixo3[]
-  acoesPlano         AcaoPlano[]
-  relatorioRascunho  RelatorioRascunho?
-  relatoriosEmitidos RelatorioEmitido[]
+  memberships           Membership[]
+  setores               SetorOrg[]
+  departamentos         Departamento[]
+  segmentos             Segmento[]
+  funcoes               Funcao[]
+  pesquisas             Pesquisa[]
+  avaliacoesEixo2       AvaliacaoEixo2[]
+  levantamentosEixo3    LevantamentoEixo3[]
+  acoesPlano            AcaoPlano[]
+  relatorioRascunho     RelatorioRascunho?
+  relatoriosEmitidos    RelatorioEmitido[]
+  responsaveisRelatorio ResponsavelRelatorio[]
 
   @@index([slug])
 }
@@ -183,7 +184,7 @@ model SetorOrg {
   respostas        Resposta[]
   avaliacoesEixo2  AvaliacaoEixo2Setor[]
   respostasEixo2   RespostaEixo2[]
-  sinaisEixo2    RespostaSinalEixo2[]
+  sinaisEixo2      RespostaSinalEixo2[]
   ocorrenciasEixo3 OcorrenciaEixo3[]
   acoesPlano       AcaoPlanoSetor[]
 
@@ -299,27 +300,27 @@ model CodigoAcesso {
 }
 
 model Resposta {
-  id             String    @id @default(cuid())
-  codigoAcessoId String    @unique
-  setorId        String?
-  departamentoId String?
-  segmentoId     String?
-  funcaoId       String?
-  iniciadoEm     DateTime  @default(now())
-  concluidoEm    DateTime?
+  id               String    @id @default(cuid())
+  codigoAcessoId   String    @unique
+  setorId          String?
+  departamentoId   String?
+  segmentoId       String?
+  funcaoId         String?
+  iniciadoEm       DateTime  @default(now())
+  concluidoEm      DateTime?
   // Passou pela pré-pesquisa (respondeu ou pulou) — para não mostrar de
   // novo. Sim/não, sem data/hora (nada que ajude a identificar alguém).
-  prePesquisaVista Boolean  @default(false)
+  prePesquisaVista Boolean   @default(false)
   // Pergunta aberta final (opcional): sugestão de melhoria do colaborador,
   // vinculada ao setor pelo próprio setorId desta resposta. Texto livre —
   // pode conter dado pessoal, então nunca vai para PDF nem para log.
   sugestaoMelhoria String?
 
-  codigoAcesso CodigoAcesso   @relation(fields: [codigoAcessoId], references: [id], onDelete: Cascade)
-  setor        SetorOrg?      @relation(fields: [setorId], references: [id])
-  departamento Departamento?  @relation(fields: [departamentoId], references: [id])
-  segmento     Segmento?      @relation(fields: [segmentoId], references: [id])
-  funcao       Funcao?        @relation(fields: [funcaoId], references: [id])
+  codigoAcesso CodigoAcesso         @relation(fields: [codigoAcessoId], references: [id], onDelete: Cascade)
+  setor        SetorOrg?            @relation(fields: [setorId], references: [id])
+  departamento Departamento?        @relation(fields: [departamentoId], references: [id])
+  segmento     Segmento?            @relation(fields: [segmentoId], references: [id])
+  funcao       Funcao?              @relation(fields: [funcaoId], references: [id])
   itens        RespostaItem[]
   prePesquisa  RespostaPrePesquisa?
 
@@ -406,17 +407,17 @@ model QuestaoEixo2 {
 // Ciclo de avaliação da empresa — independente das pesquisas do Eixo 1
 // (decisão do usuário); o cruzamento é escolhido depois, no painel final.
 model AvaliacaoEixo2 {
-  id              String          @id @default(cuid())
-  workspaceId     String
+  id                String          @id @default(cuid())
+  workspaceId       String
   // Versão do Eixo 1 cujo catálogo do Eixo 2 esta avaliação usa.
-  questionarioId  String
-  nome            String
-  status          StatusAvaliacao @default(RASCUNHO)
-  participantes   String?
-  responsavel     String?
-  observacaoFinal String?
-  createdAt       DateTime        @default(now())
-  concluidaEm     DateTime?
+  questionarioId    String
+  nome              String
+  status            StatusAvaliacao @default(RASCUNHO)
+  participantes     String?
+  responsavel       String?
+  observacaoFinal   String?
+  createdAt         DateTime        @default(now())
+  concluidaEm       DateTime?
   // Etapa dos sinais de exposição (ISO 45003): o padrão é "Nunca" em todos os
   // setores, então só vale como avaliada depois que o consultor confirma a
   // revisão. Nula = não revisada (avaliações antigas ficam assim).
@@ -718,9 +719,9 @@ model Consultor {
 // Textos fixos do relatório mantidos pelo admin (ex.: "LEGISLACAO" — o
 // dossiê da legislação, ainda em elaboração pela consultoria).
 model TextoRelatorio {
-  chave        String   @id
-  conteudo     String
-  atualizadoEm DateTime @updatedAt
+  chave         String   @id
+  conteudo      String
+  atualizadoEm  DateTime @updatedAt
   atualizadoPor String?
 }
 
@@ -738,6 +739,30 @@ model RelatorioRascunho {
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }
 
+// Responsáveis do relatório de UMA empresa: pessoas que constam e assinam o
+// relatório completo, sem login na plataforma. "incluirNoRelatorio" diz se
+// entram no próximo relatório emitido; "ordem" define a ordem das assinaturas.
+// Edição rara, feita pelo admin na tela da empresa.
+model ResponsavelRelatorio {
+  id                 String   @id @default(cuid())
+  workspaceId        String
+  areaFuncao         String
+  nome               String
+  especialidade      String?
+  descritivo         String?
+  empresa            String?
+  email              String?
+  celular            String?
+  incluirNoRelatorio Boolean  @default(false)
+  ordem              Int      @default(0)
+  criadoEm           DateTime @default(now())
+  atualizadoEm       DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, ordem])
+}
+
 // Versão emitida (imutável): o PDF fica gravado em uploads/relatorios/
 // (fora de public/, baixado por rota com checagem de empresa).
 model RelatorioEmitido {
@@ -752,6 +777,8 @@ model RelatorioEmitido {
   // Retrato do que foi usado: nomes das fontes e consultores no momento.
   fontes         Json
   consultores    Json
+  // Retrato dos responsáveis da empresa que assinaram (ver ResponsavelRelatorio).
+  responsaveis   Json     @default("[]")
   conclusao      String?
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)

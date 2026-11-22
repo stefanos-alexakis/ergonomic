@@ -458,8 +458,8 @@ function Documento({ d, paginas }: { d: DadosRelatorio; paginas: Paginas }) {
       <Page size="A4" style={s.page}>
         {rodape}
         <TituloSecao chave="assinaturas" paginas={paginas} />
-        {d.consultores.length === 0 ? (
-          <Text style={s.aviso}>Nenhum consultor selecionado para assinar.</Text>
+        {d.consultores.length === 0 && d.responsaveis.length === 0 ? (
+          <Text style={s.aviso}>Nenhum responsável selecionado para assinar.</Text>
         ) : (
           d.consultores.map((c, i) => (
             <View key={i} style={{ marginTop: 34 }} wrap={false}>
@@ -472,6 +472,21 @@ function Documento({ d, paginas }: { d: DadosRelatorio; paginas: Paginas }) {
             </View>
           ))
         )}
+        {d.responsaveis.length > 0 && (
+          <Text style={{ fontWeight: 700, marginTop: 30 }}>Responsáveis da empresa</Text>
+        )}
+        {d.responsaveis.map((r, i) => (
+          <View key={`resp-${i}`} style={{ marginTop: 34 }} wrap={false}>
+            <View style={{ borderTopWidth: 1, borderTopColor: "#18181b", width: 260, marginBottom: 4 }} />
+            <Text style={{ fontWeight: 700 }}>{paraPdf(r.nome)}</Text>
+            <Text>{paraPdf(r.areaFuncao)}</Text>
+            {r.especialidade && <Text>{paraPdf(r.especialidade)}</Text>}
+            {r.descritivo && <Text style={s.pequeno}>{paraPdf(r.descritivo)}</Text>}
+            {r.empresa && <Text>{paraPdf(r.empresa)}</Text>}
+            {r.email && <Text style={s.pequeno}>{paraPdf(r.email)}</Text>}
+            {r.celular && <Text style={s.pequeno}>{paraPdf(r.celular)}</Text>}
+          </View>
+        ))}
         <Text style={[s.pequeno, { marginTop: 30 }]}>
           Documento assinado digitalmente após a emissão. {d.versao ? `Versão ${d.versao}, emitida em ${dataBr(d.emissao)}.` : ""}
         </Text>

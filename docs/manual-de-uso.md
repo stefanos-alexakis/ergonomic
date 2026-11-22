@@ -60,7 +60,12 @@ usuário. O histórico de cada ação registra o nome com a marca "(consultoria)
 ---
 
 
-### 1.8 Consultores e textos do relatório
+### 1.8 Consultores, responsáveis e textos do relatório
+- **Responsáveis do relatório (por empresa)** — pessoas que só constam e assinam o relatório completo; não são
+  usuários da plataforma. Ficam em **Editar empresa → Responsáveis do relatório**: área/função, nome,
+  especialidade, descritivo, empresa, e-mail e celular. Em cada linha marque **Consta no próximo relatório** e
+  defina a **Ordem** (1, 2, 3…); salve tudo de uma vez. A marca continua ligada depois de emitir. No PDF saem, na
+  ordem, abaixo dos consultores, com e-mail e celular. Mudar o cadastro depois não altera versões já emitidas.
 - **Consultores** — quem assina o relatório completo: nome, formação, registro profissional, cargo e
   e-mail. Vale para todas as empresas. Relatórios já emitidos guardam uma cópia dos dados: editar ou
   excluir o consultor não os altera.
@@ -272,12 +277,13 @@ página — nada é sobrescrito sem ver.
 No Painel FRPRT, botão **Relatório completo**. O documento traz capa (empresa e logo), sumário, dossiê da
 legislação, metodologia e anonimato, Eixo 1 por setor e fator, Eixo 2 (fatores e planos registrados),
 Eixo 3 (indicadores por setor, sem identificação), as páginas do Painel FRPRT (índices, FMEA e PGR), o
-plano de ação, a conclusão do consultor e os responsáveis técnicos.
+plano de ação, a conclusão do consultor, os responsáveis técnicos (consultores) e os responsáveis da empresa.
 
 - **Consultoria** (admin na visão de gestor): escolhe as fontes (mais recente, uma específica ou "não
   considerar"), escreve a conclusão, marca quem assina, **salva o rascunho** e pode **pré-visualizar**.
   **Emitir versão N** grava o PDF (os prazos da FMEA contam da data de emissão). Cada emissão é uma nova
   versão; as anteriores continuam disponíveis. A assinatura digital é feita depois, sobre o PDF emitido.
+  O rascunho mostra, só para leitura, os responsáveis da empresa marcados (editados no cadastro da empresa).
 - **Gestor da empresa**: vê a lista de versões emitidas e baixa os PDFs.
 - O logo em WebP não aparece no PDF (formato não aceito pelo gerador): envie PNG ou JPG.
 
