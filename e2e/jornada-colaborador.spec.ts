@@ -73,6 +73,8 @@ test("jornada completa do colaborador: código → organização → questionár
   await gestorPage.getByRole("button", { name: "Entrar" }).click();
   await expect(gestorPage).toHaveURL(/\/gestor$/);
 
+  await gestorPage.getByRole("button", { name: "Menu" }).click();
+
   await gestorPage.getByRole("link", { name: "Setores e departamentos" }).click();
   const inputSetor = gestorPage.locator('form:has(input[value="setor"]) input[name="nome"]');
   await inputSetor.fill("Setor Jornada E2E");

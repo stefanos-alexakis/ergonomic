@@ -84,6 +84,8 @@ test("painel do gestor: estado insuficiente, depois contagem e supressão corret
   await page.getByRole("button", { name: "Entrar" }).click();
   await expect(page).toHaveURL(/\/gestor$/);
 
+  await page.getByRole("button", { name: "Menu" }).click();
+
   await page.getByRole("link", { name: "Setores e departamentos" }).click();
   const inputDepto = page.locator('form:has(input[value="departamento"]) input[name="nome"]');
   await inputDepto.fill("Depto Dashboard E2E");

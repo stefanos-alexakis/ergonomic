@@ -132,7 +132,7 @@ test("Eixo 3 publicado e Painel FRPRT com o cruzamento dos três eixos", async (
   });
 
   // ── Eixo 3: publicar a planilha pela tela ──────────────────────────
-  await page.getByRole("link", { name: "Eixo 3 · Atestados CID-F" }).click();
+  await page.getByRole("link", { name: "Eixo 3 · Atestados CID" }).click();
   const modelo = await page.request.get("/gestor/eixo3/modelo");
   expect(modelo.headers()["content-type"]).toContain("spreadsheetml");
 
@@ -171,6 +171,7 @@ test("Eixo 3 publicado e Painel FRPRT com o cruzamento dos três eixos", async (
   await expect(page.getByText(/ocorrência\(s\) F43\.1/)).toBeVisible();
 
   // ── Painel FRPRT ───────────────────────────────────────────────────
+  await page.getByRole("button", { name: "Menu" }).click();
   await page.getByRole("link", { name: "Painel FRPRT" }).click();
 
   // Topo: resultado geral em destaque (média dos setores com score = só Produção).
@@ -239,6 +240,7 @@ test("Eixo 3 publicado e Painel FRPRT com o cruzamento dos três eixos", async (
   expect((await pdf.body()).subarray(0, 4).toString()).toBe("%PDF");
 
   // ── Plano de ação (5W2H + PDCA) ────────────────────────────────────
+  await page.getByRole("button", { name: "Menu" }).click();
   await page.getByRole("link", { name: "Plano de ação" }).click();
   const pendencias = page.getByRole("region", { name: "Riscos do PGR sem ação" });
   await expect(pendencias.locator("li")).toHaveCount(8);
@@ -275,6 +277,7 @@ test("Eixo 3 publicado e Painel FRPRT com o cruzamento dos três eixos", async (
   await expect(page.getByRole("region", { name: "Histórico" })).toContainText("Responsável: — → Ana Lima");
 
   // "Criar ação" a partir de uma situação do PGR: já vem ligada a ela e some das pendências.
+  await page.getByRole("button", { name: "Menu" }).click();
   await page.getByRole("link", { name: "Plano de ação" }).click();
   await page
     .getByRole("region", { name: "Riscos do PGR sem ação" })
@@ -284,11 +287,13 @@ test("Eixo 3 publicado e Painel FRPRT com o cruzamento dos três eixos", async (
   await expect(page.getByLabel(/^Por quê/)).toHaveValue(/PGR — situação 13: Ritmo imposto/);
   await page.getByRole("button", { name: "Criar ação" }).click();
   await expect(page).toHaveURL(/\/gestor\/plano\/(?!nova)[^/]+$/);
+  await page.getByRole("button", { name: "Menu" }).click();
   await page.getByRole("link", { name: "Plano de ação" }).click();
   await expect(page.getByRole("region", { name: "Riscos do PGR sem ação" }).locator("li")).toHaveCount(7);
   await expect(page.getByRole("region", { name: "Riscos do PGR sem ação" })).not.toContainText("13. Ritmo imposto");
 
   // O painel passa a mostrar a ação no lugar do prazo sugerido.
+  await page.getByRole("button", { name: "Menu" }).click();
   await page.getByRole("link", { name: "Painel FRPRT" }).click();
   await expect(
     page.getByRole("region", { name: "Matriz FMEA" }).locator("tr", { hasText: "Produção · 5. Horários e Jornada" }),

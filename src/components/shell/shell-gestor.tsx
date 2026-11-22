@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import type { Workspace } from "@prisma/client";
 import { AppShell } from "./app-shell";
 import { BannerImpersonacao } from "./banner-impersonacao";
-import { NAV_GESTOR } from "./nav-gestor";
+import { GRUPOS_GESTOR, NAV_GESTOR } from "./nav-gestor";
 
 /**
  * AppShell já configurado para a área do gestor: menu, cores da empresa e
@@ -22,6 +22,7 @@ export function ShellGestor({
       contexto={workspace.nome}
       homeHref="/gestor"
       nav={NAV_GESTOR}
+      grupos={GRUPOS_GESTOR}
       accentColor={workspace.corPrimaria}
       secondaryColor={workspace.corSecundaria}
       logoUrl={workspace.logoUrl}

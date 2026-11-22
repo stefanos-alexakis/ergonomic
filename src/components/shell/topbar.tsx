@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { sair } from "@/lib/auth-actions";
 import { MenuBotoes } from "./menu-botoes";
-import type { ItemNav } from "./nav-gestor";
+import type { GrupoNav, ItemNav } from "./nav-gestor";
 
 /** Iniciais para o selo quando a empresa não tem logo ("Usina X" → "UX"). */
 function iniciais(nome: string): string {
@@ -14,12 +14,15 @@ export function Topbar({
   homeHref,
   userLabel,
   nav,
+  grupos,
   logoUrl,
 }: {
   contexto: string;
   homeHref: string;
   userLabel?: string;
   nav: ItemNav[];
+  /** Itens do menu lateral (gaveta); sem isso a faixa não mostra o botão "Menu". */
+  grupos?: GrupoNav[];
   logoUrl?: string | null;
 }) {
   return (
@@ -62,10 +65,10 @@ export function Topbar({
           </form>
         </div>
       </div>
-      {nav.length > 0 && (
+      {(nav.length > 0 || (grupos?.length ?? 0) > 0) && (
         <div className="bg-[var(--ws-secondary,#f4f4f5)] border-t border-[color-mix(in_srgb,var(--ws-accent,#18181b)_12%,white)]">
           <div className="mx-auto max-w-5xl px-4">
-            <MenuBotoes itens={nav} raiz={homeHref} />
+            <MenuBotoes itens={nav} grupos={grupos} raiz={homeHref} />
           </div>
         </div>
       )}
