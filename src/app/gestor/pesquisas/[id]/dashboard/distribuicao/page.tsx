@@ -5,7 +5,7 @@ import { getWorkspaceDoGestor, resolvePesquisaDoWorkspace } from "@/lib/pesquisa
 import { OPCOES_ESCALA, calcularDistribuicao } from "@/lib/distribuicao-respostas";
 import { CONCLUSOES, concluir, formatarRisco } from "@/lib/score-final";
 import { AppShell } from "@/components/shell/app-shell";
-import { NAV_GESTOR } from "@/components/shell/nav-gestor";
+import { GRUPOS_GESTOR, NAV_GESTOR } from "@/components/shell/nav-gestor";
 import { BannerImpersonacao } from "@/components/shell/banner-impersonacao";
 import { PageHeader } from "@/components/ui/page-header";
 import { Select } from "@/components/ui/input";
@@ -45,6 +45,7 @@ export default async function DistribuicaoPage({
       contexto={workspace.nome}
       homeHref="/gestor"
       nav={NAV_GESTOR}
+      grupos={GRUPOS_GESTOR}
       accentColor={workspace.corPrimaria}
       secondaryColor={workspace.corSecundaria}
       logoUrl={workspace.logoUrl}

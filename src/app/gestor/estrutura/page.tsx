@@ -2,7 +2,7 @@ import { getActor } from "@/lib/tenant";
 import { getWorkspaceDoGestor } from "@/lib/pesquisa";
 import { listarCatalogoOrganizacional } from "@/lib/estrutura";
 import { AppShell } from "@/components/shell/app-shell";
-import { NAV_GESTOR } from "@/components/shell/nav-gestor";
+import { GRUPOS_GESTOR, NAV_GESTOR } from "@/components/shell/nav-gestor";
 import { BannerImpersonacao } from "@/components/shell/banner-impersonacao";
 import { PageHeader } from "@/components/ui/page-header";
 import { Card } from "@/components/ui/card";
@@ -36,6 +36,7 @@ export default async function EstruturaPage() {
       contexto={workspace.nome}
       homeHref="/gestor"
       nav={NAV}
+      grupos={GRUPOS_GESTOR}
       accentColor={workspace.corPrimaria}
       secondaryColor={workspace.corSecundaria}
       logoUrl={workspace.logoUrl}

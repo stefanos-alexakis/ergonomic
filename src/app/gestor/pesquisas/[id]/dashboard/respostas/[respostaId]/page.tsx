@@ -6,7 +6,7 @@ import { calcularDashboard } from "@/lib/dashboard";
 import { carregarPaginasQuestionario, carregarRespostasSalvas } from "@/lib/resposta";
 import { db } from "@/lib/db";
 import { AppShell } from "@/components/shell/app-shell";
-import { NAV_GESTOR } from "@/components/shell/nav-gestor";
+import { GRUPOS_GESTOR, NAV_GESTOR } from "@/components/shell/nav-gestor";
 import { BannerImpersonacao } from "@/components/shell/banner-impersonacao";
 import { PageHeader } from "@/components/ui/page-header";
 
@@ -74,6 +74,7 @@ export default async function DetalheRespostaPage({
       contexto={workspace.nome}
       homeHref="/gestor"
       nav={NAV}
+      grupos={GRUPOS_GESTOR}
       accentColor={workspace.corPrimaria}
       secondaryColor={workspace.corSecundaria}
       logoUrl={workspace.logoUrl}
