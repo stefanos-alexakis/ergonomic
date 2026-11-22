@@ -79,7 +79,7 @@ usuário. O histórico de cada ação registra o nome com a marca "(consultoria)
 
 O topo tem os três eixos: **Eixo 1 · Pesquisa com os colaboradores**, **Eixo 2 · Medidas de controle** e
 **Eixo 3 · Atestados CID**. O botão **Menu** (à esquerda) abre uma gaveta com o restante, por categoria:
-**Cadastro** (Setores e departamentos), **Relatórios** (Painel FRPRT) e **Gestão** (Plano de ação).
+**Cadastro** (Setores e departamentos), **Relatórios** (Relatórios Eixo 1, Relatórios Eixo 2 e Painel FRPRT) e **Gestão** (Plano de ação).
 
 ### 2.1 Setores e departamentos
 - Cadastre um a um ou **importe pela planilha modelo** (botão de download na própria tela).
@@ -170,7 +170,14 @@ uma aba "Todos" e uma aba por setor.
 5. **Salvar** ou **Concluir** a qualquer momento. Depois de concluída, a avaliação pode ser
    reaberta para edição.
 
-O **Resultado** mostra o fator de cada setor × fator de risco (×0,80 a ×1,00).
+O **Resultado** mostra o fator de cada setor × fator de risco (×0,80 a ×1,00). No topo há um resumo: o
+**índice de controle (%)** é o mesmo fator em porcentagem (×0,80 = 100%, ×1,00 = 0%). O botão **Entenda o score
+do Eixo 2** abre uma página de explicação, igual para todas as empresas (o que é o Eixo 2, avaliação por setor,
+valor de cada resposta, como o multiplicador atenua o risco e que sem medida o fator fica 1,00).
+
+**Atalho:** menu **Relatórios → Relatórios Eixo 2** (ou o link *Ver todos os relatórios* no Eixo 2) lista as
+avaliações com data, setores, status e os links *Ver resultado* e *Ver respostas* (em preenchimento:
+*Resultado parcial* e *Continuar preenchendo*). Só um atalho: as avaliações continuam no Eixo 2.
 
 **Etapa final — Sinais de exposição (ISO 45003, item 8.1.2.5).** Depois das 13 dimensões há uma etapa
 com 9 sinais que o líder de cada setor pode identificar nos colaboradores (mudanças de comportamento,

@@ -67,9 +67,14 @@ export default async function ResultadoEixo2Page({
         eyebrow={`Eixo 2 · ${avaliacao.nome}`}
         title="Resultado das medidas de controle"
         actions={
-          <Link href={`/gestor/eixo2/${avaliacao.id}`}>
-            <Button variant="secondary">{avaliacao.status === "CONCLUIDA" ? "Ver respostas" : "Continuar preenchendo"}</Button>
-          </Link>
+          <div className="flex flex-wrap items-center gap-2">
+            <Link href="/gestor/eixo2/como-funciona">
+              <Button variant="secondary">Entenda o score do Eixo 2</Button>
+            </Link>
+            <Link href={`/gestor/eixo2/${avaliacao.id}`}>
+              <Button variant="secondary">{avaliacao.status === "CONCLUIDA" ? "Ver respostas" : "Continuar preenchendo"}</Button>
+            </Link>
+          </div>
         }
       />
 
@@ -80,11 +85,21 @@ export default async function ResultadoEixo2Page({
       )}
 
       <div className="mb-6 rounded-lg border border-zinc-200 bg-zinc-50 px-5 py-4 text-sm text-zinc-600 max-w-3xl">
-        Cada medida vale <strong>0,80</strong> (existente e eficaz ou não se aplica), <strong>0,90</strong>{" "}
-        (precisa melhorar) ou <strong>1,00</strong> (inexistente). O fator é a média ponderada por fator de
-        risco e setor — quanto menor, mais controlado. <Badge tom="sucesso">Bom</Badge> até ×0,85 ·{" "}
-        <Badge tom="atencao">Regular</Badge> até ×0,95 · <Badge tom="perigo">Ruim</Badge> acima disso. No
-        score final, este fator multiplica o resultado do Eixo 1.
+        <p>
+          Cada medida vale <strong>0,80</strong> (existente e eficaz ou não se aplica), <strong>0,90</strong> (precisa
+          melhorar) ou <strong>1,00</strong> (inexistente). O <strong>fator do Eixo 2</strong> é a média das medidas de
+          cada fator de risco no setor: quanto menor, mais as medidas <strong>atenuam</strong> o risco do Eixo 1, e{" "}
+          <strong>1,00 significa nenhuma atenuação</strong>. Ele multiplica o resultado do Eixo 1 no score final.
+        </p>
+        <p className="mt-2">
+          O <strong>índice de controle</strong> é o mesmo fator em porcentagem: <strong>100%</strong> = ×0,80 (todas as
+          medidas existem e são eficazes) e <strong>0%</strong> = ×1,00 (nenhuma medida). <Badge tom="sucesso">Bom</Badge>{" "}
+          até ×0,85 · <Badge tom="atencao">Regular</Badge> até ×0,95 · <Badge tom="perigo">Ruim</Badge> acima disso.{" "}
+          <Link href="/gestor/eixo2/como-funciona" className="font-medium text-zinc-900 underline underline-offset-2 hover:no-underline">
+            Entenda o score do Eixo 2
+          </Link>
+          .
+        </p>
       </div>
 
       <form method="get" className="flex items-end gap-3 mb-6">

@@ -98,6 +98,7 @@ Documentação: `docs/README.md` (índice), `manual-de-uso.md`, `metodologia.md`
   PDF ou Excel. Os indicadores contam **colaboradores com atestado** (mesma matrícula = 1 por setor; linha sem matrícula = 1 pessoa),
   com o total de atestados ao lado; só atestado "Sim" agrava. Levantamentos antigos (sem matrícula) seguem como estavam.
 - **Distribuição das respostas:** destaque pela NOSSA metodologia (≥ 50% em Frequentemente/Sempre); não entra no relatório.
+- **Relatórios Eixo 2 (nov/2026):** página-atalho `/gestor/relatorios-eixo2` (menu Relatórios + link no Eixo 2) e página fixa `/gestor/eixo2/como-funciona` explicando o score; resumo novo no topo do resultado. **Regra de cálculo inalterada:** "Não se aplica" segue 0,80 (igual a eficaz); inexistente 1,00 (sem atenuante). Houve uma interpretação errada (N.A. = 1,00) que foi desfeita pelo cliente.
 - **Relatórios Eixo 1 (nov/2026):** página-atalho `/gestor/relatorios-eixo1` (menu Relatórios + link no Eixo 1). Lista pesquisas não arquivadas/não excluídas; link só com respostas concluídas ≥ mínimo da pesquisa, senão "Aguardando respostas". Os painéis seguem em `/gestor/pesquisas/[id]/dashboard`.
 - **Responsáveis do relatório (nov/2026):** cadastro por empresa (admin), sem login; marca "consta no próximo relatório" + ordem; e-mail e celular saem no PDF; marca permanece após emitir; retrato imutável na versão emitida.
 - **Relatório completo:** só a consultoria (admin na visão de gestor) redige e emite; versões gravadas e imutáveis;

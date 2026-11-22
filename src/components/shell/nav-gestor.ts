@@ -23,6 +23,7 @@ export const GRUPOS_GESTOR: GrupoNav[] = [
     titulo: "Relatórios",
     itens: [
       { href: "/gestor/relatorios-eixo1", label: "Relatórios Eixo 1", icone: "painel" },
+      { href: "/gestor/relatorios-eixo2", label: "Relatórios Eixo 2", icone: "painel" },
       { href: "/gestor/painel", label: "Painel FRPRT", icone: "painel" },
     ],
   },
