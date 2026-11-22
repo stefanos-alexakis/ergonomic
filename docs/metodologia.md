@@ -177,7 +177,7 @@ O relatório PDF traz a página da Matriz FMEA e uma página com estes critério
   setores com amostra suficiente.
 - Se só um grupo for suprimido, o segundo menor também é, para impedir a dedução por subtração.
 - Horário individual de resposta nunca é exibido nem exportado.
-- No Eixo 3 não há nenhum identificador de trabalhador.
+- No Eixo 3 não há nome nem CPF; a matrícula (opcional) fica restrita à tela do Eixo 3 e nunca vai para relatórios.
 
 ## Exemplo
 

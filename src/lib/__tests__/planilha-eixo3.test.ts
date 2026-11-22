@@ -65,7 +65,45 @@ describe("parsePlanilhaOcorrencias", () => {
     expect(r.erros).toEqual([]);
     expect(r.linhas[0]?.setor).toBe("Produção");
     expect(JSON.stringify(r.linhas)).not.toContain("João");
-    expect(r.avisos.some((a) => /identificação do trabalhador/.test(a.mensagem))).toBe(true);
+    expect(r.avisos.some((a) => /nunca nome, CPF ou outra identificação/.test(a.mensagem))).toBe(true);
+  });
+
+  it("guarda a matrícula (como texto, zeros à esquerda e caixa preservados) e não a ignora mais", async () => {
+    const cab = [...CABECALHO_OCORRENCIAS];
+    const buf = await planilha(
+      [
+        ["Produção", "F41", null, null, 2, "Sim", null, "00123"],
+        ["Produção", "F32", null, null, 5, "Não", null, "  ab 77 "],
+        ["Produção", "F43", null, null, 1, "Sim", null, 456],
+      ],
+      cab,
+    );
+    const r = await parsePlanilhaOcorrencias(buf);
+    expect(r.erros).toEqual([]);
+    expect(r.linhas.map((l) => l.matricula)).toEqual(["00123", "ab 77", "456"]);
+    expect(r.avisos.some((a) => /ignorada/.test(a.mensagem))).toBe(false);
+  });
+
+  it("avisa quando há linhas sem matrícula (cada uma conta como uma pessoa)", async () => {
+    const buf = await planilha(
+      [
+        ["Produção", "F41", null, null, 2, "Sim", null, "10"],
+        ["Produção", "F32", null, null, 5, "Não", null, null],
+        ["Produção", "F43", null, null, 1, "Sim", null, null],
+      ],
+      [...CABECALHO_OCORRENCIAS],
+    );
+    const r = await parsePlanilhaOcorrencias(buf);
+    expect(r.erros).toEqual([]);
+    expect(r.avisos.some((a) => /2 linha\(s\) sem matrícula/.test(a.mensagem))).toBe(true);
+  });
+
+  it("planilha antiga, sem a coluna Matrícula, continua valendo e avisa", async () => {
+    const antigo = CABECALHO_OCORRENCIAS.filter((c) => c !== "Matrícula");
+    const r = await parsePlanilhaOcorrencias(await planilha([["Produção", "F41", null, null, 2, "Sim", null]], antigo));
+    expect(r.erros).toEqual([]);
+    expect(r.linhas[0]?.matricula).toBeNull();
+    expect(r.avisos.some((a) => /sem a coluna Matrícula/.test(a.mensagem))).toBe(true);
   });
 
   it("recusa arquivo que não é .xlsx e arquivo maior que 5 MB", async () => {

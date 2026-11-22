@@ -1,5 +1,5 @@
 import ExcelJS from "exceljs";
-import { normalizarCid, normalizarRelacao, type Relacao } from "@/lib/eixo3";
+import { normalizarCid, normalizarMatricula, normalizarRelacao, type Relacao } from "@/lib/eixo3";
 
 /**
  * Lê a planilha de ocorrências do Eixo 3 no padrão da aba "Ocorrências" da
@@ -26,6 +26,7 @@ export type LinhaOcorrencia = {
   diasAfastados: number | null;
   relacao: Relacao;
   justificativa: string | null;
+  matricula: string | null;
 };
 
 export type ProblemaPlanilha = { linha: number; coluna: string; mensagem: string };
@@ -36,7 +37,7 @@ export type ResultadoPlanilhaEixo3 = {
   avisos: ProblemaPlanilha[];
 };
 
-type Campo = "setor" | "cid" | "descricao" | "data" | "dias" | "relacao" | "justificativa";
+type Campo = "setor" | "cid" | "descricao" | "data" | "dias" | "relacao" | "justificativa" | "matricula";
 
 const ROTULO_CAMPO: Record<Campo, string> = {
   setor: "Setor ou GHE",
@@ -46,6 +47,7 @@ const ROTULO_CAMPO: Record<Campo, string> = {
   dias: "Total de dias afastados",
   relacao: "Relação com o trabalho?",
   justificativa: "Justificativa / Observação",
+  matricula: "Matrícula",
 };
 
 function normalizarCabecalho(valor: unknown): string {
@@ -64,11 +66,13 @@ function campoDoCabecalho(h: string): Campo | null {
   if (h.startsWith("data")) return "data";
   if (h.includes("dias")) return "dias";
   if (h.startsWith("relacao")) return "relacao";
+  if (h.startsWith("matricula")) return "matricula";
   if (h.startsWith("justificativa") || h.startsWith("observacao")) return "justificativa";
   return null;
 }
 
-const PARECE_IDENTIFICACAO = /\b(nome|colaborador|funcionario|trabalhador|matricula|cpf|rg|codigo)\b/;
+// A matrícula é aceita (coluna própria); nome, CPF e afins continuam ignorados.
+const PARECE_IDENTIFICACAO = /\b(nome|colaborador|funcionario|trabalhador|cpf|rg|codigo)\b/;
 
 /** Valor "cru" de uma célula do exceljs (texto rico, fórmula e link inclusos). */
 function valorCelula(v: ExcelJS.CellValue): string | number | Date | null {
@@ -149,7 +153,7 @@ export async function parsePlanilhaOcorrencias(buffer: Buffer): Promise<Resultad
       resultado.avisos.push({
         linha: 1,
         coluna: String(valorCelula(cell.value)),
-        mensagem: "Coluna ignorada — o Eixo 3 não guarda identificação do trabalhador (LGPD).",
+        mensagem: "Coluna ignorada — o Eixo 3 só guarda a matrícula, nunca nome, CPF ou outra identificação (LGPD).",
       });
     } else if (!campo) {
       resultado.avisos.push({ linha: 1, coluna: String(valorCelula(cell.value)), mensagem: "Coluna não reconhecida, ignorada." });
@@ -223,9 +227,27 @@ export async function parsePlanilhaOcorrencias(buffer: Buffer): Promise<Resultad
         diasAfastados: dias,
         relacao,
         justificativa: texto(ler("justificativa")),
+        matricula: normalizarMatricula(ler("matricula") instanceof Date ? null : ler("matricula")),
       });
     }
   });
+
+  if (!colunas.has("matricula")) {
+    resultado.avisos.push({
+      linha: 1,
+      coluna: ROTULO_CAMPO.matricula,
+      mensagem: "Planilha sem a coluna Matrícula: cada atestado conta como um colaborador diferente.",
+    });
+  } else {
+    const semMatricula = resultado.linhas.filter((l) => !l.matricula).length;
+    if (semMatricula > 0) {
+      resultado.avisos.push({
+        linha: 0,
+        coluna: ROTULO_CAMPO.matricula,
+        mensagem: `${semMatricula} linha(s) sem matrícula: cada uma conta como um colaborador diferente.`,
+      });
+    }
+  }
 
   if (excedeu) return erroGeral(`A planilha passa de ${LINHAS_MAXIMAS} ocorrências — divida em mais de um levantamento.`);
   return resultado;

@@ -561,7 +561,8 @@ model LevantamentoEixo3 {
   @@index([workspaceId])
 }
 
-// Uma linha da planilha. Nenhum identificador do trabalhador (LGPD).
+// Uma linha da planilha. Sem nome nem CPF; a matrícula é opcional (decisão do
+// cliente, nov/2026) e fica restrita à tela do Eixo 3 (LGPD).
 model OcorrenciaEixo3 {
   id             String          @id @default(cuid())
   levantamentoId String
@@ -577,6 +578,9 @@ model OcorrenciaEixo3 {
   diasAfastados  Int?
   relacao        RelacaoTrabalho
   justificativa  String?
+  // Matrícula (opcional): só para contar colaboradores e ver reincidência.
+  // Aparece apenas na tela do Eixo 3 — nunca em relatórios, PDF, Excel ou log.
+  matricula      String?
 
   levantamento LevantamentoEixo3 @relation(fields: [levantamentoId], references: [id], onDelete: Cascade)
   setor        SetorOrg?         @relation(fields: [setorId], references: [id], onDelete: SetNull)

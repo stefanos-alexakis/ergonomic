@@ -161,9 +161,11 @@ desejo de trabalhar com outras pessoas, conflitos). O consultor preenche na mesm
 
 ### 2.5 Eixo 3 · Atestados CID
 **Eixo 3 → Baixar modelo da planilha** e preencha uma linha por ocorrência: setor, CID-F,
-descrição, data de início, dias afastados, relação com o trabalho (*Sim / Não / Inconclusivo*) e
-justificativa. **Não inclua nome, matrícula ou CPF.** Colunas desse tipo são ignoradas e a tela
-avisa.
+descrição, data de início, dias afastados, relação com o trabalho (*Sim / Não / Inconclusivo*),
+justificativa e **matrícula** (opcional). **Não inclua nome nem CPF** — colunas desse tipo são
+ignoradas e a tela avisa. A matrícula serve para contar *colaboradores com atestado* (a mesma
+matrícula conta uma vez por setor; linha sem matrícula conta como uma pessoa) e mostrar a
+reincidência. Ela aparece só na tela do Eixo 3, nunca nos relatórios nem nas planilhas geradas.
 
 **Eixo 3 → + Publicar planilha**
 1. **Identificação** — nome do levantamento e período analisado.

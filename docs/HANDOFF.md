@@ -88,7 +88,9 @@ Documentação: `docs/README.md` (índice), `manual-de-uso.md`, `metodologia.md`
   nos títulos; prioridade continua Alta/Média/Baixa. Mantidos: "Pesquisa de Riscos Psicossociais", "Fatores de Risco
   Psicossociais Relacionados ao Trabalho", "Fator de risco PGR", "Sem risco indicado / Risco existente",
   "Riscos existentes que vão para o PGR".
-- **Eixo 3:** coluna "Ocorrência / Colab (%)" (conta ocorrências, não pessoas); nenhum identificador de trabalhador.
+- **Eixo 3 (revisto em nov/2026):** a planilha aceita a **matrícula** (opcional), mostrada só na tela do Eixo 3 — nunca em relatórios,
+  PDF ou Excel. Os indicadores contam **colaboradores com atestado** (mesma matrícula = 1 por setor; linha sem matrícula = 1 pessoa),
+  com o total de atestados ao lado; só atestado "Sim" agrava. Levantamentos antigos (sem matrícula) seguem como estavam.
 - **Distribuição das respostas:** destaque pela NOSSA metodologia (≥ 50% em Frequentemente/Sempre); não entra no relatório.
 - **Relatório completo:** só a consultoria (admin na visão de gestor) redige e emite; versões gravadas e imutáveis;
   assinatura digital é feita fora, depois da emissão; dossiê da legislação = espaço editável no admin (em elaboração).

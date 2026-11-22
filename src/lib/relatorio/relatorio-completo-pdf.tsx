@@ -405,23 +405,25 @@ function Documento({ d, paginas }: { d: DadosRelatorio; paginas: Paginas }) {
                 : ""}
             </Text>
             <Tabela
-              colunas={["Setor", "Ocorrências", "Relacionadas", "Inconclusivas", "Dias afastados", "Ocorrência / Colab (%)", "Fatores agravados"]}
-              larguras={["24%", "11%", "12%", "12%", "12%", "15%", "14%"]}
+              colunas={["Setor", "Atestados", "Colab. com atestado", "Relacionados (colab.)", "Inconclusivos (colab.)", "Dias afastados", "Colab. c/ atestado / Colab (%)", "Fatores agravados"]}
+              larguras={["19%", "9%", "11%", "12%", "12%", "9%", "16%", "12%"]}
               linhas={d.eixo3.setores.map((x) => [
                 x.nome,
                 String(x.ocorrencias),
-                String(x.relacionadas),
-                String(x.inconclusivas),
+                String(x.colaboradoresComAtestado),
+                String(x.colaboradoresRelacionados),
+                String(x.colaboradoresInconclusivos),
                 String(x.diasAfastados),
                 x.taxaPor100 !== null ? `${x.taxaPor100.toFixed(1).replace(".", ",")}%` : "—",
                 `${[...x.fatorPorFator.values()].filter((v) => v > 1).length} de ${fatores.length}`,
               ])}
             />
             <Text style={s.h2}>CIDs mais frequentes (por categoria)</Text>
-            <Text>{d.eixo3.cidsFrequentes.map((c) => `${c.cid} (${c.total})`).join(" · ") || "—"}</Text>
+            <Text>{d.eixo3.cidsFrequentes.map((c) => `${c.cid} (${c.total} atest. / ${c.colaboradores} colab.)`).join(" · ") || "—"}</Text>
             <Text style={[s.pequeno, { marginTop: 8 }]}>
-              O CID não comprova nexo causal isoladamente: o Eixo 3 é indicador agravante coletivo. Ocorrência / Colab (%)
-              conta ocorrências, não pessoas.
+              O CID não comprova nexo causal isoladamente: o Eixo 3 é indicador agravante coletivo. Os indicadores contam
+              colaboradores (a mesma pessoa conta uma vez por setor; atestado sem matrícula conta como uma pessoa) e o total
+              de atestados aparece ao lado.
             </Text>
           </>
         )}
