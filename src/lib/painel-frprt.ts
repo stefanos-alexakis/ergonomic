@@ -129,7 +129,8 @@ export async function opcoesPainel(workspaceId: string, selecao: SelecaoPainel) 
 
   const [pesquisas, avaliacoes, levantamentos] = await Promise.all([
     db.pesquisa.findMany({
-      where: { workspaceId, questionarioId: questionario.id },
+      // Arquivadas ficam fora dos seletores (decisão do cliente, nov/2026).
+      where: { workspaceId, questionarioId: questionario.id, arquivadaEm: null },
       orderBy: { createdAt: "desc" },
       select: { id: true, nome: true, dataInicio: true, dataFim: true, limiteSupressaoGrupo: true },
     }),

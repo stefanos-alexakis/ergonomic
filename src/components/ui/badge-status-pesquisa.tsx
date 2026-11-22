@@ -13,9 +13,17 @@ export function BadgeStatusPesquisa({
   pesquisa,
   codigosGerados,
 }: {
-  pesquisa: { dataInicio: Date; dataFim: Date };
+  pesquisa: { dataInicio: Date; dataFim: Date; arquivadaEm?: Date | null; exclusaoSolicitadaEm?: Date | null };
   codigosGerados: boolean;
 }) {
+  if (pesquisa.arquivadaEm) {
+    return (
+      <span className="inline-flex flex-wrap items-center gap-1.5">
+        <Badge tom="neutro">Arquivada</Badge>
+        {pesquisa.exclusaoSolicitadaEm && <Badge tom="atencao">Exclusão solicitada</Badge>}
+      </span>
+    );
+  }
   const status = statusDaPesquisa(pesquisa, { codigosGerados });
   return <Badge tom={TOM[status]}>{ROTULO_STATUS_PESQUISA[status]}</Badge>;
 }

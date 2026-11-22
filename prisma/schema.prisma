@@ -254,6 +254,12 @@ model Pesquisa {
   // Pré-pesquisa de perfil (opcional para o colaborador, que pode pular).
   exibirPrePesquisa    Boolean        @default(false)
   createdAt            DateTime       @default(now())
+  // Arquivada pelo gestor: não aceita respostas, sai das listas de trabalho e
+  // dos seletores do Painel/relatório, mas continua legível.
+  arquivadaEm          DateTime?
+  // Pedido de exclusão de uma pesquisa já iniciada: arquiva na hora e só
+  // libera a exclusão definitiva 30 dias depois (segunda confirmação).
+  exclusaoSolicitadaEm DateTime?
 
   workspace    Workspace             @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   questionario Questionario          @relation(fields: [questionarioId], references: [id])
