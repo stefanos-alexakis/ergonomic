@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { confirmarRevisaoSinaisAction, salvarSinalEixo2Action } from "../actions";
 import { Button } from "@/components/ui/button";
-import { ESCALA_SINAIS, PERGUNTA_SINAIS, VALOR_PADRAO_SINAL } from "@/lib/sinais-eixo2";
+import { ESCALA_SINAIS, PERGUNTA_SINAIS, VALOR_PADRAO_SINAL } from "@/lib/sinais-eixo2-escala";
 
 type Setor = { id: string; nome: string };
 type Sinal = { id: string; ordem: number; texto: string };
