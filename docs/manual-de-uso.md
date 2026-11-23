@@ -147,6 +147,12 @@ por fator, por setor e por departamento, e **Baixar relatório (PDF)**.
 Setores ou departamentos com menos de 3 respostas aparecem como **amostra insuficiente**. Isso
 protege o anonimato e não pode ser desligado.
 
+**Atalho para todos os painéis:** menu **Relatórios → Relatórios Eixo 1** (ou o link *Ver todos os relatórios* no
+Eixo 1) abre a página *Relatórios Eixo 1 · Pesquisas Colaboradores*, com uma linha por pesquisa: nome, período,
+respostas concluídas (de quantos códigos), status e **Abrir painel**. Pesquisa que ainda não tem respostas
+suficientes aparece sem link, com "Aguardando respostas". Arquivadas e com exclusão solicitada não aparecem.
+Os painéis continuam dentro de cada pesquisa; a página é só um atalho.
+
 
 **Distribuição das respostas (pergunta a pergunta)** — botão no painel da pesquisa. Mostra, para cada
 uma das 35 perguntas, agrupadas pelos 13 fatores, quantas pessoas marcaram cada opção (Nunca a Sempre)

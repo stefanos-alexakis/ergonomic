@@ -19,7 +19,13 @@ export type GrupoNav = { titulo: string; itens: ItemNav[] };
 /** Menu lateral (gaveta) da área do gestor, por categoria. */
 export const GRUPOS_GESTOR: GrupoNav[] = [
   { titulo: "Cadastro", itens: [{ href: "/gestor/estrutura", label: "Setores e departamentos", icone: "estrutura" }] },
-  { titulo: "Relatórios", itens: [{ href: "/gestor/painel", label: "Painel FRPRT", icone: "painel" }] },
+  {
+    titulo: "Relatórios",
+    itens: [
+      { href: "/gestor/relatorios-eixo1", label: "Relatórios Eixo 1", icone: "painel" },
+      { href: "/gestor/painel", label: "Painel FRPRT", icone: "painel" },
+    ],
+  },
   { titulo: "Gestão", itens: [{ href: "/gestor/plano", label: "Plano de ação", icone: "plano" }] },
 ];
 
