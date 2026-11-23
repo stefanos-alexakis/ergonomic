@@ -1,26 +1,39 @@
 # Handoff — Plataforma FRPRT (Pesquisa Psicossocial)
 
-> Escrito em 22/11/2026 para continuar o trabalho numa sessão nova. Leia inteiro antes de mexer em
+> Atualizado em 22/11/2026, depois do deploy da versão de novembro, para continuar numa sessão nova. Leia inteiro antes de mexer em
 > qualquer coisa. Complementa a memória do projeto (`~/.claude/projects/D--2026-v2-Ergonomic-Pesquisa/memory/`)
 > e o guia de deploy (`C:\Users\Stefanos\.claude\docs\deploy-vps.md`).
 
 ---
 
-## 1. Estado atual (22/11/2026)
+## 1. Estado atual (22/11/2026, depois do deploy)
 
 | Onde | Estado |
 |---|---|
-| Git local (`D:\2026-v2\Ergonomic\Pesquisa`) | `main` = `origin/main` = `15ff797`. Nenhum branch com trabalho pendente. |
+| Git local (`D:\2026-v2\Ergonomic\Pesquisa`) | `main` = `origin/main` (merge `02be44a` + este handoff). Os 8 branches de novembro já estão no `main`. |
 | GitHub | `stefanos-alexakis/ergonomic`, branch `main`. |
-| Produção | https://pesquisa.agtrade.com.br — VPS `root@2.24.75.225`, app em `/opt/pesquisa-psicossocial`, rodando `5a58f72` (o `15ff797` só acrescentou documentos). |
-| Backup mais recente | `/opt/pesquisa-psicossocial/backups/pesquisa-2026-10-09-1600.sql` (antes do último deploy). |
+| Produção | https://pesquisa.agtrade.com.br — VPS `root@2.24.75.225`, app em `/opt/pesquisa-psicossocial`, rodando **`02be44a`** (publicado em 22/11/2026, imagem `6679130bf24c`). Seed rodado (9 sinais ISO 45003, pergunta 4 nova). |
+| Backup da versão anterior | Na VPS: `backups/pesquisa-2026-11-22-pre-deploy.sql`, `backups/uploads-2026-11-22.tgz`, tag git `backup-pre-deploy-2026-11-22` (`5a58f72`) e imagem `pesquisa-app:backup-2026-11-22`. Cópia na Área de Trabalho do Stefanos: `D:\User\Desktop\Backup-FRPRT-2026-11-22\` (com `LEIA-ME.txt` de como voltar). |
+
+**Publicado em 22/11/2026** (merge `--no-ff`, nesta ordem): `melhorias-nov2026` → `eixo2-sinais-iso45003` →
+`gestao-pesquisas-eixo3` → `eixo3-cids-z` → `responsaveis-relatorio` → `relatorios-eixo1` → `relatorios-eixo2` →
+`relatorio-modelo-cliente`. Em resumo: menu em gaveta; pergunta 4 nova; pergunta aberta de sugestão; etapa ISO 45003
+no Eixo 2; filtro de empresas no admin; matrícula e contagem por colaborador no Eixo 3; gestão de pesquisas
+(prorrogar, arquivar, excluir com carência); CIDs Z; outros CIDs só na contagem; responsáveis do relatório; páginas
+Relatórios Eixo 1 e Eixo 2; explicação do score do Eixo 2; cálculo com 2 casas e Eixo 1 pela média dos 13 fatores;
+fator 11 fora da FMEA (Lei 14.457); **relatório final no modelo da cliente**; PDFs avulsos dos Eixos 2 e 3.
+
+**Para voltar à versão anterior**, se aparecer bug: `docker tag pesquisa-app:backup-2026-11-22 pesquisa-app:latest &&
+docker compose up -d --no-build app` (o schema novo é só aditivo; a versão antiga roda com ele). O dump só em caso
+de dados danificados — restaurar apaga o que foi gravado depois do deploy.
 
 Fora do git de propósito:
 - `scripts/seed-empresa-homologacao.ts` — cria a empresa de teste local; a linha 1 tem o login de teste.
+- `scripts/seed-lancamento-horizonte.ts` — lançamento completo simulado (3 eixos) na empresa de teste local.
 - `test-results/` (o Playwright apaga a pasta a cada execução — não guarde nada lá) e `.claude/`.
-- `Modificacoes/` — **novas solicitações do cliente (19/11/2026), ainda não analisadas**:
-  - `Solicitacao_Melhorias_Sistema_Avaliacao_Psicossocial.docx`
-  - `Relatório sistema Fatores de Risco Psicossocial.docx` (2,5 MB, provavelmente com imagens/modelo de relatório)
+- `Modificacoes/` — solicitações do cliente de 19/11/2026, **já analisadas e implementadas** (o modelo de
+  relatório virou o relatório final; ver seção 4).
+- Bancos locais de teste `pesquisa_push_teste` e `pesquisa_push_teste2` (simulação do `db push`; podem ser apagados).
 
 ---
 
@@ -149,6 +162,17 @@ Documentação: `docs/README.md` (índice), `manual-de-uso.md`, `metodologia.md`
 - **Server Actions com `.bind(...)`:** argumentos ligados vêm do navegador (não são criptografados). Ações novas
   devem resolver empresa/resposta pela sessão/cookie, nunca por id vindo do formulário. (A jornada antiga ainda
   recebe `respostaId` assim — risco baixo, cuid imprevisível; vale corrigir quando mexer lá.)
+- **`db push` no boot da VPS** roda sem flags: qualquer mudança que ele classifique como "possível perda de dados"
+  (ex.: trocar um índice único, mesmo sem dados afetados) faz o container **não subir**. Antes de publicar, simule:
+  banco novo com o schema do `main` e, por cima, `npx prisma db push < /dev/null` com o schema novo. O Prisma
+  bloqueia `--force-reset` vindo do agente (pede consentimento explícito) — use um banco novo em vez de reset.
+- **@react-pdf:** cabeçalho de tabela `fixed` junto com `minPresenceAhead` num documento longo quebra a geração
+  (`unsupported number: -1.77e21` em `renderBorders`). O relatório final não usa nenhum dos dois e dá página própria a
+  cada distribuição do Eixo 1. Hifenização automática segue regras do inglês ("Nun-ca"): desligada com
+  `Font.registerHyphenationCallback`. Para achar a página que quebra, gere por partes (filtro temporário por página).
+- **E2E com `getByText("0100")`** casa trechos: células vizinhas ("4,00" + "100%") e o estilo de fonte que o modo dev
+  do Next injeta ("unicode-range: U+0100…"). Use `{ exact: true }` dentro de `getByRole("main")`.
+- **Mensagem de sucesso que fica na tela** ("Rascunho salvo.") não prova o 2º envio: no E2E, espere o banco com `expect.poll`.
 - **Excluir empresa:** apaga em ordem explícita (pesquisas → ações → Eixos 2/3 → empresa); um único DELETE dispara
   conflito de chave em `Resposta_codigoAcessoId_fkey`.
 
@@ -156,22 +180,26 @@ Documentação: `docs/README.md` (índice), `manual-de-uso.md`, `metodologia.md`
 
 ## 7. Pendências em aberto
 
-- **Deploy pendente (nov/2026), revisado antes de publicar:** merge `--no-ff` na ordem `melhorias-nov2026` →
-  `eixo2-sinais-iso45003` → `gestao-pesquisas-eixo3` → `eixo3-cids-z` → `responsaveis-relatorio` →
-  `relatorios-eixo1` → `relatorios-eixo2`. Schema só aditivo (5 colunas opcionais/com padrão, 3 tabelas:
-  `SinalEixo2`, `RespostaSinalEixo2`, `ResponsavelRelatorio`), sem env nova. Na VPS: backup do banco →
-  `git pull` → `docker compose up -d --build` → **seed obrigatório** `docker compose exec -T app npx prisma db seed`
-  (cria os 9 sinais ISO 45003 e atualiza o texto da pergunta 4; preserva pesos, severidade e PGR) → provar com grep
-  em `/app/.next` (ex.: "Relatórios Eixo 2") → `/api/health` → hard refresh. Avisar o cliente: rascunhos do Eixo 2
-  só concluem depois de confirmar a etapa ISO 45003; o painel passa a abrir com a avaliação concluída mais recente.
-
-- **CIDs do capítulo Z no Eixo 3** — implementados no branch `eixo3-cids-z` conforme a proposta (`docs/Inclusao-CIDs-Z-Eixo3.docx`), **ainda sem validação formal do cliente** (pontos da seção 7 do documento: Z73.0/Z73.3, uso de substâncias, agentes físicos, ocultar sensíveis na lista, nome do eixo). Tabela em `src/lib/cids-z.ts`; ajustar lá se o cliente mudar algo.
-- **Dossiê da legislação** — cliente elaborando; preencher em Admin → Textos do relatório.
+- **Avisar o cliente sobre a versão publicada em 22/11/2026:** índices do Eixo 1 por setor mudam um pouco (média dos
+  13 fatores, 2 casas); rascunhos do Eixo 2 só concluem depois de confirmar a etapa ISO 45003; o painel abre com a
+  avaliação concluída mais recente; fator 11 fora da FMEA; planilha do Eixo 3 aceita outros CIDs (só contagem) e os
+  termos "relacionado / parcialmente / não relacionado"; pedir hard refresh (Ctrl+Shift+R).
+- **Conferir em produção, logado:** pré-visualização do Relatório final de uma empresa real (não testado logado na VPS).
+- **CIDs do capítulo Z no Eixo 3** — publicados conforme a proposta (`docs/Inclusao-CIDs-Z-Eixo3.docx`), **ainda sem
+  validação formal do cliente** (seção 7 do documento: Z73.0/Z73.3, uso de substâncias, agentes físicos, ocultar
+  sensíveis na lista). Tabela em `src/lib/cids-z.ts`; ajustar lá se o cliente mudar algo.
+- **Critério O da FMEA** — o quadro de aspectos metodológicos do modelo diz que frequência de respostas não deve virar
+  probabilidade; a nota O é a média do Eixo 1. Mantido por decisão da consultoria; o lembrete aparece só na
+  pré-visualização do relatório final (`NOTA_INTERNA_FMEA` em `textos-modelo.ts`).
+- **Word da metodologia** (`docs/Metodologia-FRPRT.docx`, v1.0) desatualizado: 2 casas, Eixo 1 pela média dos 13
+  fatores, fator 11 fora da FMEA, CIDs Z e outros CIDs. O texto-fonte (`src/lib/relatorio/metodologia.ts` e
+  `docs/metodologia.md`) já está atualizado; gerar uma v1.1 se o cliente pedir.
+- **Dossiê da legislação** — o relatório final usa o texto do modelo da cliente (`textos-modelo.ts`); o espaço em
+  Admin → Textos do relatório continua valendo só para o relatório completo.
 - **Consultores reais** — cadastrar em produção (Admin → Consultores) antes do primeiro relatório completo.
 - **Visão do gestor na pré-pesquisa** — opções com menos de 3 pessoas aparecem com a contagem (ex.: "1"); foi
   oferecido escondê-las, sem decisão.
-- **Limpeza** — há 17 branches locais antigos, todos já no `main` (podem ser apagados se o Stefanos quiser).
-- **Novas solicitações** — `Modificacoes/` (ver seção 1): mudanças em todos os eixos e nos relatórios.
+- **Limpeza** — há 24 branches locais antigos, todos já no `main` (podem ser apagados se o Stefanos quiser).
 
 ---
 
@@ -185,18 +213,10 @@ Antes de qualquer coisa, leia:
 2. a memória do projeto e C:\Users\Stefanos\.claude\docs\deploy-vps.md;
 3. AGENTS.md (versão nova do Next.js).
 
-Recebi novas solicitações de melhoria do cliente, com mudanças em todos os eixos e nos relatórios.
-Os documentos estão na pasta Modificacoes/:
-- Solicitacao_Melhorias_Sistema_Avaliacao_Psicossocial.docx
-- Relatório sistema Fatores de Risco Psicossocial.docx
-
-Quero que você:
-1. Leia os dois documentos com bastante atenção (inclusive imagens e tabelas);
-2. Traga sua interpretação item por item, as dúvidas que precisar esclarecer e sugestões de
-   melhoria — sem escrever código ainda;
-3. Aponte onde cada pedido conflita com as decisões já tomadas pelo cliente (seção 4 do handoff);
-4. Depois das minhas respostas, traga o plano de implementação em etapas, com impactos e
-   potenciais bugs, para eu aprovar.
+A versão de novembro já está publicada (ver seção 1). Vou passar as próximas modificações em partes.
+Para cada uma: traga primeiro seu entendimento e as dúvidas (sem código), aponte conflitos com as
+decisões do cliente (seção 4 do handoff) e, depois das minhas respostas, o plano em etapas com
+impactos e potenciais bugs, para eu aprovar.
 
 Siga o fluxo combinado: branch novo, eu testo local, aprovo, merge no main e deploy na VPS
 (sempre confirmando o subdomínio).
