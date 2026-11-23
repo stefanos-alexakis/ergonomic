@@ -14,7 +14,7 @@ Em produção: **https://pesquisa.agtrade.com.br**
 | [Handoff](HANDOFF.md) | Desenvolvimento | Estado atual, mapa do código, decisões do cliente, fluxo e armadilhas — ponto de partida de cada sessão nova. |
 | [Metodologia e cálculos](metodologia.md) | Técnico SST, consultoria | Fórmulas, cortes, FMEA, regras de anonimato e da matriz CID. |
 | [Metodologia final (Word)](Metodologia-FRPRT.docx) | Cliente, consultoria | Documento final validado (v1.0, out/2026), com exemplos e anexos. Mesmo texto do relatório completo ([versão Markdown](metodologia-final.md)). |
-| [Inclusão dos CIDs Z no Eixo 3 (Word)](Inclusao-CIDs-Z-Eixo3.docx) | Cliente | Proposta de classificação dos CIDs do capítulo Z, aguardando validação. |
+| [Inclusão dos CIDs Z no Eixo 3 (Word)](Inclusao-CIDs-Z-Eixo3.docx) | Cliente | Proposta de classificação dos CIDs do capítulo Z (implementada em teste; aguardando validação). |
 | [Proposta da Matriz FMEA](proposta-fmea.html) | Consultoria | Severidade por fator com evidências, agravantes, matriz e prazos. |
 | [Arquitetura](arquitetura.md) | Desenvolvimento | Stack, pastas, modelo de dados, segurança e LGPD. |
 | [Operação](operacao.md) | Desenvolvimento / TI | Ambiente local, testes, publicação, backup. |
@@ -32,7 +32,7 @@ A avaliação de cada empresa combina **três eixos**, sempre por **setor** e po
 |---|---|---|---|
 | 1 · Percepção | Colaboradores (anônimo) | Como o trabalho é percebido | Base de 1 a 5 |
 | 2 · Medidas de controle | Gestor da empresa | O que a empresa já faz | Reduz até 20% (×0,80 a ×1,00) |
-| 3 · Atestados CID-F | RH/DP da empresa | O que já aconteceu | Agrava 10% (×1,10) quando há caso ligado ao trabalho |
+| 3 · Atestados CID F e Z | RH/DP da empresa | O que já aconteceu | Agrava 10% (×1,10) quando há caso ligado ao trabalho |
 
 ```
 Índice final (1–5) = Eixo 1 × Fator Eixo 2 × Fator Eixo 3
@@ -62,7 +62,7 @@ O resultado aparece no **Painel FRPRT** e no **relatório PDF**, prontos para al
 3. **Pesquisas e licenças (Eixo 1)** — questionário v2 com 35 perguntas em 13 fatores, códigos
    anônimos (+5% de códigos de teste), cartões em PDF, painel da pesquisa com índice e faixas de cor, e relatório.
 4. **Eixo 2 · Medidas de controle** — avaliação por setor, com exceções e plano de ação.
-5. **Eixo 3 · Atestados CID-F** — publicação de planilha, mapeamento de setores, declaração de
+5. **Eixo 3 · Atestados CID F e Z** — publicação de planilha, mapeamento de setores, declaração de
    veracidade e painel de ocorrências.
 6. **Painel FRPRT** — cruzamento dos três eixos, principais achados, **Matriz FMEA** (prioridade de
    ação e prazos), matriz de decisão, lista para o PGR e relatório PDF.

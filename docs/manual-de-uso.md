@@ -176,12 +176,18 @@ desejo de trabalhar com outras pessoas, conflitos). O consultor preenche na mesm
   Avaliações concluídas antes desta etapa aparecem como "não avaliado".
 
 ### 2.5 Eixo 3 · Atestados CID
-**Eixo 3 → Baixar modelo da planilha** e preencha uma linha por ocorrência: setor, CID-F,
+**Eixo 3 → Baixar modelo da planilha** e preencha uma linha por ocorrência: setor, CID (F ou Z),
 descrição, data de início, dias afastados, relação com o trabalho (*Sim / Não / Inconclusivo*),
 justificativa e **matrícula** (opcional). **Não inclua nome nem CPF** — colunas desse tipo são
 ignoradas e a tela avisa. A matrícula serve para contar *colaboradores com atestado* (a mesma
 matrícula conta uma vez por setor; linha sem matrícula conta como uma pessoa) e mostrar a
 reincidência. Ela aparece só na tela do Eixo 3, nunca nos relatórios nem nas planilhas geradas.
+
+**CIDs do capítulo Z** também são aceitos (o modelo traz a aba *CIDs Z aceitos*). Alguns agravam fatores como os
+CID F (grupo A), outros só contam nos indicadores (grupo B) e os de agentes físicos (ruído, vibração, fumaça) ficam
+fora do FRPRT, com aviso para tratar no PGR de riscos físicos (grupo C). O painel mostra F e Z separados e alertas
+para uso de substâncias, histórico de lesão autoprovocada e agentes físicos. Os códigos mais sensíveis aparecem só
+em números agregados, sem a linha individual.
 
 **Eixo 3 → + Publicar planilha**
 1. **Identificação** — nome do levantamento e período analisado.

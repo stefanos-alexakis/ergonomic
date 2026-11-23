@@ -1,4 +1,5 @@
 import ExcelJS from "exceljs";
+import { CIDS_Z, ROTULO_GRUPO } from "@/lib/cids-z";
 
 /**
  * Modelo para download da planilha de ocorrências do Eixo 3 — as colunas
@@ -10,7 +11,7 @@ import ExcelJS from "exceljs";
 
 export const CABECALHO_OCORRENCIAS = [
   "Setor ou GHE",
-  "CID-F",
+  "CID (F ou Z)",
   "DESCRIÇÃO DO CID",
   "Data de início",
   "Total de dias afastados",
@@ -20,13 +21,14 @@ export const CABECALHO_OCORRENCIAS = [
 ];
 
 export const ORIENTACOES_EIXO3 = [
-  "Registre todos os atestados e afastamentos com CID iniciado em F do período analisado, uma linha por ocorrência.",
+  "Registre todos os atestados e afastamentos com CID dos capítulos F ou Z do período analisado, uma linha por ocorrência. A aba 'CIDs Z aceitos' lista os códigos Z reconhecidos e como cada um é tratado.",
   "Não informe nome nem CPF do colaborador. A matrícula é opcional e serve para contar colaboradores (e não só atestados) e identificar reincidência; ela aparece apenas na tela do Eixo 3, nunca nos relatórios.",
   "Preencha a matrícula sempre igual para o mesmo colaborador (a coluna já vem como texto, para não perder zeros à esquerda). Linha sem matrícula conta como um colaborador diferente.",
   "Use o mesmo nome de setor cadastrado na plataforma (a plataforma ajuda a associar nomes diferentes na publicação).",
   "A coluna 'Relação com o trabalho' deve ser preenchida com base no conhecimento do RH/DP, relatos do colaborador ou parecer médico disponível.",
-  "Os CID F são possibilidades de agravos/desfechos compatíveis ou associados, não diagnósticos causados automaticamente pelo fator de risco psicossocial.",
-  "A presença de um CID F em atestado não comprova, isoladamente, nexo causal com o trabalho e não deve ser usada para atribuir causalidade individual.",
+  "Os CID F e Z são possibilidades de agravos/desfechos compatíveis ou associados, não diagnósticos causados automaticamente pelo fator de risco psicossocial.",
+  "CIDs Z: o grupo A agrava fatores (como os CID F, quando a relação é Sim); o grupo B é só indicador; o grupo C (ruído, vibração, fumaça) é risco físico/ambiental e deve ser tratado no PGR de riscos físicos. Código Z fora da lista é aceito, mas não agrava nenhum fator.",
+  "A presença de um CID F ou Z em atestado não comprova, isoladamente, nexo causal com o trabalho e não deve ser usada para atribuir causalidade individual.",
   "F43.1 deve ser considerado somente quando houver exposição a evento traumático compatível e avaliação clínica; não deve ser usado como sinônimo de estresse ocupacional.",
   "F51.2 é pertinente quando houver alteração não orgânica do ciclo vigília-sono clinicamente identificada; a organização da jornada pode ser um elemento a investigar.",
   "Os dados de atestados/afastamentos funcionam como indicadores agravantes da análise coletiva por setor, e não como prova isolada de nexo ocupacional.",
@@ -62,7 +64,7 @@ export async function gerarPlanilhaModeloEixo3(): Promise<Buffer> {
 
   const orientacoes = workbook.addWorksheet("Orientações");
   orientacoes.columns = [{ width: 120 }];
-  orientacoes.addRow(["Orientações de preenchimento — Eixo 3 (atestados e afastamentos CID-F)"]).font = { bold: true };
+  orientacoes.addRow(["Orientações de preenchimento — Eixo 3 (atestados e afastamentos CID F e Z)"]).font = { bold: true };
   orientacoes.addRow([]);
   for (const o of ORIENTACOES_EIXO3) orientacoes.addRow([`• ${o}`]).alignment = { wrapText: true };
   orientacoes.addRow([]);
@@ -70,6 +72,11 @@ export async function gerarPlanilhaModeloEixo3(): Promise<Buffer> {
   orientacoes.addRow([
     "Produção | F43.2 | Transtornos de adaptação | 15/03/2025 | 10 | Sim | Relato de sobrecarga por metas",
   ]);
+
+  const zs = workbook.addWorksheet("CIDs Z aceitos");
+  zs.columns = [{ width: 10 }, { width: 70 }, { width: 30 }];
+  zs.addRow(["CID", "Descrição", "Tratamento"]).font = { bold: true };
+  for (const c of CIDS_Z) zs.addRow([c.cid, c.descricao, ROTULO_GRUPO[c.grupo]]);
 
   return Buffer.from(await workbook.xlsx.writeBuffer());
 }

@@ -523,7 +523,7 @@ export function PaginasFrprt(params: ParamsFrprtPdf) {
           <View style={{ flex: 1 }}>
             <Text style={{ marginBottom: 3 }}>
               S · Severidade: gravidade do dano típico do fator (1–5), agravada no setor (+1 cada, até 5) por atestado
-              CID-F relacionado ao trabalho, afastamento acima de 15 dias e respondentes expostos (50% ou mais).
+              CID F ou Z relacionado ao trabalho, afastamento acima de 15 dias e respondentes expostos (50% ou mais).
             </Text>
             <Text style={{ marginBottom: 3 }}>
               O · Ocorrência: média do Eixo 1 no fator. D · Detecção: medidas de controle do Eixo 2 (1 = eficazes, 5 =
@@ -635,7 +635,7 @@ export function PaginasFrprt(params: ParamsFrprtPdf) {
               </Text>
               <Text>Possíveis consequências: {r.apoio.consequencias.join(" ")}</Text>
               <Text>
-                CID F compatíveis: {r.apoio.cids.join(", ") || "Não específico"}
+                CIDs compatíveis: {r.apoio.cids.join(", ") || "Não específico"}
                 {r.celula.cidsEixo3.length ? ` · registrados e relacionados ao trabalho: ${r.celula.cidsEixo3.join(", ")}` : ""}
               </Text>
               <Text>Observação técnica: {r.apoio.observacoes.join(" ")}</Text>
@@ -655,7 +655,7 @@ export function PaginasFrprt(params: ParamsFrprtPdf) {
           </Text>
           <Text>Eixo 2 — Medidas de controle: {opcoes.avaliacao ? opcoes.avaliacao.nome : "não considerado (×1,00)"}</Text>
           <Text>
-            Eixo 3 — Atestados CID-F:{" "}
+            Eixo 3 — Atestados CID F e Z:{" "}
             {opcoes.levantamento
               ? `${opcoes.levantamento.nome} (${data(opcoes.levantamento.periodoInicio)} a ${data(opcoes.levantamento.periodoFim)})`
               : "não considerado (×1,00)"}
@@ -671,8 +671,8 @@ export function PaginasFrprt(params: ParamsFrprtPdf) {
         <View style={s.caixa}>
           <Text>
             Índice final = Eixo 1 (média 1–5 por fator e setor) × Fator do Eixo 2 (0,80 eficaz/N.A. · 0,90 precisa
-            melhorar · 1,00 inexistente) × Fator do Eixo 3 (×1,10 quando há CID-F relacionado ao trabalho e compatível
-            com o fator pela matriz Fatores × CID F). Resultado geral = média dos
+            melhorar · 1,00 inexistente) × Fator do Eixo 3 (×1,10 quando há CID F ou Z relacionado ao trabalho e compatível
+            com o fator pela matriz Fatores × CID). Resultado geral = média dos
             setores avaliados. Setores com menos de {limite} respostas no Eixo 1 não têm score, para proteger o
             anonimato.
           </Text>

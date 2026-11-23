@@ -44,7 +44,7 @@ export default async function LevantamentoPage({
   const publicado = l.status === "PUBLICADO";
   const cabecalho = (
     <PageHeader
-      eyebrow="Eixo 3 · Atestados CID-F"
+      eyebrow="Eixo 3 · Atestados CID F e Z"
       title={l.nome}
       actions={
         publicado ? (
@@ -160,7 +160,7 @@ export default async function LevantamentoPage({
         <Etapa numero={l.arquivoNome && pendentes === 0 && totalLinhas > 0 ? 4 : 3} titulo="Publicar">
           {l.arquivoNome && totalLinhas === 0 && (
             <p className="text-sm text-zinc-600 mb-3">
-              A planilha não tem ocorrências: o levantamento registra que não houve atestados CID-F no período.
+              A planilha não tem ocorrências: o levantamento registra que não houve atestados CID F ou Z no período.
             </p>
           )}
           <PublicarForm

@@ -34,7 +34,7 @@ describe("metodologia — fonte única do texto", () => {
       "Visão geral",
       "Eixo 1 — Percepção dos colaboradores",
       "Eixo 2 — Medidas de controle",
-      "Eixo 3 — Atestados e afastamentos CID-F",
+      "Eixo 3 — Atestados e afastamentos (CID F e Z)",
       "Índice final e faixas",
       "O que vai para o PGR",
       "Matriz FMEA — classificação dos riscos e prioridade",

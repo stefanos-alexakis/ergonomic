@@ -19,7 +19,7 @@ export default async function Eixo3Page() {
     <ShellGestor workspace={workspace} isPlatformAdmin={actor.isPlatformAdmin}>
       <PageHeader
         eyebrow="Eixo 3"
-        title="Atestados e afastamentos CID-F"
+        title="Atestados e afastamentos (CID F e Z)"
         actions={
           <>
             <a href="/gestor/eixo3/modelo">
@@ -32,9 +32,9 @@ export default async function Eixo3Page() {
         }
       />
       <p className="text-sm text-zinc-500 mb-6 max-w-2xl">
-        O RH/DP publica a planilha com as ocorrências CID-F do período, uma linha por ocorrência, sem
+        O RH/DP publica a planilha com as ocorrências com CID F ou Z do período, uma linha por ocorrência, sem
         identificar o colaborador. Ocorrências <strong>relacionadas ao trabalho</strong> agravam (×1,10)
-        os fatores de risco do setor compatíveis com o CID, conforme a matriz Fatores × CID F. Um CID
+        os fatores de risco do setor compatíveis com o CID, conforme a matriz Fatores × CID (F e Z). Um CID
         não comprova, sozinho, nexo causal — é indicador coletivo do setor.
       </p>
 

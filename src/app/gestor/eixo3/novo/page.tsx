@@ -15,7 +15,7 @@ export default async function NovoLevantamentoPage() {
   return (
     <ShellGestor workspace={workspace} isPlatformAdmin={actor.isPlatformAdmin}>
       <div className="max-w-2xl">
-        <PageHeader eyebrow="Eixo 3 · Atestados CID-F" title="Publicar planilha de ocorrências" />
+        <PageHeader eyebrow="Eixo 3 · Atestados CID F e Z" title="Publicar planilha de ocorrências" />
         <IdentificacaoForm
           inicial={{
             nome: `Atestados ${fim.getUTCFullYear()}`,

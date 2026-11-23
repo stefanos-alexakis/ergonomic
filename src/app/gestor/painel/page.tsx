@@ -127,7 +127,7 @@ export default async function PainelFrprtPage({
               </Select>
             </label>
             <label className="flex flex-col gap-1 text-xs font-medium text-zinc-500">
-              Eixo 3 · Levantamento (atestados CID-F)
+              Eixo 3 · Levantamento (atestados CID F e Z)
               <Select name="levantamento" defaultValue={opcoes.levantamento?.id ?? "nenhum"}>
                 {opcoes.levantamentos.map((l) => (
                   <option key={l.id} value={l.id}>
@@ -259,7 +259,7 @@ export default async function PainelFrprtPage({
           <div className="flex flex-col gap-3 text-sm text-zinc-700">
             <p>
               <strong>S · Severidade</strong>: gravidade do dano típico do fator (1–5), agravada no setor por atestado
-              CID-F relacionado ao trabalho, afastamento acima de 15 dias e 50% ou mais dos respondentes expostos.
+              CID F ou Z relacionado ao trabalho, afastamento acima de 15 dias e 50% ou mais dos respondentes expostos.
             </p>
             <p>
               <strong>O · Ocorrência</strong>: média do Eixo 1 no fator. <strong>D · Detecção</strong>: medidas de
@@ -402,7 +402,7 @@ export default async function PainelFrprtPage({
                     <dd className="text-zinc-700">{r.apoio.consequencias.join(" ")}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs font-medium text-zinc-500">CID F compatíveis (matriz)</dt>
+                    <dt className="text-xs font-medium text-zinc-500">CIDs compatíveis (matriz F e Z)</dt>
                     <dd className="text-zinc-700">{r.apoio.cids.join(", ") || "Não específico"}</dd>
                     {r.celula.cidsEixo3.length > 0 && (
                       <dd className="text-red-700 text-xs mt-1">Registrados no setor e relacionados ao trabalho: {r.celula.cidsEixo3.join(", ")}</dd>
