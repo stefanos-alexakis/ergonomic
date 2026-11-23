@@ -405,7 +405,7 @@ function Documento({ d, paginas }: { d: DadosRelatorio; paginas: Paginas }) {
                 : ""}
             </Text>
             <Tabela
-              colunas={["Setor", "Atestados", "Colab. com atestado", "Relacionados (colab.)", "Inconclusivos (colab.)", "Dias afastados", "Colab. c/ atestado / Colab (%)", "Fatores agravados"]}
+              colunas={["Setor", "Atestados", "Colab. com atestado", "Relacionados (colab.)", "Parcialmente relac. (colab.)", "Dias afastados", "Colab. c/ atestado / Colab (%)", "Fatores agravados"]}
               larguras={["19%", "9%", "11%", "12%", "12%", "9%", "16%", "12%"]}
               linhas={d.eixo3.setores.map((x) => [
                 x.nome,

@@ -88,7 +88,10 @@ export default async function PainelFrprtPage({
               <Button variant="secondary">Baixar relatório (PDF)</Button>
             </a>
             <Link href="/gestor/painel/relatorio-completo">
-              <Button>Relatório completo</Button>
+              <Button variant="secondary">Relatório completo</Button>
+            </Link>
+            <Link href="/gestor/painel/relatorio-final">
+              <Button>Relatório final</Button>
             </Link>
           </span>
         }
@@ -199,7 +202,7 @@ export default async function PainelFrprtPage({
         <TituloSecao
           numero={1}
           titulo="Painel resumido por setor"
-          sub="Índice final = Eixo 1 × Eixo 2 × Eixo 3 (escala 1–5, quanto maior, pior). Eixos 2 e 3 em pontos: quanto moveram o Eixo 1."
+          sub="Índice final = Eixo 1 × Eixo 2 × Eixo 3 em cada um dos 13 fatores (2 casas); o setor é a média dos 13. Eixos 2 e 3: multiplicador médio do setor e, entre parênteses, quanto moveram o Eixo 1 em pontos."
         />
         <TabelaSetores linhas={linhas} limite={limite} />
         <div className="flex flex-wrap gap-2 mt-3 text-xs">
@@ -426,6 +429,59 @@ export default async function PainelFrprtPage({
           </div>
         )}
       </section>
+
+      {painel.violencia.length > 0 && (
+        <section className="mt-12" aria-label="Assédio e violência">
+          <TituloSecao
+            numero={6}
+            titulo="Assédio e violência no trabalho (Lei 14.457/2022)"
+            sub="Termômetro organizacional: o fator 11 não recebe pontuação pela matriz FMEA"
+          />
+          <p className="mb-3 max-w-3xl text-sm text-zinc-600">
+            Por decisão metodológica, os indicadores de assédio e de outras formas de violência não passam pela FMEA: a
+            prevenção não se orienta por níveis toleráveis de ocorrência. Quando o índice indicar exposição, cabe à
+            organização avaliar no GRO/PGR, independentemente do fluxo de denúncias.
+          </p>
+          <div className="overflow-x-auto rounded-lg border border-zinc-200">
+            <table className="w-full text-sm">
+              <thead className="bg-zinc-50 text-xs text-zinc-500">
+                <tr>
+                  <th className="px-3 py-2 text-left font-medium">Setor</th>
+                  <th className="px-3 py-2 text-left font-medium">Índice do fator 11</th>
+                  <th className="px-3 py-2 text-left font-medium">Respondentes expostos</th>
+                  <th className="px-3 py-2 text-left font-medium">Situações (Eixo 1)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {painel.violencia.map((v) => (
+                  <tr key={v.setorId} className="border-t border-zinc-100 align-top">
+                    <td className="px-3 py-2 font-medium text-zinc-900">{v.setor}</td>
+                    <td className="px-3 py-2">
+                      <span
+                        className="rounded px-2 py-0.5 font-semibold tabular-nums"
+                        style={{ background: CONCLUSOES[v.conclusao].fundo, color: CONCLUSOES[v.conclusao].cor }}
+                      >
+                        {formatarRisco(v.final)}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2 tabular-nums">
+                      {v.parcelaExpostos !== null ? `${Math.round(v.parcelaExpostos * 100)}%` : "—"}
+                    </td>
+                    <td className="px-3 py-2 text-zinc-700">
+                      {v.situacoes.map((s) => (
+                        <div key={s.numero}>
+                          {s.numero}. {s.texto}: <strong className="tabular-nums">{formatarRisco(s.eixo1)}</strong>
+                          {s.expostos !== null ? ` · ${Math.round(s.expostos * 100)}% expostos` : ""}
+                        </div>
+                      ))}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
     </ShellGestor>
   );
 }

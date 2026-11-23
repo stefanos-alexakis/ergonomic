@@ -728,13 +728,19 @@ model TextoRelatorio {
 // Rascunho do relatório completo de uma empresa (um por empresa): fontes,
 // conclusão do consultor e quem assina.
 model RelatorioRascunho {
-  workspaceId    String   @id
-  pesquisaId     String?
-  avaliacaoId    String?
-  levantamentoId String?
-  conclusao      String?
-  consultorIds   String[]
-  atualizadoEm   DateTime @updatedAt
+  workspaceId         String   @id
+  pesquisaId          String?
+  avaliacaoId         String?
+  levantamentoId      String?
+  conclusao           String?
+  consultorIds        String[]
+  // Relatório final (modelo da cliente, nov/2026): textos do consultor. Nulo =
+  // usa o texto gerado pelo sistema (resumo e observação do Eixo 2, fontes).
+  cruzamentoAnalitico String?
+  resumoEixo2         String?
+  observacaoEixo2     String?
+  fontesInternas      String?
+  atualizadoEm        DateTime @updatedAt
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }
@@ -769,6 +775,10 @@ model RelatorioEmitido {
   id             String   @id @default(cuid())
   workspaceId    String
   versao         Int
+  // COMPLETO (relatório completo) ou FINAL (modelo da cliente). A numeração das versões é
+  // única por empresa (os dois modelos dividem a sequência): trocar o índice único
+  // exigiria --accept-data-loss no db push do boot da VPS.
+  modelo         String   @default("COMPLETO")
   emitidoEm      DateTime @default(now())
   emitidoPorId   String?
   emitidoPorNome String

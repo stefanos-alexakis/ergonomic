@@ -38,9 +38,9 @@ describe("parsePlanilhaOcorrencias", () => {
     expect(r).toMatchObject({ linhas: [], erros: [] });
   });
 
-  it("aponta erro por linha e coluna: CID fora do capítulo F, relação inválida, dias negativos", async () => {
+  it("aponta erro por linha e coluna: CID inválido, relação inválida, dias negativos", async () => {
     const buf = await planilha([
-      ["Produção", "M54.5", null, null, 2, "Sim", null],
+      ["Produção", "XYZ", null, null, 2, "Sim", null],
       ["Produção", "F41", null, null, -1, "talvez", null],
       [null, "F32", null, null, null, "Sim", null],
     ]);
@@ -52,6 +52,33 @@ describe("parsePlanilhaOcorrencias", () => {
       [3, "Total de dias afastados"],
       [4, "Setor ou GHE"],
     ]);
+  });
+
+  it("outros CIDs entram só na contagem: sem código, descrição, justificativa nem matrícula", async () => {
+    const buf = await planilha([
+      ["Produção", "M54.5", "Lombalgia", "10/03/2025", 2, null, "Dor nas costas", "0101"],
+      ["Produção", "J11", null, null, 1, "Não relacionado", null, null],
+      ["Produção", "F41", null, null, 3, "Parcialmente relacionado", null, null],
+    ]);
+    const r = await parsePlanilhaOcorrencias(buf);
+    expect(r.erros).toEqual([]);
+    expect(r.linhas.map((l) => [l.cid, l.relacao, l.cidDescricao, l.justificativa, l.matricula])).toEqual([
+      ["OUTRO", "NAO", null, null, null],
+      ["OUTRO", "NAO", null, null, null],
+      ["F41", "INCONCLUSIVO", null, null, null],
+    ]);
+    expect(r.avisos.some((a) => /2 atestado\(s\) de outros CIDs/.test(a.mensagem))).toBe(true);
+  });
+
+  it("aceita os termos do modelo da cliente para a relação com o trabalho", async () => {
+    const buf = await planilha([
+      ["Produção", "F41", null, null, 1, "Relacionado ao trabalho", null],
+      ["Produção", "F41", null, null, 1, "Parcialmente relacionado", null],
+      ["Produção", "F41", null, null, 1, "Não relacionado", null],
+    ]);
+    const r = await parsePlanilhaOcorrencias(buf);
+    expect(r.erros).toEqual([]);
+    expect(r.linhas.map((l) => l.relacao)).toEqual(["SIM", "INCONCLUSIVO", "NAO"]);
   });
 
   it("recusa cabeçalho sem as colunas obrigatórias", async () => {

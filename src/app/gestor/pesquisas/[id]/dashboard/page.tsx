@@ -39,7 +39,7 @@ function PilulaMedia({ media }: { media: number }) {
       style={{ background: c.fundo, color: c.cor }}
       title={c.curto}
     >
-      {media.toFixed(2)}
+      {media.toFixed(2).replace(".", ",")}
     </span>
   );
 }

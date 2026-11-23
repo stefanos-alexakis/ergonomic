@@ -118,3 +118,19 @@ describe("compararPorNumeroDaDimensao — painel do Eixo 1 em ordem de 1 a 13", 
     expect(ordenado.map((d) => d.nome)).toEqual(["3. Controle e Autonomia", "Outros"]);
   });
 });
+
+describe("indiceDoGrupo — Eixo 1 do grupo = média dos fatores (igual ao Painel FRPRT)", () => {
+  it("cada fator pesa igual, mesmo com número diferente de perguntas", async () => {
+    const { indiceDoGrupo } = await import("@/lib/dashboard");
+    // Fator A: 3 perguntas valendo 1; fator B: 1 pergunta valendo 5.
+    // Média por pergunta daria 2,00; média dos fatores dá (1 + 5) / 2 = 3,00.
+    const itens = [
+      { dimensao: "1. A", valor: 1, polaridade: "MAIOR_PIOR" as const },
+      { dimensao: "1. A", valor: 1, polaridade: "MAIOR_PIOR" as const },
+      { dimensao: "1. A", valor: 1, polaridade: "MAIOR_PIOR" as const },
+      { dimensao: "2. B", valor: 5, polaridade: "MAIOR_PIOR" as const },
+    ];
+    expect(indiceDoGrupo(itens)).toBe(3);
+    expect(indiceDoGrupo([])).toBeNull();
+  });
+});

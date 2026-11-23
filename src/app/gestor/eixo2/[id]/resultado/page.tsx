@@ -71,6 +71,9 @@ export default async function ResultadoEixo2Page({
             <Link href="/gestor/eixo2/como-funciona">
               <Button variant="secondary">Entenda o score do Eixo 2</Button>
             </Link>
+            <a href={`/gestor/eixo2/${avaliacao.id}/resultado/relatorio-pdf`}>
+              <Button variant="secondary">Relatório do Eixo 2 (PDF)</Button>
+            </a>
             <Link href={`/gestor/eixo2/${avaliacao.id}`}>
               <Button variant="secondary">{avaliacao.status === "CONCLUIDA" ? "Ver respostas" : "Continuar preenchendo"}</Button>
             </Link>

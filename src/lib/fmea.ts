@@ -56,6 +56,20 @@ export function notaDeteccao(fatorEixo2: number | null): number {
   return 5;
 }
 
+/**
+ * Lei nº 14.457/2022 (decisão da cliente, nov/2026): os indicadores de assédio e
+ * de outras formas de violência — o fator 11, "Violência no Trabalho" — não
+ * recebem pontuação pela matriz FMEA. A prevenção do assédio não se orienta por
+ * níveis toleráveis de ocorrência: esses resultados aparecem como termômetro
+ * organizacional e, quando indicarem exposição, a organização os avalia no GRO/PGR.
+ */
+export const FATOR_FORA_DA_FMEA = 11;
+
+/** O fator (pelo nome da dimensão, "11. Violência no Trabalho") fica fora da FMEA? */
+export function foraDaFmea(nomeDimensao: string): boolean {
+  return Number.parseInt(nomeDimensao, 10) === FATOR_FORA_DA_FMEA;
+}
+
 export type Agravante = "ATESTADO" | "AFASTAMENTO_LONGO" | "EXPOSTOS";
 
 export const ROTULO_AGRAVANTE: Record<Agravante, string> = {

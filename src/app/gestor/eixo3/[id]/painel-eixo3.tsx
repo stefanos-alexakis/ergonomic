@@ -32,7 +32,7 @@ export async function PainelEixo3({
   filtroRelacao?: string;
   caminhoBase: string;
 }) {
-  const { fatores, setores, cidsFrequentes, ocorrencias } = await calcularPainelEixo3(levantamentoId, workspaceId, {
+  const { fatores, setores, cidsFrequentes, ocorrencias, totalOutros } = await calcularPainelEixo3(levantamentoId, workspaceId, {
     // A matrícula só existe nesta tela (decisão do cliente): relatórios nunca a recebem.
     incluirMatricula: true,
   });
@@ -95,10 +95,20 @@ export async function PainelEixo3({
         {semMatricula > 0 &&
           ` ${semMatricula} atestado(s) sem matrícula: cada um conta como um colaborador diferente.`}
       </p>
-      {porCapitulo.Z.atestados > 0 && (
+      {(porCapitulo.Z.atestados > 0 || totalOutros > 0) && (
         <p data-testid="resumo-capitulos" className="-mt-6 text-sm text-zinc-700">
           <strong>CID F:</strong> {porCapitulo.F.atestados} atestado(s) · {porCapitulo.F.pessoas.size} colaborador(es) &nbsp;|&nbsp;{" "}
           <strong>CID Z:</strong> {porCapitulo.Z.atestados} atestado(s) · {porCapitulo.Z.pessoas.size} colaborador(es)
+          {totalOutros > 0 && (
+            <>
+              {" "}
+              &nbsp;|&nbsp; <strong>Outros CIDs:</strong> {totalOutros} atestado(s), só na contagem ·{" "}
+              <strong>
+                {Math.round(((porCapitulo.F.atestados + porCapitulo.Z.atestados) / (porCapitulo.F.atestados + porCapitulo.Z.atestados + totalOutros)) * 100)}%
+              </strong>{" "}
+              dos atestados são CID F ou Z
+            </>
+          )}
         </p>
       )}
 
@@ -107,8 +117,8 @@ export async function PainelEixo3({
           <h2 className="text-sm font-semibold text-zinc-900">Pontos de atenção</h2>
           {inconclusivas > 0 && (
             <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-              {inconclusivas} atestado(s) ({colabInconclusivos} colaborador(es)) com relação <strong>inconclusiva</strong> —
-              não agravam o score, mas devem ser investigados.
+              {inconclusivas} atestado(s) ({colabInconclusivos} colaborador(es)) <strong>parcialmente relacionado(s)</strong> ao
+              trabalho — não agravam o score, mas devem ser investigados.
             </p>
           )}
           {comF431 > 0 && (
@@ -145,7 +155,7 @@ export async function PainelEixo3({
               <Th>Atestados</Th>
               <Th>Colab. com atestado</Th>
               <Th>Relacionados (colab.)</Th>
-              <Th>Inconclusivos (colab.)</Th>
+              <Th>Parcialmente relac. (colab.)</Th>
               <Th>Reincidentes</Th>
               <Th>Dias</Th>
               <Th>

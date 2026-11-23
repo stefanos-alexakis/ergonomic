@@ -174,7 +174,8 @@ export async function salvarRascunho(workspaceId: string, r: Rascunho): Promise<
 
 export function listarEmitidos(workspaceId: string) {
   return db.relatorioEmitido.findMany({
-    where: { workspaceId },
+    // Só o relatório completo; o relatório final (modelo da cliente) tem a lista própria.
+    where: { workspaceId, modelo: "COMPLETO" },
     orderBy: { versao: "desc" },
     select: { id: true, versao: true, emitidoEm: true, emitidoPorNome: true, tamanhoBytes: true, fontes: true, consultores: true },
   });

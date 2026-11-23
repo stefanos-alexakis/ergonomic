@@ -2,8 +2,8 @@ import { createHash } from "node:crypto";
 import { db } from "@/lib/db";
 import { adicionarItemCatalogo } from "@/lib/estrutura";
 import { parsePlanilhaOcorrencias, type ProblemaPlanilha } from "@/lib/planilha-eixo3";
-import { numeroDoFator } from "@/lib/cids-z";
-import { calcularEixo3Setor, chaveColaborador, montarMatrizPorFator, type MatrizPorFator, type Relacao } from "@/lib/eixo3";
+import { capituloDoCid, numeroDoFator } from "@/lib/cids-z";
+import { CID_OUTRO, calcularEixo3Setor, chaveColaborador, montarMatrizPorFator, type MatrizPorFator, type Relacao } from "@/lib/eixo3";
 
 /**
  * Levantamento do Eixo 3: a empresa publica a planilha de ocorrências CID-F
@@ -306,9 +306,14 @@ export async function calcularPainelEixo3(
     : { fatores: [], matriz: new Map() as MatrizPorFator };
 
   const ocorrencias = await db.ocorrenciaEixo3.findMany({
-    where: { levantamentoId, ignorada: false, levantamento: { workspaceId } },
+    // Outros CIDs só entram na contagem (abaixo), nunca na análise.
+    where: { levantamentoId, ignorada: false, levantamento: { workspaceId }, cid: { not: CID_OUTRO } },
     include: { setor: { select: { id: true, nome: true, numeroColaboradores: true } } },
     orderBy: [{ setorOriginal: "asc" }, { linhaPlanilha: "asc" }],
+  });
+  const outros = await db.ocorrenciaEixo3.findMany({
+    where: { levantamentoId, ignorada: false, levantamento: { workspaceId }, cid: CID_OUTRO },
+    select: { setorOriginal: true, dataInicio: true, setor: { select: { nome: true } } },
   });
 
   const porSetor = new Map<string, typeof ocorrencias>();
@@ -367,5 +372,23 @@ export async function calcularPainelEixo3(
     matricula: opcoes.incluirMatricula ? o.matricula : null,
   }));
 
-  return { fatores, setores, cidsFrequentes, ocorrencias: lista };
+  // Contagem por capítulo (F, Z e outros), por setor e por ano de início — base dos gráficos do Eixo 3.
+  const contagem = new Map<string, LinhaCapitulos>();
+  const somar = (setor: string, data: Date | null, campo: "F" | "Z" | "outros") => {
+    const ano = data ? data.getUTCFullYear() : null;
+    const chave = `${setor}|${ano ?? ""}`;
+    const atual = contagem.get(chave) ?? { setor, ano, F: 0, Z: 0, outros: 0 };
+    atual[campo]++;
+    contagem.set(chave, atual);
+  };
+  for (const o of ocorrencias) somar(o.setor?.nome ?? o.setorOriginal, o.dataInicio, capituloDoCid(o.cid));
+  for (const o of outros) somar(o.setor?.nome ?? o.setorOriginal, o.dataInicio, "outros");
+  const porCapitulo = [...contagem.values()].sort(
+    (a, b) => (a.ano ?? 0) - (b.ano ?? 0) || a.setor.localeCompare(b.setor, "pt-BR"),
+  );
+
+  return { fatores, setores, cidsFrequentes, ocorrencias: lista, porCapitulo, totalOutros: outros.length };
 }
+
+/** Atestados de um setor num ano, por capítulo (outros = só contagem). */
+export type LinhaCapitulos = { setor: string; ano: number | null; F: number; Z: number; outros: number };

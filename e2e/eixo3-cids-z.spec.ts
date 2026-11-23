@@ -80,22 +80,8 @@ test("Eixo 3 aceita CIDs Z: agrava só o grupo A, alerta os demais e oculta os s
     ]),
   });
   await page.getByRole("button", { name: "Enviar planilha" }).click();
-  // Capítulo M continua recusado: nenhuma linha é importada com ele.
-  await expect(page.getByText(/aceita CID dos capítulos F e Z/)).toBeVisible();
-  await expect(page.getByText(/4 ocorrência\(s\) importada\(s\)\./)).toHaveCount(0);
-
-  await page.getByLabel("Planilha de ocorrências (.xlsx)").setInputFiles({
-    name: "ocorrencias-z2.xlsx",
-    mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    buffer: await planilha([
-      ["Produção", "Z73.0", "Esgotamento", "10/03/2025", 20, "Sim", "Sobrecarga", "0300"],
-      ["Produção", "Z72.1", "Uso de álcool", "11/03/2025", 3, "Sim", null, "0301"],
-      ["Produção", "Z57.0", "Ruído", "12/03/2025", 0, "Sim", null, "0302"],
-      ["Produção", "F41", "Ansiedade", "13/03/2025", 2, "Não", null, "0303"],
-    ]),
-  });
-  await page.getByRole("button", { name: "Enviar planilha" }).click();
-  await expect(page.getByText("4 ocorrência(s) importada(s).")).toBeVisible();
+  // Outro capítulo (M54.5) entra só na contagem, sem código guardado.
+  await expect(page.getByText("5 ocorrência(s) importada(s).", { exact: false })).toBeVisible();
 
   await page.getByLabel("Responsável pelo preenchimento (RH/DP)").last().fill("Ana do RH");
   await page.getByRole("checkbox", { name: /Declaro, como responsável/ }).check();
@@ -107,6 +93,9 @@ test("Eixo 3 aceita CIDs Z: agrava só o grupo A, alerta os demais e oculta os s
   await expect(linha.getByText("4 de 13")).toBeVisible();
   await expect(page.getByTestId("resumo-capitulos")).toContainText("CID Z: 3 atestado(s)");
   await expect(page.getByTestId("resumo-capitulos")).toContainText("CID F: 1 atestado(s)");
+  await expect(page.getByTestId("resumo-capitulos")).toContainText("Outros CIDs: 1 atestado(s), só na contagem");
+  await expect(page.getByTestId("resumo-capitulos")).toContainText("80%"); // 4 de 5 atestados são F ou Z
+  await expect(page.locator("table tr", { hasText: "M54" })).toHaveCount(0);
 
   // Alertas dos grupos B e C (só números).
   await expect(page.getByTestId("alerta-SUBSTANCIAS")).toContainText("1 ocorrência(s)");

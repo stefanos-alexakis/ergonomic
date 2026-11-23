@@ -1,5 +1,5 @@
 import ExcelJS from "exceljs";
-import { normalizarCid, normalizarMatricula, normalizarRelacao, type Relacao } from "@/lib/eixo3";
+import { CID_OUTRO, ehCidDeOutroCapitulo, normalizarCid, normalizarMatricula, normalizarRelacao, type Relacao } from "@/lib/eixo3";
 
 /**
  * Lê a planilha de ocorrências do Eixo 3 no padrão da aba "Ocorrências" da
@@ -192,18 +192,22 @@ export async function parsePlanilhaOcorrencias(buffer: Buffer): Promise<Resultad
     if (!setor) erro("setor", "Setor ou GHE em branco.");
     else if (setor.length > 120) erro("setor", "Nome do setor muito longo (máx. 120 caracteres).");
 
-    const cid = normalizarCid(cidBruto);
+    // F e Z entram na análise; os demais capítulos só na contagem (decisão da cliente, nov/2026).
+    const outro = !normalizarCid(cidBruto) && ehCidDeOutroCapitulo(cidBruto);
+    const cid = outro ? CID_OUTRO : normalizarCid(cidBruto);
     if (!cid) {
       erro(
         "cid",
         cidBruto === null
           ? "CID em branco."
-          : `CID "${texto(cidBruto, 30)}" inválido — o Eixo 3 aceita CID dos capítulos F e Z, no formato F41, F41.1 ou Z73.0.`,
+          : `CID "${texto(cidBruto, 30)}" inválido — use o formato F41, F41.1, Z73.0 ou M54.5.`,
       );
     }
 
-    const relacao = normalizarRelacao(ler("relacao"));
-    if (!relacao) erro("relacao", 'Preencha com "Sim", "Não" ou "Inconclusivo".');
+    const relacaoLida = normalizarRelacao(ler("relacao"));
+    // Para outros CIDs a relação não é usada: em branco vale "Não relacionado".
+    const relacao: Relacao | null = relacaoLida ?? (outro && ler("relacao") === null ? "NAO" : null);
+    if (!relacao) erro("relacao", 'Preencha com "Relacionado ao trabalho", "Parcialmente relacionado" ou "Não relacionado".');
 
     const diasBruto = ler("dias");
     let dias: number | null = null;
@@ -222,15 +226,25 @@ export async function parsePlanilhaOcorrencias(buffer: Buffer): Promise<Resultad
         linha: numero,
         setor,
         cid,
-        cidDescricao: texto(ler("descricao"), 300),
+        // Outro CID: só a contagem — nada de descrição, justificativa ou matrícula.
+        cidDescricao: outro ? null : texto(ler("descricao"), 300),
         dataInicio: data,
         diasAfastados: dias,
         relacao,
-        justificativa: texto(ler("justificativa")),
-        matricula: normalizarMatricula(ler("matricula") instanceof Date ? null : ler("matricula")),
+        justificativa: outro ? null : texto(ler("justificativa")),
+        matricula: outro ? null : normalizarMatricula(ler("matricula") instanceof Date ? null : ler("matricula")),
       });
     }
   });
+
+  const outros = resultado.linhas.filter((l) => l.cid === CID_OUTRO).length;
+  if (outros > 0) {
+    resultado.avisos.push({
+      linha: 0,
+      coluna: ROTULO_CAMPO.cid,
+      mensagem: `${outros} atestado(s) de outros CIDs (nem F nem Z): entram só na contagem do total de atestados; o código não é guardado.`,
+    });
+  }
 
   if (!colunas.has("matricula")) {
     resultado.avisos.push({

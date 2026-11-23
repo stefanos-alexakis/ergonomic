@@ -99,7 +99,7 @@ export function secoesMetodologia(p: ParametrosMetodologia): SecaoTexto[] {
       blocos: [
         {
           tipo: "p",
-          texto: `O RH/DP publica os atestados com CID F ou Z do período, com a relação com o trabalho (Sim, Não ou Inconclusivo) e, opcionalmente, a matrícula do colaborador, que serve só para contar colaboradores (e não apenas atestados) e identificar reincidência. Se houve no setor ao menos uma ocorrência com relação "Sim" e CID compatível com o fator (matriz Fatores × CID, capítulos F e Z), o fator recebe ×${v2(FATOR_AGRAVAMENTO)}; senão, ×1,00. A quantidade de ocorrências não gradua o agravamento.`,
+          texto: `O RH/DP publica os atestados com CID F ou Z do período, com a relação com o trabalho (relacionado, parcialmente relacionado ou não relacionado) e, opcionalmente, a matrícula do colaborador, que serve só para contar colaboradores (e não apenas atestados) e identificar reincidência. Atestados de outros capítulos da CID entram só na contagem do total. Se houve no setor ao menos uma ocorrência "relacionada ao trabalho" e CID compatível com o fator (matriz Fatores × CID, capítulos F e Z), o fator recebe ×${v2(FATOR_AGRAVAMENTO)}; senão, ×1,00. A quantidade de ocorrências não gradua o agravamento.`,
         },
         {
           tipo: "lista",
@@ -129,7 +129,8 @@ export function secoesMetodologia(p: ParametrosMetodologia): SecaoTexto[] {
           tipo: "lista",
           itens: [
             "Comparação em centésimos: 3,00 calculado nunca passa para a faixa seguinte.",
-            "Índice do setor = média dos fatores com dado; resultado geral da empresa = média dos setores com índice.",
+            "Valores com 2 casas em cada etapa (Eixo 1 do fator, multiplicadores e resultado): a conta exibida fecha à mão.",
+            "Índice do setor = média simples dos fatores com dado (cada fator pesa igual, como no relatório do Eixo 1); resultado geral da empresa = média dos setores com índice.",
             "Terminologia: antes da matriz FMEA fala-se em índice; depois da classificação FMEA e no PGR, em risco.",
           ],
         },
@@ -156,7 +157,7 @@ export function secoesMetodologia(p: ParametrosMetodologia): SecaoTexto[] {
         {
           tipo: "p",
           texto:
-            "Todo item acima de 3,00 (situações do PGR e fatores do plano de ação) é classificado por Severidade (S) × Ocorrência (O) × Detecção (D), cada um de 1 a 5.",
+            "Todo item acima de 3,00 (situações do PGR e fatores do plano de ação) é classificado por Severidade (S) × Ocorrência (O) × Detecção (D), cada um de 1 a 5. Exceção (Lei nº 14.457/2022): os indicadores de assédio e de outras formas de violência — fator 11, Violência no Trabalho — não recebem pontuação pela FMEA; aparecem como termômetro organizacional e, quando indicarem exposição, a organização os avalia no GRO/PGR.",
         },
         {
           tipo: "lista",
