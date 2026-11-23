@@ -14,6 +14,7 @@ import {
   salvarFechamento,
   salvarResposta,
 } from "@/lib/avaliacao-eixo2";
+import { confirmarRevisaoSinais, salvarSinal } from "@/lib/sinais-eixo2";
 
 /**
  * Toda action aqui resolve a empresa pela sessão — nunca confia em
@@ -81,6 +82,26 @@ export async function salvarRespostaEixo2Action(
   const workspace = await empresaDoGestor();
   if (!workspace) return { ok: false, erro: "Sem permissão." };
   return salvarResposta(avaliacaoId, workspace.id, input);
+}
+
+/** Sinais de exposição (ISO 45003): a resposta de um setor a um sinal. */
+export async function salvarSinalEixo2Action(
+  avaliacaoId: string,
+  input: { sinalId: string; setorId: string; valor: number },
+): Promise<{ ok: true } | { ok: false; erro: string }> {
+  const workspace = await empresaDoGestor();
+  if (!workspace) return { ok: false, erro: "Sem permissão." };
+  return salvarSinal(avaliacaoId, workspace.id, input);
+}
+
+export async function confirmarRevisaoSinaisAction(
+  avaliacaoId: string,
+): Promise<{ ok: true } | { ok: false; erro: string }> {
+  const workspace = await empresaDoGestor();
+  if (!workspace) return { ok: false, erro: "Sem permissão." };
+  const r = await confirmarRevisaoSinais(avaliacaoId, workspace.id);
+  if (r.ok) revalidatePath(`/gestor/eixo2/${avaliacaoId}`);
+  return r;
 }
 
 export async function salvarFechamentoAction(

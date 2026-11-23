@@ -19,6 +19,8 @@ export default async function ConcluirAvaliacaoPage({ params }: { params: Promis
     db.praticaAdicional.findMany({ where: { avaliacaoId: avaliacao.id }, orderBy: { ordem: "asc" } }),
   ]);
   const faltam = progresso.total - progresso.completas;
+  // Etapa da ISO 45003: o "Nunca" é padrão, então a revisão precisa estar confirmada.
+  const faltaRevisarSinais = (await db.sinalEixo2.count()) > 0 && avaliacao.sinaisRevisadosEm === null;
 
   return (
     <ShellGestor workspace={workspace} isPlatformAdmin={actor.isPlatformAdmin}>
@@ -33,6 +35,14 @@ export default async function ConcluirAvaliacaoPage({ params }: { params: Promis
             </Link>
             . Você pode salvar os dados abaixo agora e concluir depois.
           </p>
+        ) : faltaRevisarSinais ? (
+          <p className="mb-6 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            Falta confirmar a revisão dos sinais de exposição (etapa ISO 45003).{" "}
+            <Link href={`/gestor/eixo2/${avaliacao.id}?etapa=999`} className="underline">
+              Ir para a etapa
+            </Link>
+            . Você pode salvar os dados abaixo agora e concluir depois.
+          </p>
         ) : (
           <p className="mb-6 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
             Todas as {progresso.total} perguntas estão respondidas em todos os setores.
@@ -41,7 +51,7 @@ export default async function ConcluirAvaliacaoPage({ params }: { params: Promis
 
         <FechamentoForm
           avaliacaoId={avaliacao.id}
-          podeConcluir={faltam === 0}
+          podeConcluir={faltam === 0 && !faltaRevisarSinais}
           inicial={{
             participantes: avaliacao.participantes ?? "",
             responsavel: avaliacao.responsavel ?? "",

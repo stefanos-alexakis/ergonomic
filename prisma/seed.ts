@@ -250,6 +250,26 @@ async function seedEixo2(v: VersaoQuestionario) {
   if (total !== esperado) throw new Error(`Inconsistência pós-seed do Eixo 2: ${total} questões.`);
 }
 
+/**
+ * Sinais de exposição a riscos psicossociais (ISO 45003, 8.1.2.5) do Eixo 2.
+ * Ids estáveis pela ordem, para o seed poder rodar de novo sem duplicar.
+ */
+async function seedSinaisEixo2() {
+  const path = join(__dirname, "seed-data", "sinais-eixo2.json");
+  const { sinais } = JSON.parse(readFileSync(path, "utf-8")) as { sinais: string[] };
+  for (const [i, texto] of sinais.entries()) {
+    const ordem = i + 1;
+    await prisma.sinalEixo2.upsert({
+      where: { id: `sinal-iso45003-${ordem}` },
+      update: { texto, ordem },
+      create: { id: `sinal-iso45003-${ordem}`, texto, ordem },
+    });
+  }
+  const total = await prisma.sinalEixo2.count();
+  console.log(`Seed dos sinais de exposição (ISO 45003): ${total} (esperado: ${sinais.length}).`);
+  if (total !== sinais.length) throw new Error(`Inconsistência pós-seed dos sinais: ${total}.`);
+}
+
 type MatrizCidSeed = {
   ordem: number;
   situacao: string;
@@ -359,6 +379,7 @@ async function main() {
   await seedQuestionario(V1);
   await seedQuestionario(V2);
   await seedEixo2(V2);
+  await seedSinaisEixo2();
   await seedMatrizCid(V2);
   await seedSeveridadeFmea(V2);
   await seedSituacoesPgr(V2);

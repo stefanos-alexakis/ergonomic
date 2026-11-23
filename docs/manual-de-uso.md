@@ -69,8 +69,9 @@ usuário. O histórico de cada ação registra o nome com a marca "(consultoria)
 
 ## 2. Gestor da empresa
 
-O menu do gestor tem: **Eixo 1 · Pesquisa com os colaboradores · Setores e departamentos · Eixo 2 · Eixo 3 · Painel FRPRT**.
-A ordem recomendada de trabalho é a do menu.
+O topo tem os três eixos: **Eixo 1 · Pesquisa com os colaboradores**, **Eixo 2 · Medidas de controle** e
+**Eixo 3 · Atestados CID**. O botão **Menu** (à esquerda) abre uma gaveta com o restante, por categoria:
+**Cadastro** (Setores e departamentos), **Relatórios** (Painel FRPRT) e **Gestão** (Plano de ação).
 
 ### 2.1 Setores e departamentos
 - Cadastre um a um ou **importe pela planilha modelo** (botão de download na própria tela).
@@ -144,7 +145,21 @@ uma aba "Todos" e uma aba por setor.
 
 O **Resultado** mostra o fator de cada setor × fator de risco (×0,80 a ×1,00).
 
-### 2.5 Eixo 3 · Atestados CID-F
+**Etapa final — Sinais de exposição (ISO 45003, item 8.1.2.5).** Depois das 13 dimensões há uma etapa
+com 9 sinais que o líder de cada setor pode identificar nos colaboradores (mudanças de comportamento,
+isolamento, afastamentos, falta de engajamento, energia reduzida, rotatividade, desempenho, baixo
+desejo de trabalhar com outras pessoas, conflitos). O consultor preenche na mesma entrevista:
+- O padrão é **Nunca** em todos os setores, sem precisar marcar nada.
+- Só quando o líder reconhece o sinal, marque **Sinal identificado** naquele setor: abre a escala
+  (*Nunca, Raramente, Às vezes, Frequentemente, Sempre*). Escolher *Nunca* volta ao padrão.
+- No fim, clique em **Confirmo a revisão dos sinais** (vale também quando nenhum sinal foi
+  identificado). Sem essa confirmação a avaliação não conclui. Se um setor entrar na avaliação
+  depois, a confirmação precisa ser refeita.
+- O **Resultado** mostra a matriz setor × sinal (Frequentemente e Sempre em destaque) e um Excel.
+  É um indicador à parte: **não entra** no fator do Eixo 2, no índice final nem no relatório em PDF.
+  Avaliações concluídas antes desta etapa aparecem como "não avaliado".
+
+### 2.5 Eixo 3 · Atestados CID
 **Eixo 3 → Baixar modelo da planilha** e preencha uma linha por ocorrência: setor, CID-F,
 descrição, data de início, dias afastados, relação com o trabalho (*Sim / Não / Inconclusivo*) e
 justificativa. **Não inclua nome, matrícula ou CPF.** Colunas desse tipo são ignoradas e a tela
