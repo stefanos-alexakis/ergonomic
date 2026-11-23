@@ -286,6 +286,27 @@ página — nada é sobrescrito sem ver.
 ---
 
 
+### 2.7.1 Relatório final (modelo da consultoria)
+No Painel FRPRT, botão **Relatório final**. É o documento no modelo enviado pela consultoria (nov/2026), em
+retrato: responsáveis pelo documento, sumário, objetivo, introdução, legislação (NR-1 e Lei 14.457),
+metodologia (fluxograma, aspectos metodológicos e correspondência legal), implementação (passos 1 a 5),
+**Eixo 1** (positividade por setor e distribuição pergunta a pergunta de todos os setores e de cada setor),
+**Eixo 2** (resumo executivo, quadro por dimensão, frentes de ação, perguntas e respostas por setor,
+observação interpretativa), **Eixo 3** (painel de atestados por ano com CID F, Z e outros, e indicadores por
+setor), **cruzamento analítico** (texto do consultor, síntese, resultado geral, resultados setoriais e a
+tabela "Como chegamos ao resultado de cada setor"), plano de ação na vertical, conclusão, monitoramento,
+Anexo 1 (PGR ou o texto "não foram identificados riscos…"), Anexo 2 (assédio e violência), referências e
+assinaturas.
+
+- **Consultoria:** usa as mesmas fontes e a mesma conclusão do relatório completo. Escreve o cruzamento
+  analítico. O resumo e a observação do Eixo 2 e as fontes internas vêm **gerados pelo sistema** e podem
+  ser editados; o link "Voltar ao texto gerado pelo sistema" desfaz a edição. Pré-visualiza e emite versões
+  (a numeração é a mesma sequência do relatório completo).
+- **Gestor:** vê e baixa as versões emitidas.
+- **Responsáveis e assinaturas:** vêm do cadastro da empresa (Editar empresa → Responsáveis do relatório).
+- Os relatórios avulsos do **Eixo 2** (tela de resultado → *Relatório do Eixo 2 (PDF)*) e do **Eixo 3**
+  (levantamento publicado → *Relatório do Eixo 3 (PDF)*) usam as mesmas seções.
+
 ### 2.8 Relatório completo
 No Painel FRPRT, botão **Relatório completo**. O documento traz capa (empresa e logo), sumário, dossiê da
 legislação, metodologia e anonimato, Eixo 1 por setor e fator, Eixo 2 (fatores e planos registrados),

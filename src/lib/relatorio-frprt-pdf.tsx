@@ -1,6 +1,6 @@
 import { Document, Page, View, Text, Image, StyleSheet, renderToBuffer } from "@react-pdf/renderer";
 import type { PainelFrprt } from "@/lib/painel-frprt";
-import { CONCLUSOES, formatarEfeito, formatarRisco, posicaoNaRegua } from "@/lib/score-final";
+import { CONCLUSOES, formatarEfeito, formatarRisco, posicaoNaRegua, textoEixoSetor } from "@/lib/score-final";
 import { ORIENTACOES_EIXO3 } from "@/lib/planilha-modelo-eixo3";
 import {
   FAIXAS_D,
@@ -405,10 +405,10 @@ export function PaginasFrprt(params: ParamsFrprtPdf) {
                   <Barra valor={l.eixo1 ?? 0} maximo={5} cor="#4a86b5" texto={formatarRisco(l.eixo1 ?? 0)} />
                 </View>
                 <View style={{ width: "18%", paddingHorizontal: 4 }}>
-                  <Barra valor={l.efeitoEixo2 ?? 0} maximo={1} cor="#5fae8f" texto={efeito(l.efeitoEixo2 ?? 0)} />
+                  <Barra valor={l.efeitoEixo2 ?? 0} maximo={1} cor="#5fae8f" texto={textoEixoSetor(l.fatorEixo2, l.efeitoEixo2).replace("−", "-")} />
                 </View>
                 <View style={{ width: "18%", paddingHorizontal: 4 }}>
-                  <Barra valor={l.efeitoEixo3 ?? 0} maximo={0.6} cor="#f39a5b" texto={efeito(l.efeitoEixo3 ?? 0)} />
+                  <Barra valor={l.efeitoEixo3 ?? 0} maximo={0.6} cor="#f39a5b" texto={textoEixoSetor(l.fatorEixo3, l.efeitoEixo3).replace("−", "-")} />
                 </View>
                 <View style={{ width: "12%", alignItems: "center" }}>
                   <Text
@@ -430,8 +430,9 @@ export function PaginasFrprt(params: ParamsFrprtPdf) {
           </View>
         ))}
         <Text style={[s.pequeno, { marginTop: 4 }]}>
-          Índice final = Eixo 1 × Eixo 2 × Eixo 3 (1–5, quanto maior, pior). Eixos 2 e 3 em pontos: quanto moveram o
-          Eixo 1. Até 3,00 sem risco · 3,01 a 4,00 com controle existente · acima de 4,00 risco existente (plano de ação). O PGR
+          Índice final = Eixo 1 × Eixo 2 × Eixo 3 (1–5, quanto maior, pior), calculado em cada um dos 13 fatores com
+          valores de 2 casas; o resultado do setor é a média dos 13. Eixos 2 e 3: multiplicador médio do setor e, entre
+          parênteses, quanto moveram o Eixo 1 em pontos. Até 3,00 sem risco · 3,01 a 4,00 com controle existente · acima de 4,00 risco existente (plano de ação). O PGR
           recebe só as situações inerentes à função acima de 3,00 (seção 5).
         </Text>
       </Page>

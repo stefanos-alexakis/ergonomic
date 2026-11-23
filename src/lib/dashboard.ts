@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { aplicarSupressaoGruposPequenos, type GrupoComSupressao } from "@/lib/agregacao";
-import { CONCLUSOES, concluir } from "@/lib/score-final";
+import { CONCLUSOES, arredondar2, concluir, media2 } from "@/lib/score-final";
 
 /**
  * Toda a matemática de indicador mora aqui, num único lugar — nenhum
@@ -79,6 +79,25 @@ export function agruparEResumir(respondentes: { grupoNome: string; media: number
     total: v.total,
     mediaGeral: v.somaMedia / v.total,
   }));
+}
+
+/**
+ * Índice do Eixo 1 de um grupo (empresa, setor ou departamento): média simples
+ * das médias de cada um dos 13 fatores, a 2 casas — a mesma regra do Painel
+ * FRPRT (decisão da cliente, nov/2026). Antes, a média era por pessoa sobre
+ * todas as perguntas, e fatores com mais perguntas pesavam mais: o mesmo setor
+ * aparecia com um Eixo 1 aqui e outro no Painel FRPRT.
+ */
+export function indiceDoGrupo(
+  itens: { dimensao: string; valor: number; polaridade: Polaridade; peso?: number }[],
+): number | null {
+  const porDimensao = new Map<string, { valor: number; polaridade: Polaridade; peso?: number }[]>();
+  for (const i of itens) porDimensao.set(i.dimensao, [...(porDimensao.get(i.dimensao) ?? []), i]);
+  const medias = [...porDimensao.values()]
+    .map((l) => calcularMedia(l))
+    .filter((m): m is number => m !== null)
+    .map(arredondar2);
+  return media2(medias);
 }
 
 export type FiltrosDashboard = {
@@ -171,17 +190,15 @@ export async function calcularDashboard(
     };
   }
 
-  const mediasPessoais = respostas.map((r) => ({
-    resposta: r,
-    media:
-      calcularMedia(r.itens.map((i) => ({ valor: i.valor, polaridade: i.pergunta.polaridade, peso: i.pergunta.peso }))) ??
-      0,
-  }));
-
-  const mediaGeral =
-    mediasPessoais.length > 0
-      ? mediasPessoais.reduce((acc, m) => acc + m.media, 0) / mediasPessoais.length
-      : null;
+  const itensDe = (lista: typeof respostas) =>
+    lista.flatMap((r) =>
+      r.itens.map((i) => ({
+        dimensao: i.pergunta.fatorRisco.dimensao.nome,
+        valor: i.valor,
+        polaridade: i.pergunta.polaridade,
+        peso: i.pergunta.peso,
+      })),
+    );
 
   // Por dimensão: junta todas as respostas de todas as pessoas que
   // caem naquela dimensão e faz a média normalizada.
@@ -196,18 +213,23 @@ export async function calcularDashboard(
   }
   // Ordem numérica do fator (1 a 13), pedida pela cliente — não pela média.
   const porDimensao = Array.from(itensPorDimensao.entries())
-    .map(([nome, itens]) => ({ nome, media: calcularMedia(itens) ?? 0 }))
+    .map(([nome, itens]) => ({ nome, media: arredondar2(calcularMedia(itens) ?? 0) }))
     .sort(compararPorNumeroDaDimensao);
+  // Índice geral = média simples dos 13 fatores (os mesmos listados acima).
+  const mediaGeral = media2(porDimensao.map((d) => d.media));
 
   const resumirCampo = (campo: "setor" | "departamento") => {
-    const respondentesDoCampo = mediasPessoais
-      .filter((m) => m.resposta[campo] != null)
-      .map((m) => ({ grupoNome: m.resposta[campo]!.nome, media: m.media }));
-    const resumo = agruparEResumir(respondentesDoCampo);
-    return aplicarSupressaoGruposPequenos(
-      resumo.map((r) => ({ ...r, total: r.total })),
-      limiteSupressaoGrupo,
-    );
+    const grupos = new Map<string, typeof respostas>();
+    for (const r of respostas) {
+      const g = r[campo];
+      if (g) grupos.set(g.nome, [...(grupos.get(g.nome) ?? []), r]);
+    }
+    const resumo: ResumoGrupo[] = [...grupos.entries()].map(([nome, lista]) => ({
+      nome,
+      total: lista.length,
+      mediaGeral: indiceDoGrupo(itensDe(lista)) ?? 0,
+    }));
+    return aplicarSupressaoGruposPequenos(resumo, limiteSupressaoGrupo);
   };
 
   return {

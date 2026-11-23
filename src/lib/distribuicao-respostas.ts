@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { aplicarSupressaoGruposPequenos } from "@/lib/agregacao";
 import { calcularMedia, compararPorNumeroDaDimensao, normalizarValor, type Polaridade } from "@/lib/dashboard";
 import { MEDIA_EXPOSTO } from "@/lib/fmea";
+import { arredondar2 } from "@/lib/score-final";
 
 /**
  * Distribuição das respostas do Eixo 1 (pedido do cliente, out/2026):
@@ -59,6 +60,28 @@ export function estaExposto(valor: number, polaridade: Polaridade): boolean {
   return normalizarValor(valor, polaridade) >= MEDIA_EXPOSTO;
 }
 
+/**
+ * Resposta favorável (modelo da cliente, nov/2026): a que indica que o problema
+ * NÃO acontece — na escala de risco (1 melhor, 5 pior), 1 ou 2. Para as perguntas
+ * negativas é "Não/Nunca" ou "Raramente"; para as positivas, "Frequentemente" ou "Sempre".
+ */
+export function ehFavoravel(valor: number, polaridade: Polaridade): boolean {
+  return normalizarValor(valor, polaridade) <= 2;
+}
+
+/** Percentual de positividade de um fator: respostas favoráveis ÷ respostas (0 a 1); null sem respostas. */
+export function positividade(fator: FatorDistribuicao): number | null {
+  let favoraveis = 0;
+  let total = 0;
+  for (const l of fator.linhas) {
+    for (const v of [1, 2, 3, 4, 5] as const) {
+      total += l.contagem[v];
+      if (ehFavoravel(v, l.pergunta.polaridade)) favoraveis += l.contagem[v];
+    }
+  }
+  return total ? favoraveis / total : null;
+}
+
 /** Destaque em 50% ou mais — comparado em inteiros (5 de 10 é destaque, sem arredondamento). */
 export function temDestaque(expostos: number, n: number): boolean {
   return n > 0 && expostos * 2 >= n;
@@ -99,7 +122,10 @@ export function distribuir(
     f.linhas.push(linhas.get(p.id)!);
     fatores.set(p.fatorId, f);
   }
-  for (const f of fatores.values()) f.indice = calcularMedia(itensPorFator.get(f.id) ?? []);
+  for (const f of fatores.values()) {
+    const m = calcularMedia(itensPorFator.get(f.id) ?? []);
+    f.indice = m === null ? null : arredondar2(m);
+  }
   return [...fatores.values()].sort(compararPorNumeroDaDimensao);
 }
 

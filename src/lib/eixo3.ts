@@ -28,11 +28,26 @@ export const TEXTO_DECLARACAO =
 
 export type Relacao = "SIM" | "NAO" | "INCONCLUSIVO";
 
+/** Rótulos do modelo de relatório da cliente (nov/2026). Só "Relacionado" agrava. */
 export const ROTULO_RELACAO: Record<Relacao, string> = {
-  SIM: "Sim",
-  NAO: "Não",
-  INCONCLUSIVO: "Inconclusivo",
+  SIM: "Relacionado ao trabalho",
+  NAO: "Não relacionado",
+  INCONCLUSIVO: "Parcialmente relacionado",
 };
+
+/**
+ * Atestado de outro capítulo da CID (nem F nem Z): entra só na CONTAGEM
+ * (total de atestados e % de CID F e Z). Não guardamos o código, a descrição,
+ * a justificativa nem a matrícula — é dado de saúde que o FRPRT não usa.
+ */
+export const CID_OUTRO = "OUTRO";
+
+/** CID válido de qualquer capítulo que não seja F nem Z (ex.: M54.5, J11). */
+export function ehCidDeOutroCapitulo(bruto: unknown): boolean {
+  if (bruto === null || bruto === undefined) return false;
+  const m = /^\s*([A-Z])\s*(\d{2})\s*\.?\s*(\d)?(?!\d)/.exec(String(bruto).toUpperCase());
+  return !!m && m[1] !== "F" && m[1] !== "Z";
+}
 
 /**
  * "f41.1", "F 41.1", "F411", "F41.1 - Ansiedade" → "F41.1"; "z73.0" → "Z73.0".
@@ -51,10 +66,14 @@ function semAcento(s: string) {
 }
 
 export function normalizarRelacao(bruto: unknown): Relacao | null {
-  const v = semAcento(String(bruto ?? ""));
-  if (["sim", "s", "yes"].includes(v)) return "SIM";
-  if (["nao", "n", "no"].includes(v)) return "NAO";
-  if (["inconclusivo", "inconclusiva", "i"].includes(v)) return "INCONCLUSIVO";
+  const v = semAcento(String(bruto ?? "")).replace(/\s+/g, " ");
+  // Termos do modelo da cliente (nov/2026) e os antigos (Sim/Não/Inconclusivo).
+  if (["nao", "n", "no", "nao relacionado", "nao relacionado ao trabalho", "sem relacao"].includes(v)) return "NAO";
+  if (
+    ["parcialmente", "parcialmente relacionado", "parcialmente relacionado ao trabalho", "parcial", "inconclusivo", "inconclusiva", "i", "p"].includes(v)
+  )
+    return "INCONCLUSIVO";
+  if (["sim", "s", "yes", "relacionado", "relacionado ao trabalho"].includes(v)) return "SIM";
   return null;
 }
 

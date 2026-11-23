@@ -168,7 +168,7 @@ test("Eixo 3 publicado e Painel FRPRT com o cruzamento dos três eixos", async (
   // Painel do Eixo 3: F51.2 relacionado agrava 2 fatores; F43.1 "Não" não agrava.
   const linhaPainel = page.locator("tr", { hasText: "Produção" }).first();
   await expect(linhaPainel.getByText("2 de 13")).toBeVisible();
-  await expect(page.getByText(/1 atestado\(s\) \(1 colaborador\(es\)\) com relação/)).toBeVisible(); // inconclusivo
+  await expect(page.getByText(/1 atestado\(s\) \(1 colaborador\(es\)\) parcialmente relacionado/)).toBeVisible(); // inconclusivo
   // Matrícula 0100 tem 2 atestados em Produção: 1 colaborador (não 2), com reincidência.
   const reincidencia = page.getByRole("region", { name: "Reincidência" });
   await expect(reincidencia.getByText("0100")).toBeVisible();
@@ -186,8 +186,10 @@ test("Eixo 3 publicado e Painel FRPRT com o cruzamento dos três eixos", async (
   await page.getByRole("button", { name: "Menu" }).click();
   await page.getByRole("link", { name: "Painel FRPRT" }).click();
   // A matrícula só existe na tela do Eixo 3: nunca no Painel FRPRT.
-  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-  await expect(page.getByText("0100")).toHaveCount(0);
+  await expect(page).toHaveURL(/\/gestor\/painel$/, { timeout: 30_000 });
+  await expect(page.getByRole("region", { name: "Painel resumido por setor" })).toBeVisible({ timeout: 30_000 });
+  // Texto exato: células vizinhas como "4,00" e "100%" formam "4,00100%" e enganariam a busca por trecho.
+  await expect(page.getByRole("main").getByText("0100", { exact: true })).toHaveCount(0);
 
   // Topo: resultado geral em destaque (média dos setores com score = só Produção).
   const geral = page.getByRole("region", { name: "Resultado geral da empresa" });

@@ -32,7 +32,10 @@ O questionário v1 (42 perguntas) fica inativo e não entra no Painel FRPRT.
   rascunhos ficam de fora).
 
 ### Índice do Eixo 1 (painel da pesquisa)
-O painel da pesquisa mostra a própria média de 1 a 5 como **índice**, com a **mesma régua do Painel
+O índice de um grupo (empresa, setor ou departamento) é a **média simples das médias dos 13 fatores**,
+com 2 casas — a mesma regra do Painel FRPRT (decisão da cliente, nov/2026). Antes era a média por
+pessoa sobre todas as perguntas, e o mesmo setor aparecia com valores diferentes nos dois painéis.
+O painel da pesquisa mostra esse índice de 1 a 5, com a **mesma régua do Painel
 FRPRT** (função `concluir`): até 3,00 índice baixo (verde) · 3,01 a 4,00 índice médio (amarelo) ·
 acima de 4,00 índice alto (vermelho).
 
@@ -52,8 +55,15 @@ Setor sem avaliação → ×1,00.
 
 ## Eixo 3 — Atestados CID F e Z
 
-**Fator Eixo 3 (setor × fator)** = **×1,10** se houve no período **pelo menos uma** ocorrência com
-relação ao trabalho = **Sim**, no setor, com CID compatível com o fator. Caso contrário, **×1,00**.
+**Fator Eixo 3 (setor × fator)** = **×1,10** se houve no período **pelo menos uma** ocorrência
+**relacionada ao trabalho**, no setor, com CID compatível com o fator. Caso contrário, **×1,00**.
+
+- **Relação com o trabalho (modelo da cliente, nov/2026):** relacionado ao trabalho · parcialmente
+  relacionado · não relacionado. Só "relacionado" agrava. A planilha aceita também os termos antigos
+  (Sim / Inconclusivo / Não).
+- **Outros capítulos da CID** (nem F nem Z): entram **só na contagem** do total de atestados (para o
+  "% de CID F e Z" e os painéis por ano). Não guardamos o código, a descrição, a justificativa nem a
+  matrícula; não entram em nenhum indicador psicossocial.
 
 - Quantidade, dias de afastamento e casos inconclusivos não mudam o índice. Aparecem como
   indicadores (os dias de afastamento entram na severidade da FMEA).
@@ -87,6 +97,11 @@ relação ao trabalho = **Sim**, no setor, com CID compatível com o fator. Caso
 | acima de 4,00 | Índice alto (vermelho) | Risco existente | Plano de ação |
 
 A comparação é feita em centésimos (3,00 calculado nunca "escorrega" para a faixa seguinte).
+
+**Arredondamento (decisão da cliente, nov/2026):** cada etapa usa 2 casas — Eixo 1 do fator, fator do
+Eixo 2, fator do Eixo 3 e o produto. Assim, a conta exibida (ex.: 3,82 × 0,80 = 3,06) fecha à mão.
+O índice do setor é a **média dos 13 resultados por fator** (não o produto das médias do setor); o
+relatório final traz a tabela "Como chegamos ao resultado de cada setor" com os 13 fatores.
 
 **Terminologia (cliente, out/2026):** antes da matriz FMEA fala-se em **índice** (índice baixo,
 médio ou alto; índice final). "Risco" aparece depois da classificação FMEA e no PGR (títulos como
@@ -136,6 +151,15 @@ A numeração usada pela consultoria no pedido difere da do questionário (por e
 > o Painel FRPRT aplica também os Eixos 2 e 3.
 
 ## FMEA — prioridade de ação
+
+**Lei nº 14.457/2022 (decisão da cliente, nov/2026):** o fator 11 — Violência no Trabalho, que reúne
+violência por terceiros e assédio — **não passa pela FMEA**. Aparece à parte, como termômetro (painel,
+seção "Assédio e violência"; relatório final, Anexo 2). Situações desse fator não geram cards do PGR:
+quando indicarem exposição, a organização as avalia no GRO/PGR.
+
+> Pendência registrada: o quadro de aspectos metodológicos do relatório final diz que frequência de
+> respostas não deve virar probabilidade automaticamente, e a nota O hoje é a média do Eixo 1. Mantido
+> assim por decisão da consultoria; o lembrete sai só na pré-visualização do relatório final.
 
 Tudo o que fica acima de 3,00 é classificado por **Severidade (S) × Ocorrência (O) × Detecção (D)**,
 em duas listas: **PGR** (as situações acima, com S do fator a que pertencem, O da média da pergunta e

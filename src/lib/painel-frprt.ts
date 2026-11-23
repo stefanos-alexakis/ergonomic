@@ -1,12 +1,12 @@
 import { db } from "@/lib/db";
 import { calcularMedia } from "@/lib/dashboard";
 import { calcularResultado } from "@/lib/avaliacao-eixo2";
-import { calcularEixo3Setor, montarMatrizPorFator } from "@/lib/eixo3";
+import { CID_OUTRO, calcularEixo3Setor, montarMatrizPorFator } from "@/lib/eixo3";
 import { cidsZQueAgravam, numeroDoFator } from "@/lib/cids-z";
 import { carregarMatriz } from "@/lib/levantamento-eixo3";
 import { carregarRegrasPrazo } from "@/lib/prazos";
-import { calcularRiscoFinal, concluir, type Conclusao } from "@/lib/score-final";
-import { MEDIA_EXPOSTO, calcularFmea, calcularPrazos, compararFmea, type Prazos, type ResultadoFmea } from "@/lib/fmea";
+import { arredondar2, calcularRiscoFinal, concluir, media2, type Conclusao } from "@/lib/score-final";
+import { MEDIA_EXPOSTO, calcularFmea, calcularPrazos, compararFmea, foraDaFmea, type Prazos, type ResultadoFmea } from "@/lib/fmea";
 
 /**
  * Painel FRPRT — cruza, por setor × fator de risco:
@@ -47,6 +47,19 @@ export type CelulaPainel = {
   maiorAfastamento: number;
   /** Classificação FMEA — só para células com índice final. */
   fmea: ResultadoFmea | null;
+  /** Fator 11 (assédio e violência, Lei 14.457): sem pontuação FMEA. */
+  foraDaFmea: boolean;
+};
+
+/** Termômetro de assédio e violência (Lei 14.457): fator 11, por setor, fora da FMEA. */
+export type IndicadorViolencia = {
+  setorId: string;
+  setor: string;
+  /** Índice final do fator 11 no setor. */
+  final: number;
+  conclusao: Conclusao;
+  parcelaExpostos: number | null;
+  situacoes: { numero: number; texto: string; eixo1: number; expostos: number | null }[];
 };
 
 /** Ação do Plano de ação que cobre um setor × fator (prazos reais da empresa). */
@@ -92,7 +105,10 @@ export type LinhaSetorPainel = {
   participacao: number | null;
   suprimido: boolean;
   eixo1: number | null;
+  /** Multiplicador médio do Eixo 2 no setor (média dos 13 fatores); null sem avaliação. */
   fatorEixo2: number | null;
+  /** Multiplicador médio do Eixo 3 no setor; null sem levantamento. */
+  fatorEixo3: number | null;
   efeitoEixo2: number | null;
   efeitoEixo3: number | null;
   final: number | null;
@@ -210,6 +226,9 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
 
   // Situações que vão para o PGR (marcadas pelo admin), na ordem do questionário.
   const situacoesPgr = situacoes.filter((x) => x.perguntaEixo1.vaiParaPgr);
+  // Situações do fator 11 (Lei 14.457): acompanhadas à parte, fora da FMEA e dos cards do PGR.
+  const situacoesViolencia = situacoes.filter((x) => foraDaFmea(x.perguntaEixo1.fatorRisco.dimensao.nome));
+  const situacoesMonitoradas = [...new Map([...situacoesPgr, ...situacoesViolencia].map((x) => [x.perguntaEixo1Id, x])).values()];
 
   const eixo1PorSetor = new Map<
     string,
@@ -240,7 +259,7 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
       expostosPorFator.set(f.id, mediasIndividuais.length ? expostos / mediasIndividuais.length : null);
     }
     const porSituacao = new Map<string, { media: number | null; expostos: number | null }>();
-    for (const sit of situacoesPgr) {
+    for (const sit of situacoesMonitoradas) {
       const itens = lista.flatMap((r) =>
         r.itens
           .filter((i) => i.perguntaId === sit.perguntaEixo1Id)
@@ -271,7 +290,8 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
   // ── Eixo 3 ───────────────────────────────────────────────────────────
   const ocorrencias = levantamento
     ? await db.ocorrenciaEixo3.findMany({
-        where: { levantamentoId: levantamento.id, ignorada: false, setorId: { not: null } },
+        // Outros CIDs só contam atestados: ficam fora da análise psicossocial.
+        where: { levantamentoId: levantamento.id, ignorada: false, setorId: { not: null }, cid: { not: CID_OUTRO } },
         select: { setorId: true, cid: true, relacao: true, diasAfastados: true, matricula: true },
       })
     : [];
@@ -308,17 +328,21 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
     const temOcorrencias = (ocorrenciasPorSetor.get(setor.id)?.length ?? 0) > 0;
 
     const celulas: CelulaPainel[] = fatores.map((f) => {
-      const eixo1 = suprimido ? null : (e1?.porFator.get(f.id) ?? null);
-      const f2 = e2?.porDimensao[f.id] ?? null;
+      // Tudo a 2 casas (decisão da cliente): a conta exibida fecha à mão.
+      const bruto1 = suprimido ? null : (e1?.porFator.get(f.id) ?? null);
+      const eixo1 = bruto1 !== null ? arredondar2(bruto1) : null;
+      const bruto2 = e2?.porDimensao[f.id] ?? null;
+      const f2 = bruto2 !== null ? arredondar2(bruto2) : null;
       const fatorEixo2 = f2 ?? 1;
-      const fatorEixo3 = e3?.fatorPorFator.get(f.id) ?? 1;
+      const fatorEixo3 = arredondar2(e3?.fatorPorFator.get(f.id) ?? 1);
       const cidsEixo3 = e3?.cidsPorFator.get(f.id) ?? [];
-      const ajustado = eixo1 !== null ? eixo1 * fatorEixo2 : null;
+      const ajustado = eixo1 !== null ? arredondar2(eixo1 * fatorEixo2) : null;
       const final = eixo1 !== null ? calcularRiscoFinal(eixo1, fatorEixo2, fatorEixo3) : null;
       const parcelaExpostos = suprimido ? null : (e1?.expostosPorFator.get(f.id) ?? null);
       const maiorAfastamento = e3?.maiorAfastamentoPorFator.get(f.id) ?? 0;
+      const semFmea = foraDaFmea(f.nome);
       const fmea =
-        eixo1 !== null && final !== null
+        eixo1 !== null && final !== null && !semFmea
           ? calcularFmea({
               severidadeBase: severidadePorFator.get(f.id)?.severidade ?? SEVERIDADE_PADRAO,
               mediaEixo1: eixo1,
@@ -348,13 +372,14 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
         parcelaExpostos,
         maiorAfastamento,
         fmea,
+        foraDaFmea: semFmea,
       };
     });
 
     const comValor = celulas.filter((c) => c.eixo1 !== null && c.final !== null && c.ajustado !== null);
-    const media = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null);
-    const eixo1Setor = media(comValor.map((c) => c.eixo1!));
-    const finalSetor = media(comValor.map((c) => c.final!));
+    // Setor = média simples dos 13 fatores (mesma regra do relatório do Eixo 1), a 2 casas.
+    const eixo1Setor = media2(comValor.map((c) => c.eixo1!));
+    const finalSetor = media2(comValor.map((c) => c.final!));
 
     return {
       setorId: setor.id,
@@ -365,9 +390,11 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
         setor.numeroColaboradores && setor.numeroColaboradores > 0 ? respondentes / setor.numeroColaboradores : null,
       suprimido,
       eixo1: eixo1Setor,
-      fatorEixo2: e2?.geral ?? null,
-      efeitoEixo2: media(comValor.map((c) => c.ajustado! - c.eixo1!)),
-      efeitoEixo3: media(comValor.map((c) => c.final! - c.ajustado!)),
+      // Multiplicadores do setor = média dos multiplicadores dos fatores (exibidos como ×0,81).
+      fatorEixo2: e2 ? media2(comValor.map((c) => c.fatorEixo2)) : null,
+      fatorEixo3: levantamento ? media2(comValor.map((c) => c.fatorEixo3)) : null,
+      efeitoEixo2: media2(comValor.map((c) => c.ajustado! - c.eixo1!)),
+      efeitoEixo3: media2(comValor.map((c) => c.final! - c.ajustado!)),
       final: finalSetor,
       conclusao: finalSetor !== null ? concluir(finalSetor) : null,
       fatoresEmRisco: celulas.filter((c) => c.conclusao === "RISCO_EXISTENTE").length,
@@ -510,12 +537,15 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
     const ocorrDoSetor = ocorrenciasPorSetor.get(l.setorId) ?? [];
     const e3 = levantamento ? calcularEixo3Setor(ocorrDoSetor, matrizPorSituacao) : null;
     for (const sit of situacoesPgr) {
+      // Fator 11 (Lei 14.457): fica no termômetro de assédio e violência, não nos cards do PGR.
+      if (foraDaFmea(sit.perguntaEixo1.fatorRisco.dimensao.nome)) continue;
       const dados = e1?.porSituacao.get(sit.perguntaEixo1Id);
       if (!dados || dados.media === null) continue;
-      const eixo1 = dados.media;
-      const f2 = e2?.porPergunta[sit.perguntaEixo1Id] ?? null;
+      const eixo1 = arredondar2(dados.media);
+      const bruto2 = e2?.porPergunta[sit.perguntaEixo1Id] ?? null;
+      const f2 = bruto2 !== null ? arredondar2(bruto2) : null;
       const fatorEixo2 = f2 ?? 1;
-      const fatorEixo3 = e3?.fatorPorFator.get(sit.perguntaEixo1Id) ?? 1;
+      const fatorEixo3 = arredondar2(e3?.fatorPorFator.get(sit.perguntaEixo1Id) ?? 1);
       const final = calcularRiscoFinal(eixo1, fatorEixo2, fatorEixo3);
       const conclusao = concluir(final);
       if (conclusao === "SEM_RISCO") continue; // entra no PGR acima de 3,00
@@ -544,12 +574,13 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
             : ocorrDoSetor.length
               ? "CID-F sem relação"
               : "Sem CID-F",
-        ajustado: eixo1 * fatorEixo2,
+        ajustado: arredondar2(eixo1 * fatorEixo2),
         final,
         conclusao,
         parcelaExpostos: dados.expostos,
         maiorAfastamento,
         fmea,
+        foraDaFmea: false,
       };
       const situacao: SituacaoPgr = {
         perguntaId: sit.perguntaEixo1Id,
@@ -598,6 +629,30 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
     ordem,
   }));
 
+  // ── Termômetro de assédio e violência (fator 11, Lei 14.457) ──────────
+  const violencia: IndicadorViolencia[] = linhas
+    .filter((l) => !l.suprimido)
+    .flatMap((l) => {
+      const celula = l.celulas.find((c) => c.foraDaFmea && c.final !== null);
+      if (!celula) return [];
+      const e1 = eixo1PorSetor.get(l.setorId);
+      return [
+        {
+          setorId: l.setorId,
+          setor: l.nome,
+          final: celula.final!,
+          conclusao: celula.conclusao!,
+          parcelaExpostos: celula.parcelaExpostos,
+          situacoes: situacoesViolencia.flatMap((sit) => {
+            const d = e1?.porSituacao.get(sit.perguntaEixo1Id);
+            return d && d.media !== null
+              ? [{ numero: sit.perguntaEixo1.ordemGlobal, texto: sit.perguntaEixo1.situacaoInvestigada, eixo1: arredondar2(d.media), expostos: d.expostos }]
+              : [];
+          }),
+        },
+      ];
+    });
+
   // Contagem por célula da matriz S × O (as duas listas), para o mapa de calor.
   const contagemSO = Array.from({ length: 5 }, () => Array<number>(5).fill(0));
   for (const i of [...fmeaPgr, ...fmeaAcompanhamento]) contagemSO[i.fmea.s - 1]![i.fmea.o - 1]!++;
@@ -614,6 +669,7 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
     achados,
     principais: principais.map((p) => ({ ...p, tratativas: (sugeridosPorFator.get(p.fator.id) ?? []).slice(0, 3) })),
     pgr,
+    violencia,
     fmea: {
       emitidoEm,
       regrasPrazo,
@@ -641,10 +697,7 @@ export type PainelFrprt = NonNullable<Awaited<ReturnType<typeof calcularPainelFr
 export function calcularGeral(linhas: LinhaSetorPainel[]): ResultadoGeral | null {
   const comScore = linhas.filter((l) => l.final !== null);
   if (comScore.length === 0) return null;
-  const media = (xs: (number | null)[]) => {
-    const v = xs.filter((x): x is number => x !== null);
-    return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null;
-  };
+  const media = (xs: (number | null)[]) => media2(xs.filter((x): x is number => x !== null));
   const final = media(comScore.map((l) => l.final))!;
   const comHeadcount = linhas.filter((l) => l.colaboradores && l.colaboradores > 0);
   const totalColab = comHeadcount.reduce((a, l) => a + (l.colaboradores ?? 0), 0);

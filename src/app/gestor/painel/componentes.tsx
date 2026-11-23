@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { Achado, LinhaSetorPainel, ResultadoGeral } from "@/lib/painel-frprt";
-import { CONCLUSOES, formatarEfeito, formatarRisco, posicaoNaRegua, type Conclusao } from "@/lib/score-final";
+import { CONCLUSOES, formatarEfeito, formatarRisco, posicaoNaRegua, textoEixoSetor, type Conclusao } from "@/lib/score-final";
 import { IconeCalendario, IconeEmpresa, IconeFator } from "@/components/frprt/icones";
 
 /** "jan–dez/2026" (mesmo ano) ou "nov/2025–mar/2026". */
@@ -262,10 +262,10 @@ export function TabelaSetores({ linhas, limite }: { linhas: LinhaSetorPainel[]; 
                     <Barra valor={l.eixo1 ?? 0} maximo={5} cor="#4a86b5" texto={formatarRisco(l.eixo1 ?? 0)} />
                   </td>
                   <td className="px-3 py-3">
-                    <Barra valor={l.efeitoEixo2 ?? 0} maximo={1} cor="#5fae8f" texto={formatarEfeito(l.efeitoEixo2 ?? 0)} />
+                    <Barra valor={l.efeitoEixo2 ?? 0} maximo={1} cor="#5fae8f" texto={textoEixoSetor(l.fatorEixo2, l.efeitoEixo2)} />
                   </td>
                   <td className="px-3 py-3">
-                    <Barra valor={l.efeitoEixo3 ?? 0} maximo={0.6} cor="#f39a5b" texto={formatarEfeito(l.efeitoEixo3 ?? 0)} />
+                    <Barra valor={l.efeitoEixo3 ?? 0} maximo={0.6} cor="#f39a5b" texto={textoEixoSetor(l.fatorEixo3, l.efeitoEixo3)} />
                   </td>
                   <td className="px-3 py-3 text-center">
                     <PilulaRisco valor={l.final} conclusao={l.conclusao!} />

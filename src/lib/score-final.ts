@@ -16,8 +16,23 @@
  * índice para exibição e não entrava em nenhum cálculo.
  */
 
+/**
+ * Arredondamento oficial a 2 casas (decisão da cliente, nov/2026): cada etapa
+ * da conta usa o valor que aparece na tela e no relatório, para que qualquer
+ * pessoa refaça a multiplicação à mão e chegue ao mesmo número.
+ */
+export function arredondar2(valor: number): number {
+  return Math.round((valor + Number.EPSILON) * 100) / 100;
+}
+
+/** Média simples já arredondada a 2 casas; null sem valores. */
+export function media2(valores: number[]): number | null {
+  return valores.length ? arredondar2(valores.reduce((a, b) => a + b, 0) / valores.length) : null;
+}
+
+/** Eixo 1 × Fator Eixo 2 × Fator Eixo 3, com os três já arredondados a 2 casas e o resultado também. */
 export function calcularRiscoFinal(eixo1: number, fatorEixo2: number, fatorEixo3: number): number {
-  return eixo1 * fatorEixo2 * fatorEixo3;
+  return arredondar2(arredondar2(eixo1) * arredondar2(fatorEixo2) * arredondar2(fatorEixo3));
 }
 
 export type Conclusao = "SEM_RISCO" | "CONTROLE" | "RISCO_EXISTENTE";
@@ -91,6 +106,16 @@ export function efeitosEmPontos(eixo1: number, fatorEixo2: number, fatorEixo3: n
 /** "3,76" — duas casas, vírgula. */
 export function formatarRisco(valor: number): string {
   return valor.toFixed(2).replace(".", ",");
+}
+
+/** "×0,81" — multiplicador de um eixo (Eixo 2 ou Eixo 3); "—" quando o eixo não entrou. */
+export function formatarMultiplicador(valor: number | null): string {
+  return valor === null ? "—" : `×${arredondar2(valor).toFixed(2).replace(".", ",")}`;
+}
+
+/** Texto da coluna do eixo no painel resumido: multiplicador e, entre parênteses, o efeito em pontos. */
+export function textoEixoSetor(multiplicador: number | null, efeito: number | null): string {
+  return multiplicador === null ? "não entrou (×1,00)" : `${formatarMultiplicador(multiplicador)} (${formatarEfeito(efeito ?? 0)})`;
 }
 
 /** "+1,20" / "−0,50" — com sinal, para os efeitos em pontos. */

@@ -14,7 +14,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ versao:
 
   const n = Number.parseInt(versao, 10);
   const emitido = Number.isInteger(n)
-    ? await db.relatorioEmitido.findUnique({ where: { workspaceId_versao: { workspaceId: workspace.id, versao: n } } })
+    ? await db.relatorioEmitido.findFirst({ where: { workspaceId: workspace.id, versao: n, modelo: "COMPLETO" } })
     : null;
   if (!emitido) return new NextResponse("Versão não encontrada.", { status: 404 });
   const pdf = await lerRelatorioPdf(emitido.arquivo);

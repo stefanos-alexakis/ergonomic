@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+  arredondar2,
   calcularRiscoFinal,
+  formatarMultiplicador,
+  media2,
+  textoEixoSetor,
   concluir,
   efeitosEmPontos,
   formatarEfeito,
@@ -10,8 +14,29 @@ import {
 describe("calcularRiscoFinal = Eixo 1 × Eixo 2 × Eixo 3", () => {
   it("exemplo do plano: 3,80 × 0,90 × 1,10 = 3,76 → controle", () => {
     const r = calcularRiscoFinal(3.8, 0.9, 1.1);
-    expect(r).toBeCloseTo(3.762, 10);
+    // 2 casas em cada etapa (decisão da cliente, nov/2026): 3,762 → 3,76.
+    expect(r).toBe(3.76);
     expect(concluir(r)).toBe("CONTROLE");
+  });
+
+  it("a conta fecha com os números exibidos: 3,82 × 0,80 = 3,06 (antes saía 3,05 com o Eixo 1 sem arredondar)", () => {
+    expect(calcularRiscoFinal(3.8167, 0.8, 1)).toBe(3.06);
+    expect(calcularRiscoFinal(3.82, 0.8, 1)).toBe(3.06);
+  });
+
+  it("arredondamento comercial sem erro de ponto flutuante", () => {
+    expect(arredondar2(1.005)).toBe(1.01);
+    expect(arredondar2(2.675)).toBe(2.68);
+    expect(arredondar2(3.0549)).toBe(3.05);
+    expect(media2([1.8, 1.81])).toBe(1.81);
+    expect(media2([])).toBeNull();
+  });
+
+  it("multiplicador do setor e efeito em pontos", () => {
+    expect(formatarMultiplicador(0.8114)).toBe("×0,81");
+    expect(formatarMultiplicador(null)).toBe("—");
+    expect(textoEixoSetor(0.81, -0.42)).toBe("×0,81 (−0,42)");
+    expect(textoEixoSetor(null, null)).toBe("não entrou (×1,00)");
   });
 
   it("exemplo da matriz da cliente (PDF): Gestão de Mudanças 4,40 × 0,90 × 1,10 = 4,36 → risco existente", () => {

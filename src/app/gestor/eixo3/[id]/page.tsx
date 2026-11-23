@@ -48,11 +48,18 @@ export default async function LevantamentoPage({
       title={l.nome}
       actions={
         publicado ? (
-          <form action={reabrirLevantamentoAction.bind(null, l.id)}>
-            <Button type="submit" variant="secondary">
-              Reabrir para editar
-            </Button>
-          </form>
+          <div className="flex flex-wrap items-center gap-2">
+            <a href={`/gestor/eixo3/${l.id}/relatorio-pdf`}>
+              <Button type="button" variant="secondary">
+                Relatório do Eixo 3 (PDF)
+              </Button>
+            </a>
+            <form action={reabrirLevantamentoAction.bind(null, l.id)}>
+              <Button type="submit" variant="secondary">
+                Reabrir para editar
+              </Button>
+            </form>
+          </div>
         ) : (
           <Link href={`/gestor/eixo3/${l.id}/identificacao`}>
             <Button variant="ghost">Editar identificação</Button>
