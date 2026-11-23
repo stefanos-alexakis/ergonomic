@@ -19,9 +19,14 @@ export default async function Eixo2Page() {
         eyebrow="Eixo 2"
         title="Medidas de controle"
         actions={
-          <Link href="/gestor/eixo2/nova">
-            <Button>+ Nova avaliação</Button>
-          </Link>
+          <div className="flex flex-wrap items-center gap-3">
+            <Link href="/gestor/relatorios-eixo2" className="text-sm text-zinc-600 underline underline-offset-2 hover:text-zinc-900">
+              Ver todos os relatórios
+            </Link>
+            <Link href="/gestor/eixo2/nova">
+              <Button>+ Nova avaliação</Button>
+            </Link>
+          </div>
         }
       />
       <p className="text-sm text-zinc-500 mb-6 max-w-2xl">
