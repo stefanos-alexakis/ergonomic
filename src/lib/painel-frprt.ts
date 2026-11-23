@@ -102,6 +102,8 @@ export type LinhaSetorPainel = {
   situacoesPgr: number;
   temOcorrenciaRelacionada: boolean;
   ocorrenciasRelacionadas: number;
+  /** Colaboradores com atestado "Sim" (uma pessoa conta uma vez, mesmo com vários atestados). */
+  colaboradoresRelacionados: number;
   fatoresAgravados: number;
   celulas: CelulaPainel[];
 };
@@ -127,7 +129,8 @@ export async function opcoesPainel(workspaceId: string, selecao: SelecaoPainel) 
 
   const [pesquisas, avaliacoes, levantamentos] = await Promise.all([
     db.pesquisa.findMany({
-      where: { workspaceId, questionarioId: questionario.id },
+      // Arquivadas ficam fora dos seletores (decisão do cliente, nov/2026).
+      where: { workspaceId, questionarioId: questionario.id, arquivadaEm: null },
       orderBy: { createdAt: "desc" },
       select: { id: true, nome: true, dataInicio: true, dataFim: true, limiteSupressaoGrupo: true },
     }),
@@ -267,7 +270,7 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
   const ocorrencias = levantamento
     ? await db.ocorrenciaEixo3.findMany({
         where: { levantamentoId: levantamento.id, ignorada: false, setorId: { not: null } },
-        select: { setorId: true, cid: true, relacao: true, diasAfastados: true },
+        select: { setorId: true, cid: true, relacao: true, diasAfastados: true, matricula: true },
       })
     : [];
   const ocorrenciasPorSetor = new Map<string, typeof ocorrencias>();
@@ -369,6 +372,7 @@ export async function calcularPainelFrprt(workspaceId: string, selecao: SelecaoP
       situacoesPgr: 0, // preenchido depois do cálculo por situação
       temOcorrenciaRelacionada: (e3?.relacionadas ?? 0) > 0,
       ocorrenciasRelacionadas: e3?.relacionadas ?? 0,
+      colaboradoresRelacionados: e3?.colaboradoresRelacionados ?? 0,
       fatoresAgravados: celulas.filter((c) => c.fatorEixo3 > 1).length,
       celulas,
     };
@@ -701,15 +705,15 @@ export function gerarAchados(params: {
   }
 
   if (temEixo3) {
-    const ocorr = comScore.reduce((a, l) => a + l.ocorrenciasRelacionadas, 0);
+    const ocorr = comScore.reduce((a, l) => a + l.colaboradoresRelacionados, 0);
     const setoresAgravados = comScore.filter((l) => l.fatoresAgravados > 0);
     achados.push(
       ocorr > 0
         ? {
             tom: "perigo",
-            texto: `${ocorr} atestado(s) CID-F relacionado(s) ao trabalho agravaram fatores em ${setoresAgravados.length} setor(es): ${setoresAgravados.map((l) => l.nome).join(", ")}.`,
+            texto: `${ocorr} colaborador(es) com atestado CID-F relacionado ao trabalho agravaram fatores em ${setoresAgravados.length} setor(es): ${setoresAgravados.map((l) => l.nome).join(", ")}.`,
           }
-        : { tom: "sucesso", texto: "Nenhum atestado CID-F relacionado ao trabalho nos setores avaliados (Eixo 3)." },
+        : { tom: "sucesso", texto: "Nenhum colaborador com atestado CID-F relacionado ao trabalho nos setores avaliados (Eixo 3)." },
     );
   } else {
     achados.push({ tom: "neutro", texto: "Eixo 3 não considerado: nenhum levantamento de atestados publicado." });

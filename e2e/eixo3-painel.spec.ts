@@ -40,6 +40,7 @@ async function planilhaOcorrencias(linhas: unknown[][]) {
     "Total de dias afastados",
     "Relação com o trabalho?",
     "Justificativa / Observação",
+    "Matrícula",
   ]);
   for (const l of linhas) sheet.addRow(l);
   return Buffer.from(await wb.xlsx.writeBuffer());
@@ -147,9 +148,9 @@ test("Eixo 3 publicado e Painel FRPRT com o cruzamento dos três eixos", async (
     name: "ocorrencias.xlsx",
     mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     buffer: await planilhaOcorrencias([
-      ["producao", "F51.2", "Ciclo vigília-sono", "10/03/2025", 20, "Sim", "Escalas noturnas"],
-      ["PRODUÇÃO", "F43.1", "TEPT", "12/05/2025", 15, "Não", null],
-      ["Galpão Norte", "F41", "Ansiedade", "20/06/2025", 3, "Inconclusivo", null],
+      ["producao", "F51.2", "Ciclo vigília-sono", "10/03/2025", 20, "Sim", "Escalas noturnas", "0100"],
+      ["PRODUÇÃO", "F43.1", "TEPT", "12/05/2025", 15, "Não", null, "0100"],
+      ["Galpão Norte", "F41", "Ansiedade", "20/06/2025", 3, "Inconclusivo", null, "0200"],
     ]),
   });
   await page.getByRole("button", { name: "Enviar planilha" }).click();
@@ -167,12 +168,26 @@ test("Eixo 3 publicado e Painel FRPRT com o cruzamento dos três eixos", async (
   // Painel do Eixo 3: F51.2 relacionado agrava 2 fatores; F43.1 "Não" não agrava.
   const linhaPainel = page.locator("tr", { hasText: "Produção" }).first();
   await expect(linhaPainel.getByText("2 de 13")).toBeVisible();
-  await expect(page.getByText(/1 ocorrência\(s\) com relação/)).toBeVisible(); // inconclusiva
+  await expect(page.getByText(/1 atestado\(s\) \(1 colaborador\(es\)\) com relação/)).toBeVisible(); // inconclusivo
+  // Matrícula 0100 tem 2 atestados em Produção: 1 colaborador (não 2), com reincidência.
+  const reincidencia = page.getByRole("region", { name: "Reincidência" });
+  await expect(reincidencia.getByText("0100")).toBeVisible();
+  await expect(reincidencia.locator("tr", { hasText: "0100" })).toContainText("Produção");
+  await expect(linhaPainel.locator("td").nth(2)).toHaveText("2"); // atestados
+  await expect(linhaPainel.locator("td").nth(3)).toHaveText("1"); // colaboradores com atestado
+  await expect(linhaPainel.locator("td").nth(4)).toHaveText("1"); // relacionados (colab.)
+  await expect(linhaPainel.locator("td").nth(6)).toHaveText("1"); // reincidentes
+  // 1 colaborador com atestado ÷ 10 colaboradores = 10,0%; atestados ÷ colaboradores = 20,0%.
+  await expect(linhaPainel).toContainText("10,0%");
+  await expect(linhaPainel).toContainText("20,0%");
   await expect(page.getByText(/ocorrência\(s\) F43\.1/)).toBeVisible();
 
   // ── Painel FRPRT ───────────────────────────────────────────────────
   await page.getByRole("button", { name: "Menu" }).click();
   await page.getByRole("link", { name: "Painel FRPRT" }).click();
+  // A matrícula só existe na tela do Eixo 3: nunca no Painel FRPRT.
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  await expect(page.getByText("0100")).toHaveCount(0);
 
   // Topo: resultado geral em destaque (média dos setores com score = só Produção).
   const geral = page.getByRole("region", { name: "Resultado geral da empresa" });

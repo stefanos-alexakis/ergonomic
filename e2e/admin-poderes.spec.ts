@@ -89,6 +89,8 @@ test("admin assume a visão de gestor de uma empresa e sai de volta", async ({ p
   await page.getByLabel("Encerramento").fill("2026-03-15T18:00");
   await page.getByRole("button", { name: "Criar pesquisa" }).click();
   await expect(page).toHaveURL(/\/gestor$/);
+  // Encerramento no passado: a pesquisa cai em "Concluídas", não na aba padrão "Abertas".
+  await page.goto("/gestor?aba=todas");
   await expect(page.getByText("Pesquisa Impersonada E2E")).toBeVisible();
 
   // Sai da impersonação e volta para o admin.

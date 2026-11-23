@@ -6,6 +6,9 @@ Acesso: **https://pesquisa.agtrade.com.br/login** (admin e gestor). O colaborado
 
 ## 1. Administrador da plataforma
 
+**Buscar empresa.** Na lista de **Empresas**, o campo de busca filtra pelo nome: digite uma parte (sem se preocupar com
+maiúsculas ou acentos) e só as empresas que contêm o trecho aparecem; **Limpar** volta à lista inteira.
+
 ### 1.1 Cadastrar uma empresa
 **Empresas → + Nova empresa**
 - **Nome** da empresa.
@@ -93,6 +96,19 @@ Na página da pesquisa:
 O **status** da pesquisa é atualizado sozinho: *Rascunho* (licenças ainda não geradas), *Agendada*
 (antes do início), *Aberta* (dentro do período) e *Encerrada* (depois do encerramento).
 
+**Lista de pesquisas.** Na tela do Eixo 1 há as abas **Abertas** (em operação: rascunho, agendada ou em andamento),
+**Concluídas** (o encerramento já passou) e **Arquivadas**, além de **Todas**, cada uma com a contagem.
+
+**Prorrogar, arquivar ou excluir** (link na página da pesquisa):
+- **Encerramento** — dá para prorrogar mesmo depois de emitir os cartões; a pesquisa reabre e os códigos ainda não
+  usados voltam a funcionar. Depois que houver respostas, só é possível prorrogar, não antecipar.
+- **Arquivar** — a pesquisa para de receber respostas e sai da lista de trabalho, do Painel FRPRT e do relatório
+  completo; os dados continuam consultáveis. Dá para desarquivar.
+- **Excluir** — se nenhum código de participante foi usado (os de teste não contam), exclui direto, com uma confirmação.
+  Se já foi iniciada, o pedido exige digitar o nome da pesquisa e **não exclui na hora**: ela fica arquivada por 30 dias
+  (dá para cancelar o pedido) e só depois libera a **exclusão definitiva**, com nova confirmação por escrito. A exclusão
+  apaga códigos, respostas e pré-pesquisa; os relatórios já emitidos continuam arquivados.
+
 Regras de acesso do colaborador:
 - Antes do início, o código não funciona.
 - Depois do encerramento, quem não começou não entra; quem já começou tem 60 minutos de tolerância
@@ -161,9 +177,11 @@ desejo de trabalhar com outras pessoas, conflitos). O consultor preenche na mesm
 
 ### 2.5 Eixo 3 · Atestados CID
 **Eixo 3 → Baixar modelo da planilha** e preencha uma linha por ocorrência: setor, CID-F,
-descrição, data de início, dias afastados, relação com o trabalho (*Sim / Não / Inconclusivo*) e
-justificativa. **Não inclua nome, matrícula ou CPF.** Colunas desse tipo são ignoradas e a tela
-avisa.
+descrição, data de início, dias afastados, relação com o trabalho (*Sim / Não / Inconclusivo*),
+justificativa e **matrícula** (opcional). **Não inclua nome nem CPF** — colunas desse tipo são
+ignoradas e a tela avisa. A matrícula serve para contar *colaboradores com atestado* (a mesma
+matrícula conta uma vez por setor; linha sem matrícula conta como uma pessoa) e mostrar a
+reincidência. Ela aparece só na tela do Eixo 3, nunca nos relatórios nem nas planilhas geradas.
 
 **Eixo 3 → + Publicar planilha**
 1. **Identificação** — nome do levantamento e período analisado.

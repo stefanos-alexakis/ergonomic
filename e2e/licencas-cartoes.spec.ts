@@ -38,6 +38,8 @@ test("gestor gera licenças (com códigos de teste) e baixa os cartões em PDF",
   await page.getByRole("button", { name: "Criar pesquisa" }).click();
   await expect(page).toHaveURL(/\/gestor$/);
 
+  // Encerramento no passado: a pesquisa cai em "Concluídas", não na aba padrão "Abertas".
+  await page.goto("/gestor?aba=todas");
   await page.getByRole("link", { name: "Pesquisa Licencas E2E" }).click();
   await expect(page.getByText("Nenhum código gerado ainda")).toBeVisible();
 

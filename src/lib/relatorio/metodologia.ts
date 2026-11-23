@@ -99,7 +99,7 @@ export function secoesMetodologia(p: ParametrosMetodologia): SecaoTexto[] {
       blocos: [
         {
           tipo: "p",
-          texto: `O RH/DP publica as ocorrências CID-F do período, sem identificar o trabalhador, com a relação com o trabalho (Sim, Não ou Inconclusivo). Se houve no setor ao menos uma ocorrência com relação "Sim" e CID compatível com o fator (matriz Fatores × CID F), o fator recebe ×${v2(FATOR_AGRAVAMENTO)}; senão, ×1,00. A quantidade de ocorrências não gradua o agravamento.`,
+          texto: `O RH/DP publica os atestados CID-F do período, com a relação com o trabalho (Sim, Não ou Inconclusivo) e, opcionalmente, a matrícula do colaborador, que serve só para contar colaboradores (e não apenas atestados) e identificar reincidência. Se houve no setor ao menos uma ocorrência com relação "Sim" e CID compatível com o fator (matriz Fatores × CID F), o fator recebe ×${v2(FATOR_AGRAVAMENTO)}; senão, ×1,00. A quantidade de ocorrências não gradua o agravamento.`,
         },
         {
           tipo: "lista",
@@ -107,6 +107,7 @@ export function secoesMetodologia(p: ParametrosMetodologia): SecaoTexto[] {
             "Subcódigos citados explicitamente na matriz (ex.: F43.1) só casam com os fatores que os citam; os demais casam pela categoria (F41.1 → F41).",
             "CID sem correspondência na matriz não agrava nenhum fator; ocorrência Inconclusiva não agrava, mas é sinalizada para investigação.",
             "O CID não comprova nexo causal isoladamente: o Eixo 3 é indicador agravante coletivo, não prova individual.",
+            "Os indicadores do setor contam colaboradores com atestado: a mesma matrícula conta uma vez por setor e atestado sem matrícula conta como um colaborador diferente. O total de atestados é exibido ao lado; no agravamento só contam os atestados com relação \"Sim\".",
           ],
         },
       ],
@@ -193,7 +194,7 @@ export function secoesMetodologia(p: ParametrosMetodologia): SecaoTexto[] {
             `Setor, departamento ou filtro com menos de ${p.limiteAnonimato} respostas não tem resultado exibido ("amostra insuficiente") e fica fora do índice, da FMEA e do PGR.`,
             "Quando um único grupo é escondido, o segundo menor também é, para impedir a dedução por subtração.",
             "O horário individual de resposta nunca é exibido nem exportado.",
-            "O Eixo 3 não aceita identificação do trabalhador; os relatórios mostram apenas indicadores agregados por setor.",
+            "O Eixo 3 não guarda nome nem CPF; a matrícula (opcional) aparece somente na tela do Eixo 3 da própria empresa, e os relatórios mostram apenas indicadores agregados por setor.",
             "A pré-pesquisa de perfil (quando aplicada) usa faixas para idade, peso e altura; a empresa vê apenas os totais, separados do questionário.",
           ],
         },

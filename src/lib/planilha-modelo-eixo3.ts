@@ -16,11 +16,13 @@ export const CABECALHO_OCORRENCIAS = [
   "Total de dias afastados",
   "Relação com o trabalho?",
   "Justificativa / Observação",
+  "Matrícula",
 ];
 
 export const ORIENTACOES_EIXO3 = [
   "Registre todos os atestados e afastamentos com CID iniciado em F do período analisado, uma linha por ocorrência.",
-  "Não identifique o colaborador — sem nome, matrícula ou CPF. O levantamento é por CID e setor, preservando o sigilo.",
+  "Não informe nome nem CPF do colaborador. A matrícula é opcional e serve para contar colaboradores (e não só atestados) e identificar reincidência; ela aparece apenas na tela do Eixo 3, nunca nos relatórios.",
+  "Preencha a matrícula sempre igual para o mesmo colaborador (a coluna já vem como texto, para não perder zeros à esquerda). Linha sem matrícula conta como um colaborador diferente.",
   "Use o mesmo nome de setor cadastrado na plataforma (a plataforma ajuda a associar nomes diferentes na publicação).",
   "A coluna 'Relação com o trabalho' deve ser preenchida com base no conhecimento do RH/DP, relatos do colaborador ou parecer médico disponível.",
   "Os CID F são possibilidades de agravos/desfechos compatíveis ou associados, não diagnósticos causados automaticamente pelo fator de risco psicossocial.",
@@ -42,6 +44,7 @@ export async function gerarPlanilhaModeloEixo3(): Promise<Buffer> {
     { width: 14 },
     { width: 22 },
     { width: 48 },
+    { width: 16, style: { numFmt: "@" } }, // texto: preserva zeros à esquerda
   ];
   ocorrencias.addRow(CABECALHO_OCORRENCIAS);
   ocorrencias.getRow(1).font = { bold: true };

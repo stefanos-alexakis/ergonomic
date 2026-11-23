@@ -88,6 +88,27 @@ export function fatoresCompativeis(cid: string, matriz: MatrizPorFator): string[
   return resultado;
 }
 
+/**
+ * Matrícula do trabalhador (opcional na planilha): serve para contar
+ * colaboradores, não atestados, e para ver a reincidência. Sem espaços a mais
+ * e sem diferenciar maiúsculas; zeros à esquerda ficam. Vazio = sem matrícula.
+ */
+export function normalizarMatricula(bruto: unknown): string | null {
+  const t = (typeof bruto === "number" ? String(bruto) : typeof bruto === "string" ? bruto : "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return t === "" ? null : t.slice(0, 40);
+}
+
+/**
+ * Chave de "quem é a pessoa" de uma ocorrência. Linha sem matrícula conta como
+ * uma pessoa diferente (decisão do cliente): usa a posição da linha como chave.
+ */
+export function chaveColaborador(matricula: string | null | undefined, posicao: number): string {
+  const m = normalizarMatricula(matricula);
+  return m ? `m:${m.toLocaleUpperCase("pt-BR")}` : `l:${posicao}`;
+}
+
 export type ResultadoEixo3Setor = {
   /** fatorId → ×1,10 ou ×1,00 */
   fatorPorFator: Map<string, number>;
@@ -95,16 +116,27 @@ export type ResultadoEixo3Setor = {
   cidsPorFator: Map<string, string[]>;
   /** fatorId → maior afastamento (dias) entre as ocorrências relacionadas e compatíveis (FMEA) */
   maiorAfastamentoPorFator: Map<string, number>;
+  /** Atestados (linhas da planilha) do setor. */
   ocorrencias: number;
+  /** Atestados "Sim". */
   relacionadas: number;
+  /** Atestados "Inconclusivo". */
   inconclusivas: number;
+  /** Colaboradores com atestado (matrículas distintas; linha sem matrícula = uma pessoa). */
+  colaboradoresComAtestado: number;
+  /** Colaboradores com pelo menos um atestado "Sim" — só "Sim" agrava. */
+  colaboradoresRelacionados: number;
+  /** Colaboradores com pelo menos um atestado "Inconclusivo". */
+  colaboradoresInconclusivos: number;
+  /** Colaboradores com 2 ou mais atestados (reincidência). */
+  reincidentes: number;
   diasAfastados: number;
   cidsSemCorrespondencia: string[];
 };
 
 /** Fator do Eixo 3 de cada fator de risco, para as ocorrências de UM setor. */
 export function calcularEixo3Setor(
-  ocorrencias: { cid: string; relacao: Relacao; diasAfastados: number | null }[],
+  ocorrencias: { cid: string; relacao: Relacao; diasAfastados: number | null; matricula?: string | null }[],
   matriz: MatrizPorFator,
 ): ResultadoEixo3Setor {
   const cidsPorFator = new Map<string, Set<string>>();
@@ -113,9 +145,16 @@ export function calcularEixo3Setor(
   let relacionadas = 0;
   let inconclusivas = 0;
   let dias = 0;
+  const atestadosPorPessoa = new Map<string, number>();
+  const pessoasRelacionadas = new Set<string>();
+  const pessoasInconclusivas = new Set<string>();
 
-  for (const o of ocorrencias) {
+  for (const [i, o] of ocorrencias.entries()) {
     dias += o.diasAfastados ?? 0;
+    const pessoa = chaveColaborador(o.matricula, i);
+    atestadosPorPessoa.set(pessoa, (atestadosPorPessoa.get(pessoa) ?? 0) + 1);
+    if (o.relacao === "SIM") pessoasRelacionadas.add(pessoa);
+    if (o.relacao === "INCONCLUSIVO") pessoasInconclusivas.add(pessoa);
     const fatores = fatoresCompativeis(o.cid, matriz);
     if (fatores.length === 0) semCorrespondencia.add(o.cid);
     if (o.relacao === "INCONCLUSIVO") inconclusivas++;
@@ -137,6 +176,10 @@ export function calcularEixo3Setor(
     ocorrencias: ocorrencias.length,
     relacionadas,
     inconclusivas,
+    colaboradoresComAtestado: atestadosPorPessoa.size,
+    colaboradoresRelacionados: pessoasRelacionadas.size,
+    colaboradoresInconclusivos: pessoasInconclusivas.size,
+    reincidentes: [...atestadosPorPessoa.values()].filter((n) => n >= 2).length,
     diasAfastados: dias,
     cidsSemCorrespondencia: [...semCorrespondencia].sort(),
   };

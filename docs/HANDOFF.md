@@ -77,6 +77,11 @@ Documentação: `docs/README.md` (índice), `manual-de-uso.md`, `metodologia.md`
 
 ## 4. Decisões do cliente — não reverter sem pedido novo
 
+- **Pesquisas do Eixo 1 (nov/2026):** só o encerramento é editável (prorrogar); depois de respostas, não antecipa. Abas Abertas ·
+  Concluídas (pelo encerramento) · Arquivadas (manual). Arquivada não recebe respostas e some dos seletores. Exclusão direta se nenhum
+  código de participante foi usado; senão, pedido por escrito → arquivada 30 dias → exclusão definitiva com 2ª confirmação (nada apaga
+  sozinho). Relatórios emitidos ficam. Só gestor e admin.
+
 - **Índice final** = Eixo 1 (média 1–5) × fator do Eixo 2 (0,80–1,00) × fator do Eixo 3 (×1,10 com atestado
   "Sim" compatível). Faixas: até 3,00 / até 4,00 / acima.
 - **PGR por situação (opção B):** só as situações com `Pergunta.vaiParaPgr` (hoje 8: perguntas 8, 10, 12, 13, 31,
@@ -88,7 +93,9 @@ Documentação: `docs/README.md` (índice), `manual-de-uso.md`, `metodologia.md`
   nos títulos; prioridade continua Alta/Média/Baixa. Mantidos: "Pesquisa de Riscos Psicossociais", "Fatores de Risco
   Psicossociais Relacionados ao Trabalho", "Fator de risco PGR", "Sem risco indicado / Risco existente",
   "Riscos existentes que vão para o PGR".
-- **Eixo 3:** coluna "Ocorrência / Colab (%)" (conta ocorrências, não pessoas); nenhum identificador de trabalhador.
+- **Eixo 3 (revisto em nov/2026):** a planilha aceita a **matrícula** (opcional), mostrada só na tela do Eixo 3 — nunca em relatórios,
+  PDF ou Excel. Os indicadores contam **colaboradores com atestado** (mesma matrícula = 1 por setor; linha sem matrícula = 1 pessoa),
+  com o total de atestados ao lado; só atestado "Sim" agrava. Levantamentos antigos (sem matrícula) seguem como estavam.
 - **Distribuição das respostas:** destaque pela NOSSA metodologia (≥ 50% em Frequentemente/Sempre); não entra no relatório.
 - **Relatório completo:** só a consultoria (admin na visão de gestor) redige e emite; versões gravadas e imutáveis;
   assinatura digital é feita fora, depois da emissão; dossiê da legislação = espaço editável no admin (em elaboração).

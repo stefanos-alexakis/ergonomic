@@ -7,6 +7,8 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
 import { Table, Thead, Th, Tr, Td } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { filtrarPorNome } from "@/lib/filtro-nome";
+import { Input } from "@/components/ui/input";
 import { assumirVisaoGestorAction, definirStatusEmpresaAction } from "./actions";
 
 // Depende de dados de banco em tempo real e de sessão autenticada —
@@ -15,14 +17,18 @@ export const dynamic = "force-dynamic";
 
 const NAV = NAV_ADMIN;
 
-export default async function AdminHomePage() {
+export default async function AdminHomePage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const { q } = await searchParams;
   const actor = await getActor();
   const usuario = actor ? await db.user.findUnique({ where: { id: actor.userId } }) : null;
-  const empresas = await db.workspace.findMany({
+  const todas = await db.workspace.findMany({
     where: { deletedAt: null },
     orderBy: { createdAt: "desc" },
     include: { _count: { select: { pesquisas: true } } },
   });
+  // Filtro por parte do nome (sem diferenciar maiúsculas nem acentos).
+  const empresas = filtrarPorNome(todas, q);
+  const busca = (q ?? "").trim();
 
   return (
     <AppShell contexto="Administração" homeHref="/admin" userLabel={usuario?.email} nav={NAV}>
@@ -36,8 +42,39 @@ export default async function AdminHomePage() {
         }
       />
 
-      {empresas.length === 0 ? (
+      {todas.length > 0 && (
+        <form method="get" role="search" className="mb-4 flex flex-wrap items-center gap-3">
+          <label htmlFor="busca-empresa" className="sr-only">
+            Buscar empresa pelo nome
+          </label>
+          <Input
+            id="busca-empresa"
+            type="search"
+            name="q"
+            defaultValue={q ?? ""}
+            placeholder="Buscar empresa pelo nome"
+            className="w-72"
+          />
+          <Button type="submit" variant="secondary">
+            Buscar
+          </Button>
+          {busca && (
+            <Link href="/admin" className="text-sm text-zinc-500 underline-offset-2 hover:text-zinc-900 hover:underline">
+              Limpar
+            </Link>
+          )}
+          <span className="text-sm text-zinc-500" data-testid="contagem-empresas">
+            {busca ? `${empresas.length} de ${todas.length} empresas` : `${todas.length} empresas`}
+          </span>
+        </form>
+      )}
+
+      {todas.length === 0 ? (
         <p className="text-sm text-zinc-500">Nenhuma empresa cadastrada ainda.</p>
+      ) : empresas.length === 0 ? (
+        <p className="text-sm text-zinc-500" data-testid="sem-resultado-empresas">
+          Nenhuma empresa encontrada para “{busca}”.
+        </p>
       ) : (
         <Table>
           <Thead>

@@ -9,12 +9,22 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
 import { Table, Thead, Th, Tr, Td } from "@/components/ui/table";
 import { BadgeStatusPesquisa } from "@/components/ui/badge-status-pesquisa";
+import { ROTULO_CLASSE_PESQUISA, classificarPesquisa, type ClasseListaPesquisa } from "@/lib/vigencia-pesquisa";
+import { cn } from "@/lib/cn";
 
 export const dynamic = "force-dynamic";
 
 const NAV = NAV_GESTOR;
 
-export default async function GestorHomePage() {
+const ABAS = [
+  { chave: "abertas", classe: "ABERTAS" },
+  { chave: "concluidas", classe: "CONCLUIDAS" },
+  { chave: "arquivadas", classe: "ARQUIVADAS" },
+  { chave: "todas", classe: null },
+] as const;
+
+export default async function GestorHomePage({ searchParams }: { searchParams: Promise<{ aba?: string }> }) {
+  const { aba: abaParam } = await searchParams;
   const actor = await getActor();
   if (!actor) return <p>Sem sessão.</p>;
 
@@ -33,6 +43,14 @@ export default async function GestorHomePage() {
     orderBy: { createdAt: "desc" },
     include: { _count: { select: { codigos: true } } },
   });
+
+  // Abertas (em operação) · Concluídas (encerramento passou) · Arquivadas (pelo gestor).
+  const agora = new Date();
+  const comClasse = pesquisas.map((p) => ({ p, classe: classificarPesquisa(p, agora) }));
+  const contagem: Record<ClasseListaPesquisa, number> = { ABERTAS: 0, CONCLUIDAS: 0, ARQUIVADAS: 0 };
+  for (const { classe } of comClasse) contagem[classe]++;
+  const aba = ABAS.find((a) => a.chave === abaParam) ?? ABAS[0];
+  const visiveis = comClasse.filter(({ classe }) => aba.classe === null || classe === aba.classe).map(({ p }) => p);
 
   return (
     <AppShell
@@ -59,6 +77,35 @@ export default async function GestorHomePage() {
       {pesquisas.length === 0 ? (
         <p className="text-sm text-zinc-500">Nenhuma pesquisa criada ainda.</p>
       ) : (
+        <>
+          <nav aria-label="Filtrar pesquisas" className="mb-4 flex flex-wrap gap-2">
+            {ABAS.map((a) => {
+              const ativa = a.chave === aba.chave;
+              const total = a.classe === null ? pesquisas.length : contagem[a.classe];
+              return (
+                <Link
+                  key={a.chave}
+                  href={a.chave === "abertas" ? "/gestor" : `/gestor?aba=${a.chave}`}
+                  aria-current={ativa ? "page" : undefined}
+                  className={cn(
+                    "inline-flex items-center gap-2 rounded-full border px-3.5 h-8 text-sm font-medium",
+                    ativa
+                      ? "border-[var(--ws-accent,#18181b)] bg-[var(--ws-accent,#18181b)] text-[var(--ws-on-accent,#ffffff)]"
+                      : "border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50",
+                  )}
+                >
+                  {a.classe === null ? "Todas" : ROTULO_CLASSE_PESQUISA[a.classe]}
+                  <span className="tabular-nums text-xs opacity-80">{total}</span>
+                </Link>
+              );
+            })}
+          </nav>
+
+          {visiveis.length === 0 ? (
+            <p className="text-sm text-zinc-500" data-testid="lista-vazia">
+              Nenhuma pesquisa {aba.classe ? `em “${ROTULO_CLASSE_PESQUISA[aba.classe]}”` : ""}.
+            </p>
+          ) : (
         <Table>
           <Thead>
             <Tr>
@@ -69,7 +116,7 @@ export default async function GestorHomePage() {
             </Tr>
           </Thead>
           <tbody>
-            {pesquisas.map((p) => (
+            {visiveis.map((p) => (
               <Tr key={p.id}>
                 <Td>
                   <Link
@@ -90,6 +137,8 @@ export default async function GestorHomePage() {
             ))}
           </tbody>
         </Table>
+          )}
+        </>
       )}
     </AppShell>
   );

@@ -63,6 +63,9 @@ export default async function PesquisaDetalhePage({
         <Link href={`/gestor/pesquisas/${pesquisa.id}/editar`} className="ml-auto font-medium text-zinc-900 hover:underline">
           Editar orientação e pré-pesquisa
         </Link>
+        <Link href={`/gestor/pesquisas/${pesquisa.id}/gerenciar`} className="font-medium text-zinc-900 hover:underline">
+          Prorrogar, arquivar ou excluir
+        </Link>
       </div>
 
       {codigos.length === 0 ? (

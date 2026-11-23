@@ -2,13 +2,13 @@ import { createHash } from "node:crypto";
 import { db } from "@/lib/db";
 import { adicionarItemCatalogo } from "@/lib/estrutura";
 import { parsePlanilhaOcorrencias, type ProblemaPlanilha } from "@/lib/planilha-eixo3";
-import { calcularEixo3Setor, montarMatrizPorFator, type MatrizPorFator, type Relacao } from "@/lib/eixo3";
+import { calcularEixo3Setor, chaveColaborador, montarMatrizPorFator, type MatrizPorFator, type Relacao } from "@/lib/eixo3";
 
 /**
  * Levantamento do Eixo 3: a empresa publica a planilha de ocorrências CID-F
  * (dado de saúde — sensível pela LGPD). Toda função recebe o `workspaceId`
- * já resolvido pela sessão e filtra por ele; nenhum identificador de
- * trabalhador é aceito ou guardado.
+ * já resolvido pela sessão e filtra por ele; nome e CPF do trabalhador não
+ * são aceitos nem guardados — só a matrícula (opcional), restrita à tela do Eixo 3.
  */
 
 export type Resultado<T = object> = ({ ok: true } & T) | { ok: false; erro: string };
@@ -128,6 +128,7 @@ export async function importarPlanilha(
         diasAfastados: o.diasAfastados,
         relacao: o.relacao,
         justificativa: o.justificativa,
+        matricula: o.matricula,
       })),
     }),
     db.levantamentoEixo3.update({
@@ -283,10 +284,16 @@ export type OcorrenciaPainel = {
   relacao: Relacao;
   justificativa: string | null;
   linhaPlanilha: number;
+  /** Só preenchida na tela do Eixo 3 (incluirMatricula); nunca vai para relatórios. */
+  matricula: string | null;
 };
 
 /** Painel do Eixo 3: indicadores por setor e fator de agravamento setor × fator. */
-export async function calcularPainelEixo3(levantamentoId: string, workspaceId: string) {
+export async function calcularPainelEixo3(
+  levantamentoId: string,
+  workspaceId: string,
+  opcoes: { incluirMatricula?: boolean } = {},
+) {
   const questionario = await db.questionario.findFirst({ where: { ativo: true } });
   const { fatores, matriz } = questionario
     ? await carregarMatriz(questionario.id)
@@ -308,7 +315,7 @@ export async function calcularPainelEixo3(levantamentoId: string, workspaceId: s
     .map(([chave, lista]) => {
       const setor = lista[0]!.setor;
       const r = calcularEixo3Setor(
-        lista.map((o) => ({ cid: o.cid, relacao: o.relacao, diasAfastados: o.diasAfastados })),
+        lista.map((o) => ({ cid: o.cid, relacao: o.relacao, diasAfastados: o.diasAfastados, matricula: o.matricula })),
         matriz,
       );
       const colaboradores = setor?.numeroColaboradores ?? null;
@@ -317,15 +324,28 @@ export async function calcularPainelEixo3(levantamentoId: string, workspaceId: s
         setorId: setor?.id ?? null,
         nome: setor?.nome ?? `${lista[0]!.setorOriginal} (setor removido)`,
         colaboradores,
-        taxaPor100: colaboradores && colaboradores > 0 ? (r.ocorrencias / colaboradores) * 100 : null,
+        // Principal: colaboradores com atestado ÷ colaboradores do setor (decisão do
+        // cliente, nov/2026); ao lado, a taxa de atestados (o critério antigo).
+        taxaPor100:
+          colaboradores && colaboradores > 0 ? (r.colaboradoresComAtestado / colaboradores) * 100 : null,
+        taxaAtestadosPor100: colaboradores && colaboradores > 0 ? (r.ocorrencias / colaboradores) * 100 : null,
         ...r,
       };
     })
     .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
 
-  const porCategoria = new Map<string, number>();
-  for (const o of ocorrencias) porCategoria.set(o.cid.slice(0, 3), (porCategoria.get(o.cid.slice(0, 3)) ?? 0) + 1);
-  const cidsFrequentes = [...porCategoria.entries()].sort((a, b) => b[1] - a[1]).map(([cid, total]) => ({ cid, total }));
+  const porCategoria = new Map<string, { total: number; pessoas: Set<string> }>();
+  for (const [i, o] of ocorrencias.entries()) {
+    const cat = o.cid.slice(0, 3);
+    const atual = porCategoria.get(cat) ?? { total: 0, pessoas: new Set<string>() };
+    atual.total++;
+    // Mesma matrícula em setores diferentes é a mesma pessoa no ranking geral.
+    atual.pessoas.add(chaveColaborador(o.matricula, i));
+    porCategoria.set(cat, atual);
+  }
+  const cidsFrequentes = [...porCategoria.entries()]
+    .sort((a, b) => b[1].total - a[1].total)
+    .map(([cid, v]) => ({ cid, total: v.total, colaboradores: v.pessoas.size }));
 
   const lista: OcorrenciaPainel[] = ocorrencias.map((o) => ({
     id: o.id,
@@ -338,6 +358,7 @@ export async function calcularPainelEixo3(levantamentoId: string, workspaceId: s
     relacao: o.relacao,
     justificativa: o.justificativa,
     linhaPlanilha: o.linhaPlanilha,
+    matricula: opcoes.incluirMatricula ? o.matricula : null,
   }));
 
   return { fatores, setores, cidsFrequentes, ocorrencias: lista };
