@@ -1,9 +1,11 @@
 "use server";
 
 import { redirect, notFound } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { getActor } from "@/lib/tenant";
 import { workspaceInputSchema } from "@/lib/validation";
 import { atualizarEmpresa, excluirEmpresa, getEmpresaParaEditar, redefinirSenhaGestor } from "@/lib/workspace";
+import { lerResponsaveis, salvarResponsaveis } from "@/lib/responsaveis-relatorio";
 import { apagarRelatorioPdf, apagarUpload, salvarLogoWorkspace } from "@/lib/upload";
 
 export type EstadoEditarEmpresa = { erro?: string } | undefined;
@@ -101,4 +103,27 @@ export async function carregarEmpresaOuNotFound(workspaceId: string) {
   const dados = await getEmpresaParaEditar(workspaceId);
   if (!dados) notFound();
   return dados;
+}
+
+export type EstadoResponsaveis = { erro?: string; sucesso?: string } | undefined;
+
+/**
+ * Responsáveis do relatório (sem login): só o admin edita. A lista inteira é
+ * validada e substituída de uma vez; a empresa vem do id da rota, já conferido.
+ */
+export async function salvarResponsaveisAction(
+  workspaceId: string,
+  _estadoAnterior: EstadoResponsaveis,
+  formData: FormData,
+): Promise<EstadoResponsaveis> {
+  const actor = await getActor();
+  if (!actor?.isPlatformAdmin) return { erro: "Sem permissão." };
+  if (!(await getEmpresaParaEditar(workspaceId))) return { erro: "Empresa não encontrada." };
+
+  const lido = lerResponsaveis(String(formData.get("linhas") ?? "[]"));
+  if (!lido.ok) return { erro: lido.erro };
+  await salvarResponsaveis(workspaceId, lido.linhas);
+  revalidatePath(`/admin/empresas/${workspaceId}/editar`);
+  revalidatePath("/gestor/painel/relatorio-completo");
+  return { sucesso: `Responsáveis salvos (${lido.linhas.length}).` };
 }

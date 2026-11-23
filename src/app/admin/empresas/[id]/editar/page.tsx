@@ -6,6 +6,8 @@ import { EditarEmpresaForm } from "./form";
 import { RedefinirSenhaForm } from "./redefinir-senha-form";
 import { ExcluirEmpresaForm } from "./excluir-empresa-form";
 import { resumoParaExcluir } from "@/lib/workspace";
+import { listarResponsaveis } from "@/lib/responsaveis-relatorio";
+import { ResponsaveisForm } from "./responsaveis-form";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +17,7 @@ export default async function EditarEmpresaPage({ params }: { params: Promise<{ 
   const { id } = await params;
   const { workspace, gestor } = await carregarEmpresaOuNotFound(id);
   const resumo = workspace.isActive ? null : await resumoParaExcluir(workspace.id);
+  const responsaveis = await listarResponsaveis(workspace.id);
 
   return (
     <AppShell contexto="Administração" homeHref="/admin" nav={NAV}>
@@ -31,6 +34,16 @@ export default async function EditarEmpresaPage({ params }: { params: Promise<{ 
           />
         </div>
       </div>
+
+      <section aria-label="Responsáveis do relatório" className="mt-10 max-w-3xl">
+        <h2 className="text-base font-semibold text-zinc-900">Responsáveis do relatório</h2>
+        <p className="mb-4 mt-1 text-sm text-zinc-600">
+          Pessoas que constam e assinam o relatório completo desta empresa. Não são usuários da plataforma. Marque quem
+          entra no <strong>próximo relatório emitido</strong> e defina a <strong>ordem</strong> em que aparecem. E-mail e
+          celular saem impressos no relatório.
+        </p>
+        <ResponsaveisForm iniciais={responsaveis} empresaPadrao={workspace.nome} workspaceId={workspace.id} />
+      </section>
     </AppShell>
   );
 }

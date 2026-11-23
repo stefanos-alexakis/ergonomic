@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { opcoesPainel } from "@/lib/painel-frprt";
 import { listarConsultores } from "@/lib/consultores";
+import { responsaveisParaRelatorio } from "@/lib/responsaveis-relatorio";
 import { carregarRascunho, listarEmitidos, type FontesEmitidas } from "@/lib/relatorio/relatorio-completo";
 import { ShellGestor } from "@/components/shell/shell-gestor";
 import { PageHeader } from "@/components/ui/page-header";
@@ -18,11 +19,12 @@ const kb = (b: number) => `${Math.max(1, Math.round(b / 1024)).toLocaleString("p
 export default async function RelatorioCompletoPage() {
   const { actor, workspace } = await contextoGestor();
   const consultoria = actor.isPlatformAdmin;
-  const [emitidos, rascunho, opcoes, consultores] = await Promise.all([
+  const [emitidos, rascunho, opcoes, consultores, assinantes] = await Promise.all([
     listarEmitidos(workspace.id),
     consultoria ? carregarRascunho(workspace.id) : null,
     consultoria ? opcoesPainel(workspace.id, {}) : null,
     consultoria ? listarConsultores() : [],
+    responsaveisParaRelatorio(workspace.id),
   ]);
   const proximaVersao = (emitidos[0]?.versao ?? 0) + 1;
 
@@ -63,6 +65,26 @@ export default async function RelatorioCompletoPage() {
               }))}
               proximaVersao={proximaVersao}
             />
+            <div data-testid="responsaveis-empresa" className="mt-4 rounded-lg border border-zinc-200 p-4">
+              <h3 className="text-sm font-semibold text-zinc-900">Responsáveis da empresa que assinam o próximo relatório</h3>
+              {assinantes.length === 0 ? (
+                <p className="mt-1 text-sm text-zinc-500">Nenhum marcado.</p>
+              ) : (
+                <ol className="mt-1 list-decimal pl-5 text-sm text-zinc-700">
+                  {assinantes.map((a, i) => (
+                    <li key={i}>
+                      {a.nome} <span className="text-zinc-500">— {a.areaFuncao}</span>
+                    </li>
+                  ))}
+                </ol>
+              )}
+              <Link
+                href={`/admin/empresas/${workspace.id}/editar`}
+                className="mt-2 inline-block text-sm text-zinc-600 underline underline-offset-2 hover:text-zinc-900"
+              >
+                Editar responsáveis da empresa
+              </Link>
+            </div>
           </section>
         ) : (
           <p className="rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-600">

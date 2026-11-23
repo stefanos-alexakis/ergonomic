@@ -65,6 +65,7 @@ Fora do git de propósito:
 | PDFs | `relatorio-pdf.tsx` (Eixo 1), `relatorio-frprt-pdf.tsx` (`PaginasFrprt`), `cartoes-pdf.tsx`, `plano-acao-export.tsx` (`PaginaPlano`) |
 | Relatório completo | `src/lib/relatorio/relatorio-completo.ts` (dados, rascunho, emissão), `relatorio-completo-pdf.tsx`, `src/app/gestor/painel/relatorio-completo/` |
 | Metodologia (fonte única) | `src/lib/relatorio/metodologia.ts` + `parametros.ts`; gera `docs/metodologia-final.md` (`scripts/gerar-metodologia.ts`) e entra no relatório completo |
+| Responsáveis do relatório (por empresa, sem login) | `src/lib/responsaveis-relatorio*.ts`, `src/app/admin/empresas/[id]/editar/responsaveis-form.tsx`; retrato em `RelatorioEmitido.responsaveis` |
 | Consultores / textos do relatório | `src/lib/consultores*.ts`, `src/lib/textos-relatorio.ts`, admin `consultores/` e `textos/` |
 | Empresas (editar/inativar/excluir) | `src/lib/workspace.ts`, `src/app/admin/` |
 | Uploads (logos e PDFs emitidos) | `src/lib/upload.ts` → pasta `uploads/` (fora de `public/`), servida por `src/app/uploads/[arquivo]/route.ts` |
@@ -97,6 +98,7 @@ Documentação: `docs/README.md` (índice), `manual-de-uso.md`, `metodologia.md`
   PDF ou Excel. Os indicadores contam **colaboradores com atestado** (mesma matrícula = 1 por setor; linha sem matrícula = 1 pessoa),
   com o total de atestados ao lado; só atestado "Sim" agrava. Levantamentos antigos (sem matrícula) seguem como estavam.
 - **Distribuição das respostas:** destaque pela NOSSA metodologia (≥ 50% em Frequentemente/Sempre); não entra no relatório.
+- **Responsáveis do relatório (nov/2026):** cadastro por empresa (admin), sem login; marca "consta no próximo relatório" + ordem; e-mail e celular saem no PDF; marca permanece após emitir; retrato imutável na versão emitida.
 - **Relatório completo:** só a consultoria (admin na visão de gestor) redige e emite; versões gravadas e imutáveis;
   assinatura digital é feita fora, depois da emissão; dossiê da legislação = espaço editável no admin (em elaboração).
 - **Metodologia aprovada** pelo cliente (documento final v1.0 em `docs/Metodologia-FRPRT.docx`).
