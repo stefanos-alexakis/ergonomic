@@ -303,6 +303,10 @@ model Resposta {
   // Passou pela pré-pesquisa (respondeu ou pulou) — para não mostrar de
   // novo. Sim/não, sem data/hora (nada que ajude a identificar alguém).
   prePesquisaVista Boolean  @default(false)
+  // Pergunta aberta final (opcional): sugestão de melhoria do colaborador,
+  // vinculada ao setor pelo próprio setorId desta resposta. Texto livre —
+  // pode conter dado pessoal, então nunca vai para PDF nem para log.
+  sugestaoMelhoria String?
 
   codigoAcesso CodigoAcesso   @relation(fields: [codigoAcessoId], references: [id], onDelete: Cascade)
   setor        SetorOrg?      @relation(fields: [setorId], references: [id])

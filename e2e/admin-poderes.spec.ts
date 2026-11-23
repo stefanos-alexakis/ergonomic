@@ -74,6 +74,7 @@ test("admin assume a visão de gestor de uma empresa e sai de volta", async ({ p
   await expect(page.getByText(`Você está vendo como ${nomeEmpresa}`)).toBeVisible();
 
   // Acesso completo de gestor: cadastra setor/departamento e cria pesquisa.
+  await page.getByRole("button", { name: "Menu" }).click();
   await page.getByRole("link", { name: "Setores e departamentos" }).click();
   const inputSetor = page.locator('form:has(input[value="setor"]) input[name="nome"]');
   await inputSetor.fill("Setor Impersonado E2E");

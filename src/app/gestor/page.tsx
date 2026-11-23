@@ -3,7 +3,7 @@ import { getActor } from "@/lib/tenant";
 import { getWorkspaceDoGestor } from "@/lib/pesquisa";
 import { db } from "@/lib/db";
 import { AppShell } from "@/components/shell/app-shell";
-import { NAV_GESTOR } from "@/components/shell/nav-gestor";
+import { GRUPOS_GESTOR, NAV_GESTOR } from "@/components/shell/nav-gestor";
 import { BannerImpersonacao } from "@/components/shell/banner-impersonacao";
 import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
@@ -40,6 +40,7 @@ export default async function GestorHomePage() {
       homeHref="/gestor"
       userLabel={usuario?.email}
       nav={NAV}
+      grupos={GRUPOS_GESTOR}
       accentColor={workspace.corPrimaria}
       secondaryColor={workspace.corSecundaria}
       logoUrl={workspace.logoUrl}

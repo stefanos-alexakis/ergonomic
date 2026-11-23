@@ -237,16 +237,17 @@ export async function carregarRespostasSalvas(respostaId: string) {
 }
 
 /**
- * Conclui em definitivo — idempotente (review.md §3.2): chamar de novo
+ * Conclui em definitivo, gravando junto a sugestão de melhoria (pergunta
+ * aberta opcional) — idempotente (review.md §3.2): chamar de novo
  * numa resposta já concluída não é erro, só confirma de novo.
  */
-export async function concluirResposta(respostaId: string): Promise<{ ok: true }> {
+export async function concluirResposta(respostaId: string, sugestaoMelhoria: string | null = null): Promise<{ ok: true }> {
   const resposta = await db.resposta.findUnique({ where: { id: respostaId } });
   if (!resposta) return { ok: true };
   if (resposta.concluidoEm) return { ok: true };
 
   await db.$transaction([
-    db.resposta.update({ where: { id: respostaId }, data: { concluidoEm: new Date() } }),
+    db.resposta.update({ where: { id: respostaId }, data: { concluidoEm: new Date(), sugestaoMelhoria } }),
     db.codigoAcesso.update({ where: { id: resposta.codigoAcessoId }, data: { status: "CONCLUIDO" } }),
   ]);
   return { ok: true };

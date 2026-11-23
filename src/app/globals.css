@@ -38,6 +38,36 @@
     animation: jornada-fade-up 220ms cubic-bezier(0.23, 1, 0.32, 1);
   }
 
+  /* Gaveta do menu do gestor: fundo escurece e o painel entra pela esquerda. */
+  @keyframes gaveta-fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes gaveta-esquerda {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+  .anim-fade-in {
+    animation: gaveta-fade-in 180ms ease-out;
+  }
+  .anim-drawer-left {
+    animation: gaveta-esquerda 220ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .anim-fade-in,
+    .anim-drawer-left {
+      animation: none;
+    }
+  }
+
   /* Acordeão com altura animada via grid-template-rows — funciona com
      conteúdo de altura variável sem medir pixels em JS. */
   .accordion-content {

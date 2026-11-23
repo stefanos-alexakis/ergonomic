@@ -71,6 +71,7 @@ test("vídeo + texto de orientação e pré-pesquisa obrigatória: gestor vê s�
 
   await g.context().clearCookies();
   await login(g, gestorEmail, gestorSenha, /\/gestor$/);
+  await g.getByRole("button", { name: "Menu" }).click();
   await g.getByRole("link", { name: "Setores e departamentos" }).click();
   const inputSetor = g.locator('form:has(input[value="setor"]) input[name="nome"]');
   await inputSetor.fill("Setor Pre E2E");

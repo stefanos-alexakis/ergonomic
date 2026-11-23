@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import {
   resolvePesquisaPublica,
   carregarEstadoJornada,
@@ -11,6 +11,8 @@ import { FormularioCodigo } from "./formulario-codigo";
 import { FormularioOrganizacao } from "./formulario-organizacao";
 import { Questionario } from "./questionario";
 import { FormularioPrePesquisa } from "./formulario-pre-pesquisa";
+import { FormularioSugestao } from "./formulario-sugestao";
+import { primeiraPaginaPendente } from "@/lib/sugestao-melhoria";
 
 export const dynamic = "force-dynamic";
 
@@ -121,7 +123,25 @@ export default async function JornadaColaboradorPage({
   const paginas = await carregarPaginasQuestionario(pesquisa.questionarioId);
   const respostasSalvas = await carregarRespostasSalvas(estado.respostaId);
 
-  const numeroPagina = Math.min(Math.max(Number.parseInt(paginaParam ?? "1", 10) || 1, 1), paginas.length);
+  // As páginas de escala + a pergunta aberta final (opcional), que conclui.
+  const totalPaginas = paginas.length + 1;
+  const numeroPagina = Math.min(Math.max(Number.parseInt(paginaParam ?? "1", 10) || 1, 1), totalPaginas);
+
+  if (numeroPagina > paginas.length) {
+    // Link direto da última página sem ter respondido tudo: volta ao que falta.
+    const pendente = primeiraPaginaPendente(paginas, respostasSalvas);
+    if (pendente !== null) redirect(`/p/${workspaceSlug}/${pesquisaSlug}?pagina=${pendente}`);
+    return (
+      <FormularioSugestao
+        key="sugestao"
+        workspaceSlug={workspaceSlug}
+        pesquisaSlug={pesquisaSlug}
+        numeroPagina={numeroPagina}
+        totalPaginas={totalPaginas}
+      />
+    );
+  }
+
   const pagina = paginas[numeroPagina - 1];
   if (!pagina) notFound();
 
@@ -137,7 +157,7 @@ export default async function JornadaColaboradorPage({
       pesquisaSlug={pesquisaSlug}
       respostaId={estado.respostaId}
       pagina={pagina}
-      totalPaginas={paginas.length}
+      totalPaginas={totalPaginas}
       respostasSalvas={respostasSalvas}
       mostrarInstrucaoPeriodo={instrucoesV2}
     />

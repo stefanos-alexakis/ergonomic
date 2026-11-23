@@ -7,14 +7,20 @@ export type ItemNav = {
   ativoEm?: string[];
 };
 
-/** Menu da área do gestor — um lugar só, em vez de uma cópia por página. */
+/** Botões sempre visíveis na faixa do topo da área do gestor: só os três eixos. */
 export const NAV_GESTOR: ItemNav[] = [
   { href: "/gestor", label: "Eixo 1 · Pesquisa com os colaboradores", icone: "pesquisas", ativoEm: ["/gestor/pesquisas"] },
-  { href: "/gestor/estrutura", label: "Setores e departamentos", icone: "estrutura" },
   { href: "/gestor/eixo2", label: "Eixo 2 · Medidas de controle", icone: "eixo2" },
-  { href: "/gestor/eixo3", label: "Eixo 3 · Atestados CID-F", icone: "eixo3" },
-  { href: "/gestor/painel", label: "Painel FRPRT", icone: "painel" },
-  { href: "/gestor/plano", label: "Plano de ação", icone: "plano" },
+  { href: "/gestor/eixo3", label: "Eixo 3 · Atestados CID", icone: "eixo3" },
+];
+
+export type GrupoNav = { titulo: string; itens: ItemNav[] };
+
+/** Menu lateral (gaveta) da área do gestor, por categoria. */
+export const GRUPOS_GESTOR: GrupoNav[] = [
+  { titulo: "Cadastro", itens: [{ href: "/gestor/estrutura", label: "Setores e departamentos", icone: "estrutura" }] },
+  { titulo: "Relatórios", itens: [{ href: "/gestor/painel", label: "Painel FRPRT", icone: "painel" }] },
+  { titulo: "Gestão", itens: [{ href: "/gestor/plano", label: "Plano de ação", icone: "plano" }] },
 ];
 
 /** Menu da área do admin da plataforma. */

@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { getActor } from "@/lib/tenant";
 import { getWorkspaceDoGestor, resolvePesquisaDoWorkspace } from "@/lib/pesquisa";
 import { AppShell } from "@/components/shell/app-shell";
-import { NAV_GESTOR } from "@/components/shell/nav-gestor";
+import { GRUPOS_GESTOR, NAV_GESTOR } from "@/components/shell/nav-gestor";
 import { BannerImpersonacao } from "@/components/shell/banner-impersonacao";
 import { PageHeader } from "@/components/ui/page-header";
 import { EditarOrientacaoForm } from "./form";
@@ -24,6 +24,7 @@ export default async function EditarPesquisaPage({ params }: { params: Promise<{
       contexto={workspace.nome}
       homeHref="/gestor"
       nav={NAV_GESTOR}
+      grupos={GRUPOS_GESTOR}
       accentColor={workspace.corPrimaria}
       secondaryColor={workspace.corSecundaria}
       logoUrl={workspace.logoUrl}

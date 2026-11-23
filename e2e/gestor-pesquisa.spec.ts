@@ -80,6 +80,7 @@ test("gestor cria pesquisa e importa estrutura organizacional por planilha", asy
   await expect(page).toHaveURL(/\/gestor\/pesquisas\/nova$/);
 
   // 4. Importa a planilha de estrutura organizacional.
+  await page.getByRole("button", { name: "Menu" }).click();
   await page.getByRole("link", { name: "Setores e departamentos" }).click();
   const buffer = await gerarPlanilhaTeste();
   await page.locator('input[name="planilha"]').setInputFiles({

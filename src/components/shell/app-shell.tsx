@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { contrasteEntre } from "@/lib/validation";
 import { Topbar } from "./topbar";
-import type { ItemNav } from "./nav-gestor";
+import type { GrupoNav, ItemNav } from "./nav-gestor";
 
 /** Texto legível sobre a cor primária: branco ou quase-preto, o que contrastar mais. */
 function textoSobre(hex: string): string {
@@ -13,6 +13,7 @@ export function AppShell({
   homeHref,
   userLabel,
   nav,
+  grupos,
   logoUrl,
   accentColor,
   secondaryColor,
@@ -26,6 +27,8 @@ export function AppShell({
   homeHref: string;
   userLabel?: string;
   nav: ItemNav[];
+  // Menu lateral por categoria (só a área do gestor usa).
+  grupos?: GrupoNav[];
   // Logo da empresa (workspace.logoUrl) — aparece no canto da barra superior.
   logoUrl?: string | null;
   // Cores cadastradas da empresa do gestor logado (workspace.corPrimaria/
@@ -51,7 +54,7 @@ export function AppShell({
 
   return (
     <div className="min-h-screen bg-white" style={temaEmpresa}>
-      <Topbar contexto={contexto} homeHref={homeHref} userLabel={userLabel} nav={nav} logoUrl={logoUrl} />
+      <Topbar contexto={contexto} homeHref={homeHref} userLabel={userLabel} nav={nav} grupos={grupos} logoUrl={logoUrl} />
       {banner}
       <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
     </div>
